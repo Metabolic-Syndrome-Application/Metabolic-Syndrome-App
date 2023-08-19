@@ -1,24 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
-import 'package:flutter_application_1/page/loginRegister/forgetPassword.dart';
-import 'package:flutter_application_1/page/loginRegister/register.dart';
+import 'package:flutter_application_1/page/loginRegister/login.dart';
 
-class Login extends StatelessWidget {
+class Register extends StatelessWidget {
+  const Register({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Login Page",
-      home: LoginPage(),
+      title: "Register Page",
+      home: RegisterPage(),
     );
   }
 }
 
-class LoginPage extends StatefulWidget {
+class RegisterPage extends StatefulWidget {
+  const RegisterPage({super.key});
+
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _RegisterPageState extends State<RegisterPage> {
   bool value = false;
   bool _isObscure = false;
 
@@ -38,20 +41,40 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                   children: [
                     SizedBox(
-                      height: 56,
+                      height: 28,
                     ),
-                    Container(child: Image.asset('assets/images/login.png')),
-                    SizedBox(
-                      height: 19,
+                    Row(
+                      children: [
+                        Expanded(
+                            child: Container(
+                          height: 220,
+                          padding: EdgeInsets.only(left: 5),
+                          alignment: Alignment.topLeft,
+                          child: IconButton(
+                            iconSize: 30,
+                            icon: const Icon(Icons.arrow_back),
+                            onPressed: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Login()));
+                            },
+                          ),
+                        )),
+                        Image.asset('assets/images/login.png'),
+                        Expanded(
+                            child: SizedBox(
+                          width: 52,
+                        ))
+                      ],
                     ),
-                    Text("เข้าสู่ระบบ",
+                    Text("ลงทะเบียน",
                         style: TextStyle(
                           fontSize: 32,
                           fontFamily: 'IBMPlexSansThai',
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center),
+                        )),
                     SizedBox(
                       height: 19,
                     ),
@@ -135,36 +158,48 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     SizedBox(
-                      height: 13,
+                      height: 20,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 0),
+                      padding: const EdgeInsets.only(left: 10, bottom: 10),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Checkbox(
-                            value: this.value,
-                            onChanged: (bool? value) {
-                              setState(() {
-                                this.value = false;
-                              });
-                            },
-                          ), //Che
-                          Text(
-                            "จำไว้ในระบบ",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'IBMPlexSansThai',
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal,
-                            ),
-                            textAlign: TextAlign.start,
-                          ),
-                        ],
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text("ยืนยันรหัสผ่าน",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'IBMPlexSansThai',
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                                textAlign: TextAlign.start),
+                          ]),
+                    ),
+                    SizedBox(
+                      height: 47,
+                      child: TextField(
+                        obscureText: _isObscure,
+                        decoration: InputDecoration(
+                          hintText: '●●●●●●●●●●',
+                          suffixIcon: IconButton(
+                              icon: Icon(_isObscure
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                              onPressed: () {
+                                // check box
+                              }),
+                          border: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(24)),
+                              borderSide: BorderSide(
+                                color: Color(hexColor('#DBDBDB')),
+                                width: 1,
+                              )),
+                        ),
                       ),
                     ),
                     SizedBox(
-                      height: 27,
+                      height: 47,
                     ),
                     MaterialButton(
                       color: Color(hexColor('#2F4EF1')),
@@ -178,7 +213,7 @@ class _LoginPageState extends State<LoginPage> {
                         height: 47,
                         width: 350,
                         alignment: Alignment.center,
-                        child: Text("เข้าสู่ระบบ",
+                        child: Text("ลงทะเบียน",
                             style: TextStyle(
                                 fontSize: 20,
                                 fontFamily: 'IBMPlexSansThai',
@@ -188,30 +223,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     SizedBox(
-                      height: 5,
-                    ),
-                    Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ForgetPassword()));
-                        },
-                        child: Text(
-                          "ลืมรหัสผ่าน ?",
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'IBMPlexSansThai',
-                            color: Color(hexColor('#484554')),
-                            fontWeight: FontWeight.normal,
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      )
-                    ]),
-                    SizedBox(
-                      height: 10,
+                      height: 16,
                     ),
                     Row(
                       children: [
@@ -250,7 +262,7 @@ class _LoginPageState extends State<LoginPage> {
                       ],
                     ),
                     SizedBox(
-                      height: 20,
+                      height: 24,
                     ),
                     MaterialButton(
                       height: 47,
@@ -280,38 +292,8 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     SizedBox(
-                      height: 15,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('คุณมีบัญชี Account เเล้วหรือยัง?',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: 'IBMPlexSansThai',
-                              color: Color(hexColor('#484554')),
-                              fontWeight: FontWeight.normal,
-                            )),
-                        SizedBox(
-                          width: 11,
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Register()));
-                          },
-                          child: Text('สมัครใช้งาน',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontFamily: 'IBMPlexSansThai',
-                                color: Color(hexColor('#2F4EF1')),
-                                fontWeight: FontWeight.normal,
-                              )),
-                        ),
-                      ],
-                    ),
+                      height: 36,
+                    )
                   ],
                 ),
               ),

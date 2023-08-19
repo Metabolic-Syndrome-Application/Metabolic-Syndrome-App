@@ -27,8 +27,12 @@ class _HealthNotePageState extends State<HealthNotePage> {
     return Scaffold(
       backgroundColor: Color(hexColor('#42884B')),
       body: Center(
-        child: OnboardingDesc("บันทึกประจำวัน", "สามารถจดบันทึกค่าสุขภาพในเเต่ละวันได้\nพร้อมทั้งติดตามเเนวโน้มสุขภาพของคุณ\nรวมถึงการเเจ้งเตือนสำคัญต่างๆ ที่ต้องทำ", "ถัดไป")
-      ),
+          child: OnboardingDesc(
+              "บันทึกประจำวัน",
+              "สามารถจดบันทึกค่าสุขภาพในเเต่ละวันได้\nพร้อมทั้งติดตามเเนวโน้มสุขภาพของคุณ\nรวมถึงการเเจ้งเตือนสำคัญต่างๆ ที่ต้องทำ",
+              "ถัดไป",
+              Color(hexColor('#42884B')),
+              'assets/images/healthNotePage.png')),
     );
   }
 }

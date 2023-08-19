@@ -27,8 +27,12 @@ class _KnowledgeChallengePageState extends State<KnowledgeChallengePage> {
     return Scaffold(
       backgroundColor: Color(hexColor('#F94B4B')),
       body: Center(
-        child: OnboardingDesc("ความรู้เเละความท้าทาย", "ช่วยให้ความรู้เเละความเข้าใจเกี่ยวกับภาวะ\nเมตาบอลิกซินโดรม เเถมยังเพลิดเพลินกับกิจกรรม\nความท้าทายภายในเเอปพลิเคชัน", "เริ่มใช้งานกันเลย !")
-      ),
+          child: OnboardingDesc(
+              "ความรู้เเละความท้าทาย",
+              "ช่วยให้ความรู้เเละความเข้าใจเกี่ยวกับภาวะ\nเมตาบอลิกซินโดรม เเถมยังเพลิดเพลินกับกิจกรรม\nความท้าทายภายในเเอปพลิเคชัน",
+              "เริ่มใช้งานกันเลย !",
+              Color(hexColor('#F94B4B')),
+              'assets/images/healthNotePage.png')),
     );
   }
 }

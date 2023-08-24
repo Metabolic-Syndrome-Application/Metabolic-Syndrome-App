@@ -3,10 +3,9 @@ import 'package:flutter_application_1/data/onboarding.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/loginRegister/login.dart';
 
-void main() {
+void main(){
   runApp(Onboarding());
 }
-
 class Onboarding extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -132,7 +131,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   onPressed: () {
                     if (currentIndex == contentsList.length - 1) {
                       // Go to next page...
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => Login()));
                     }
                     _controller!.nextPage(
                       duration: const Duration(milliseconds: 500),

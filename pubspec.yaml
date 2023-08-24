@@ -37,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_launcher_icons: ^0.13.1
   intl: ^0.18.1
+  scroll_shadow_container:
+  custom_sliding_segmented_control:
 
 flutter_icons:
   android: true

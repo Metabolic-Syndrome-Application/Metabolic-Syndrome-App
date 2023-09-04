@@ -3,9 +3,11 @@ import 'package:flutter_application_1/data/onboarding.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/loginRegister/login.dart';
 
-void main(){
+
+void main() {
   runApp(Onboarding());
 }
+
 class Onboarding extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

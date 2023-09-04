@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
+import 'package:flutter_application_1/page/screening/startScreening.dart';
 
 void main() {
   runApp(Permission());
 }
+
+bool isChecked = false;
 
 class Permission extends StatelessWidget {
   const Permission({super.key});
@@ -25,8 +28,151 @@ class PermissionPage extends StatefulWidget {
 }
 
 class _PermissionPageState extends State<PermissionPage> {
+  Color getColor(Set<MaterialState> states) {
+    const Set<MaterialState> interactiveStates = <MaterialState>{
+      MaterialState.pressed,
+      MaterialState.hovered,
+      MaterialState.focused,
+    };
+    if (states.any(interactiveStates.contains)) {
+      return Colors.black;
+    }
+    return Colors.black;
+  }
+
+  void _showPermission() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        //context: _scaffoldKey.currentContext,
+        builder: (context) {
+          return AlertDialog(
+            titlePadding: EdgeInsets.only(top: 0),
+            contentPadding: EdgeInsets.only(left: 25, right: 25, top: 0),
+            title: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    SizedBox(width: 48),
+                    Text(
+                      'ข้อตกลงและเงื่อนไข',
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontFamily: 'IBMPlexSansThai',
+                          color: Colors.black,
+                          fontWeight: FontWeight.normal),
+                      textAlign: TextAlign.center,
+                    ),
+                    Container(
+                      alignment: Alignment.topCenter,
+                      child: IconButton(
+                          icon: const Icon(Icons.cancel),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          }),
+                    )
+                  ],
+                )
+              ],
+            ),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            content: Container(
+              height: 400,
+              width: 300,
+              child: Scrollbar(
+                isAlwaysShown: true,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      Text('Name of requestor: }'),
+                      Text(
+                        'Description:' * 400,
+                      ),
+                      Text(
+                        'Help_Description',
+                      ),
+                      Text(
+                        'Type of help needed:Help_TypeNeeded',
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            actions: <Widget>[
+              Padding(
+                padding: const EdgeInsets.only(left: 10, right: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Container(
+                        alignment: Alignment.topCenter,
+                        height: 100,
+                        child: Checkbox(
+                          checkColor: Colors.white,
+                          fillColor:
+                              MaterialStateProperty.resolveWith(getColor),
+                          value: isChecked,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              isChecked = value!;
+                            });
+
+                            Navigator.of(context).pop();
+                          },
+                        )),
+                    Container(
+                      width: 225,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Text(
+                            'รับทราบและให้ความยินยอมตาม     ',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'IBMPlexSansThai',
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal,
+                            ),
+                            textAlign: TextAlign.left,
+                          ),
+                          Text(
+                            'ข้อตกลงเกี่ยวกับการใช้งานเเละนโยบายความเป็นส่วนตัว',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'IBMPlexSansThai',
+                              color: Color(hexColor('#FB6262')),
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
+    Color getColor(Set<MaterialState> states) {
+      const Set<MaterialState> interactiveStates = <MaterialState>{
+        MaterialState.pressed,
+        MaterialState.hovered,
+        MaterialState.focused,
+      };
+      if (states.any(interactiveStates.contains)) {
+        return Colors.black;
+      }
+      return Colors.black;
+    }
+
     return Scaffold(
       backgroundColor: Color(hexColor('#FAFCFB')),
       body: Column(
@@ -67,12 +213,28 @@ class _PermissionPageState extends State<PermissionPage> {
               ],
             ),
           ),
-          Column(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Row(
+              Container(
+                  alignment: Alignment.topCenter,
+                  height: 100,
+                  child: Checkbox(
+                    checkColor: Colors.white,
+                    fillColor: MaterialStateProperty.resolveWith(getColor),
+                    value: isChecked,
+                    onChanged: (bool? value) {
+                      _showPermission();
+                      setState(() {
+                        isChecked = isChecked;
+                      });
+                    },
+                  )),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    'รับทราบและให้ความยินยอมตาม',
+                    'รับทราบและให้ความยินยอมตาม            ',
                     style: TextStyle(
                       fontSize: 16,
                       fontFamily: 'IBMPlexSansThai',
@@ -80,10 +242,6 @@ class _PermissionPageState extends State<PermissionPage> {
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                ],
-              ),
-              Row(
-                children: [
                   Text(
                     'ข้อตกลงเกี่ยวกับการใช้งานเเละนโยบาย\nความเป็นส่วนตัว',
                     style: TextStyle(
@@ -109,7 +267,7 @@ class _PermissionPageState extends State<PermissionPage> {
                   borderRadius: BorderRadius.circular(23.5),
                 ),
                 onPressed: () {
-                  // login by email
+                  _showPermission();
                 },
                 child: Container(
                   height: 40,
@@ -131,7 +289,12 @@ class _PermissionPageState extends State<PermissionPage> {
                   borderRadius: BorderRadius.circular(23.5),
                 ),
                 onPressed: () {
-                  // login by email
+                  if (isChecked == true) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => StartScreening()));
+                  }
                 },
                 child: Container(
                   height: 40,

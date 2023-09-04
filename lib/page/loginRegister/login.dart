@@ -3,6 +3,10 @@ import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/loginRegister/forgetPassword.dart';
 import 'package:flutter_application_1/page/loginRegister/register.dart';
 
+void main (){
+  runApp(Login());
+}
+
 class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

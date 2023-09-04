@@ -1,16 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/page/screening/Screening.dart';
+
+import '../../extension/Color.dart';
 
 void main() {
-  runApp(MyPageView());
+  runApp(StartScreening());
 }
-class MyPageView extends StatefulWidget {
-  const MyPageView({super.key});
+
+class StartScreening extends StatelessWidget {
+  const StartScreening({super.key});
 
   @override
-  State<MyPageView> createState() => _MyPageViewState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: "Login Page",
+      home: StartScreeningPage(),
+    );
+  }
 }
 
-class _MyPageViewState extends State<MyPageView> {
+class StartScreeningPage extends StatefulWidget {
+  const StartScreeningPage({super.key});
+
+  @override
+  State<StartScreeningPage> createState() => _StartScreeningPageState();
+}
+
+class _StartScreeningPageState extends State<StartScreeningPage> {
   final PageController _pageController = PageController();
 
   @override
@@ -23,46 +39,94 @@ class _MyPageViewState extends State<MyPageView> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: PageView(
-          controller: _pageController,
-          children: <Widget>[
-            ColoredBox(
-              color: Colors.red,
-              child: Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_pageController.hasClients) {
-                      _pageController.animateToPage(
-                        1,
-                        duration: const Duration(milliseconds: 400),
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                  },
-                  child: const Text('Next'),
-                ),
+          body: Container(
+        padding: EdgeInsets.only(top: 56),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  width: 24,
+                  child: IconButton(
+                      iconSize: 24,
+                      icon: const Icon(Icons.keyboard_arrow_left),
+                      onPressed: () {
+                        //
+                      }),
+                )
+              ],
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 50,
+                  ),
+                  Image.asset('assets/images/sceening.png'),
+                  SizedBox(
+                    height: 44,
+                  ),
+                  Text('เเบบประเมินสุขภาพ',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontFamily: 'IBMPlexSansThai',
+                        color: Colors.black,
+                        fontWeight: FontWeight.normal,
+                      )),
+                  SizedBox(height: 18),
+                  Text(
+                    'ทำเเบบประเมินสุขภาพ\nเพื่อช่วยวิเคราะห์ความเสี่ยงเเละติดตามค่าสุขภาพของคุณ',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'IBMPlexSansThai',
+                      color: Colors.black,
+                      fontWeight: FontWeight.normal,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             ),
-            ColoredBox(
-              color: Colors.blue,
-              child: Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (_pageController.hasClients) {
-                      _pageController.animateToPage(
-                        0,
-                        duration: const Duration(milliseconds: 400),
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                  },
-                  child: const Text('Previous'),
-                ),
-              ),
-            ),
+            Container(
+                height: 93,
+                child: Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.only(left: 22.5, right: 22.5),
+                        child: MaterialButton(
+                          height: 44,
+                          color: Color(hexColor('#2F4EF1')),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(23.5),
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MyApp()));
+                          },
+                          child: Container(
+                            height: 47,
+                            alignment: Alignment.center,
+                            child: Text("เริ่มทำแบบประเมิน",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontFamily: 'IBMPlexSansThai',
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.normal),
+                                textAlign: TextAlign.center),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
           ],
         ),
-      ),
+      )),
     );
   }
 }

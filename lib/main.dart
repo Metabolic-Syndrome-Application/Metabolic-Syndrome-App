@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-
-import 'FoodMenu.dart';
-import 'widget/MoneyBox.dart';
-
+import 'package:flutter_application_1/extension/Color.dart';
+import 'package:flutter_application_1/page/challenge/allChallenge.dart';
+import 'package:flutter_application_1/page/home/home.dart';
 
 void main() {
   runApp(MyApp());
@@ -15,82 +14,61 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: "My App",
       home: MyHomePage(),
-      theme: ThemeData(primarySwatch: Colors.yellow),
-      color: Colors.amber,
+      theme: ThemeData(primarySwatch: Colors.blue),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
+  const MyHomePage({super.key});
+
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int number = 0;
-  //กลุ่มข้อมูล
-  List<FoodMenu> menu = [
-    FoodMenu("กุ้งเผา", "500", "assets/images/grillshrimp.jpg"),
-    FoodMenu("กะเพราไก่", "25", "assets/images/kapraokai.jpg"),
-    FoodMenu("ต้มยำกุ้ง", "300", "assets/images/tomyumkung.jpg"),
-    FoodMenu("สลัดผัก", "250", "assets/images/saladbowl.jpg")
+  int _currentIndex = 0;
+  final List _children = [
+    Home(),
+    Container(
+      color: Colors.black,
+    ),
+    Container(
+      color: Colors.amber,
+    ),
+    AllChallenge(),
+    Container(
+      color: Colors.black,
+    ),
   ];
 
-  @override
-  Widget build(BuildContext context) {
-    List<Widget> data = [];
-
-    data.add(Text("กดปุ่มเพื่อเพิ่มตัวเลข"));
-    data.add(Text(number.toString()));
-    data.add(Image(
-        image: NetworkImage(
-            "https://cdn.pixabay.com/photo/2014/12/10/20/48/laboratory-563423_640.jpg")));
-
-    return Container(
-      decoration: BoxDecoration(
-      color: Colors.lightGreenAccent,),
-      child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            children: [
-              MoneyBox("ยอดคงเหลือ", 10000000, Colors.blue, 100),
-              SizedBox(
-                height: 10,
-              ),
-              MoneyBox("รายรับ", 20000, Colors.green, 70),
-              SizedBox(
-                height: 10,
-              ),
-              MoneyBox("รายจ่าย", 7000, Colors.red, 70),
-              SizedBox(
-                height: 10,
-              ),
-              MoneyBox("ค้างชำระ", 1200, Colors.orange, 70),
-            ],
-          ),
-        
-      ),
-    );
-  }
-
-  void addNumber() {
+  void onTabTapped(int index) {
     setState(() {
-      number++;
+      _currentIndex = index;
     });
   }
 
-  List<Widget> getData(int count) {
-    List<Widget> data = [];
-    for (var i = 0; i < count; i++) {
-      var menu = ListTile(
-        title: Text(
-          "เมนูทที่ ${i + 1}",
-          style: TextStyle(fontSize: 25),
-        ),
-        subtitle: Text("หัวข้อย่อยที่ ${i + 1}"),
-      );
-      data.add(menu);
-    }
-    return data;
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Color(hexColor('#FAFCFB')),
+      body: _children[_currentIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        onTap: onTabTapped,
+        currentIndex: _currentIndex,
+        items: [
+          new BottomNavigationBarItem(
+            backgroundColor: Color(hexColor('#1438F3')),
+              icon: Icon(Icons.home), label: 'หน้าหลัก'),
+          new BottomNavigationBarItem(icon: Icon(Icons.mail), label: 'ปฏิทิน'),
+          new BottomNavigationBarItem(
+              icon: Icon(Icons.person), label: 'บันทึก'),
+          new BottomNavigationBarItem(
+              icon: Icon(Icons.battery_alert_outlined), label: 'ท้าดวล'),
+          new BottomNavigationBarItem(
+              icon: Icon(Icons.person), label: 'โปรไฟล์'),
+        ],
+      ),
+    );
   }
 }

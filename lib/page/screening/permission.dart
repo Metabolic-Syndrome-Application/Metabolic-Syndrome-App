@@ -226,7 +226,7 @@ class _PermissionPageState extends State<PermissionPage> {
                     onChanged: (bool? value) {
                       _showPermission();
                       setState(() {
-                        isChecked = isChecked;
+                        isChecked = !isChecked;
                       });
                     },
                   )),

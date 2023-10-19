@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
+import 'package:flutter_application_1/page/home/home.dart';
 import 'package:flutter_application_1/page/loginRegister/forgetPassword.dart';
 import 'package:flutter_application_1/page/loginRegister/register.dart';
 
-void main (){
+void main() {
   runApp(Login());
 }
 
@@ -23,30 +24,52 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool value = false;
-  bool _isObscure = false;
+  bool rememberLogin = false;
+  bool visiblePassword = false;
+  bool fillPassword = false;
+
+  String _ssnEmail = '';
+  String _password = '';
+
+  final _controllerSsnEmail = TextEditingController();
+  final _controllerPassword = TextEditingController();
+
+  bool _validateSsnEmail = false;
+  bool _validatePassword = false;
+
+  @override
+  void dispose() {
+    _controllerSsnEmail.dispose();
+    _controllerPassword.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-        backgroundColor: Color(hexColor('#FAFCFB')),
-        body: SingleChildScrollView(
+      backgroundColor: Color(hexColor('#FAFCFB')),
+      body: SafeArea(
+        child: SingleChildScrollView(
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
+                width: screenWidth,
+                padding: EdgeInsets.symmetric(vertical: screenHeight * 0.023),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
                 ),
-                child: Center(
-                    child: Column(
+                child: Column(
                   children: [
+                    Container(
+                        height: screenHeight * 0.195,
+                        child: Image.asset('assets/images/login.png')),
                     SizedBox(
-                      height: 56,
-                    ),
-                    Container(child: Image.asset('assets/images/login.png')),
-                    SizedBox(
-                      height: 19,
+                      height: screenHeight * 0.023,
                     ),
                     Text("เข้าสู่ระบบ",
                         style: TextStyle(
@@ -56,22 +79,21 @@ class _LoginPageState extends State<LoginPage> {
                           fontWeight: FontWeight.bold,
                         ),
                         textAlign: TextAlign.center),
-                    SizedBox(
-                      height: 19,
-                    ),
                   ],
-                )),
+                ),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 20, right: 20),
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * .05),
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left: 10, bottom: 10),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * .025,
+                          vertical: screenHeight * 0.012),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Text("อีเมล",
+                          Text("เลขบัตรประชาชนหรืออีเมล",
                               style: TextStyle(
                                 fontSize: 16,
                                 fontFamily: 'IBMPlexSansThai',
@@ -83,13 +105,43 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     SizedBox(
-                      height: 47,
                       child: TextField(
+                        onChanged: (value) {
+                          setState(() {
+                            _ssnEmail = value;
+                          });
+                        },
+                        controller: _controllerSsnEmail,
+                        textAlign: TextAlign.left,
+                        textAlignVertical: TextAlignVertical.center,
                         decoration: InputDecoration(
-                          hintText: 'example@gmial.com',
+                          errorBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30)),
+                              borderSide: BorderSide(
+                                color: Color(hexColor('#DBDBDB')),
+                                width: 1,
+                              )),
+                          errorText: _validateSsnEmail && _ssnEmail == ''
+                              ? "กรุณากรอกเลขบัตรประชาชนหรืออีเมล"
+                              : null,
+                          errorStyle: TextStyle(
+                            fontSize: 14,
+                            fontFamily: 'IBMPlexSansThai',
+                            color: Color(hexColor('#FB6262')),
+                            fontWeight: FontWeight.normal,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 15),
+                          hintText: 'email@example.com',
+                          hintStyle: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'IBMPlexSansThai',
+                            color: Color(hexColor('#999999')),
+                            fontWeight: FontWeight.normal,
+                          ),
                           border: OutlineInputBorder(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(24)),
+                                  BorderRadius.all(Radius.circular(30)),
                               borderSide: BorderSide(
                                 color: Color(hexColor('#DBDBDB')),
                                 width: 1,
@@ -98,10 +150,12 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     SizedBox(
-                      height: 20,
+                      height: screenHeight * 0.012,
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 10, bottom: 10),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: screenWidth * .025,
+                          vertical: screenHeight * 0.012),
                       child: Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
@@ -116,21 +170,57 @@ class _LoginPageState extends State<LoginPage> {
                           ]),
                     ),
                     SizedBox(
-                      height: 47,
+                      // height: screenHeight * 0.055,
                       child: TextField(
-                        obscureText: _isObscure,
+                        onChanged: (value) {
+                          setState(() {
+                            _password = value;
+                          });
+                        },
+                        controller: _controllerPassword,
+                        obscuringCharacter: '●',
+                        textAlign: TextAlign.left,
+                        textAlignVertical: TextAlignVertical.center,
+                        obscureText: !visiblePassword,
                         decoration: InputDecoration(
+                          errorBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30)),
+                              borderSide: BorderSide(
+                                color: Color(hexColor('#DBDBDB')),
+                                width: 1,
+                              )),
+                          errorText: _validatePassword && _password == ''
+                              ? "กรุณากรอกรหัสผ่าน"
+                              : null,
+                          errorStyle: TextStyle(
+                            fontSize: 14,
+                            fontFamily: 'IBMPlexSansThai',
+                            color: Color(hexColor('#FB6262')),
+                            fontWeight: FontWeight.normal,
+                          ),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 15),
                           hintText: '●●●●●●●●●●',
+                          hintStyle: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'IBMPlexSansThai',
+                            color: Color(hexColor('#999999')),
+                            fontWeight: FontWeight.normal,
+                          ),
                           suffixIcon: IconButton(
-                              icon: Icon(_isObscure
+                              iconSize: 16,
+                              color: Color(hexColor('#999999')),
+                              icon: Icon(visiblePassword
                                   ? Icons.visibility
                                   : Icons.visibility_off),
                               onPressed: () {
-                                // check box
+                                setState(() {
+                                  visiblePassword = !visiblePassword;
+                                });
                               }),
                           border: OutlineInputBorder(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(24)),
+                                  BorderRadius.all(Radius.circular(30)),
                               borderSide: BorderSide(
                                 color: Color(hexColor('#DBDBDB')),
                                 width: 1,
@@ -139,60 +229,75 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     SizedBox(
-                      height: 13,
+                      height: screenHeight * 0.012,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Checkbox(
-                            value: this.value,
-                            onChanged: (bool? value) {
-                              setState(() {
-                                this.value = false;
-                              });
-                            },
-                          ), //Che
-                          Text(
-                            "จำไว้ในระบบ",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'IBMPlexSansThai',
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal,
-                            ),
-                            textAlign: TextAlign.start,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                          activeColor: Color(hexColor('#2F4EF1')),
+                          shape: CircleBorder(),
+                          value: this.rememberLogin,
+                          onChanged: (bool? rememberLogin) {
+                            setState(() {
+                              this.rememberLogin = !this.rememberLogin;
+                            });
+                          },
+                        ), //Che
+                        Text(
+                          "จำไว้ในระบบ",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'IBMPlexSansThai',
+                            color: Colors.black,
+                            fontWeight: FontWeight.normal,
                           ),
-                        ],
-                      ),
+                          textAlign: TextAlign.start,
+                        ),
+                      ],
                     ),
                     SizedBox(
-                      height: 27,
+                      height: screenHeight * 0.02,
                     ),
                     MaterialButton(
+                      height: screenHeight * 0.048,
                       color: Color(hexColor('#2F4EF1')),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(23.5),
                       ),
                       onPressed: () {
-                        // login by email
+                        if (_controllerSsnEmail.text.isEmpty == true) {
+                          setState(() {
+                            _validateSsnEmail =
+                                _controllerSsnEmail.text.isEmpty;
+                            _validatePassword = false;
+                          });
+                        } else {
+                          setState(() {
+                            _validateSsnEmail = false;
+                            _validatePassword =
+                                _controllerPassword.text.isEmpty;
+                          });
+                        }
+
+                        if (_password != '' && _ssnEmail != '') {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => Home()));
+                        }
                       },
                       child: Container(
-                        height: 47,
-                        width: 350,
                         alignment: Alignment.center,
                         child: Text("เข้าสู่ระบบ",
                             style: TextStyle(
                                 fontSize: 20,
                                 fontFamily: 'IBMPlexSansThai',
                                 color: Colors.white,
-                                fontWeight: FontWeight.normal),
+                                fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center),
                       ),
                     ),
                     SizedBox(
-                      height: 5,
+                      height: screenHeight * 0.002,
                     ),
                     Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                       TextButton(
@@ -215,21 +320,18 @@ class _LoginPageState extends State<LoginPage> {
                       )
                     ]),
                     SizedBox(
-                      height: 10,
+                      height: screenHeight * 0.002,
                     ),
                     Row(
                       children: [
                         Expanded(
                           child: Divider(
                             color: Color(hexColor('#DBDBDB')),
-                            height: 25,
                             thickness: 1,
-                            indent: 5,
-                            endIndent: 5,
                           ),
                         ),
                         SizedBox(
-                          width: 21,
+                          width: screenWidth * .050,
                         ),
                         Text(
                           'หรือ ดำเนินการต่อ',
@@ -240,24 +342,21 @@ class _LoginPageState extends State<LoginPage> {
                               fontWeight: FontWeight.normal),
                         ),
                         SizedBox(
-                          width: 21,
+                          width: screenWidth * .050,
                         ),
                         Expanded(
                           child: Divider(
                             color: Color(hexColor('#DBDBDB')),
-                            height: 25,
                             thickness: 1,
-                            indent: 5,
-                            endIndent: 5,
                           ),
                         ),
                       ],
                     ),
                     SizedBox(
-                      height: 20,
+                      height: screenHeight * 0.02,
                     ),
                     MaterialButton(
-                      height: 47,
+                      height: screenHeight * 0.048,
                       color: Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(23.5),
@@ -271,7 +370,7 @@ class _LoginPageState extends State<LoginPage> {
                           Container(
                               child: Image.asset('assets/images/google.png')),
                           SizedBox(
-                            width: 15,
+                            width: screenWidth * .025,
                           ),
                           Text("เข้าสู่ระบบด้วย Google",
                               style: TextStyle(
@@ -284,7 +383,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     SizedBox(
-                      height: 15,
+                      height: screenHeight * 0.03,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -297,7 +396,7 @@ class _LoginPageState extends State<LoginPage> {
                               fontWeight: FontWeight.normal,
                             )),
                         SizedBox(
-                          width: 11,
+                          width: screenWidth * .025,
                         ),
                         TextButton(
                           onPressed: () {
@@ -321,6 +420,8 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

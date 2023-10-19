@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
+import 'package:flutter_application_1/page/home/home.dart';
 import 'package:flutter_application_1/page/loginRegister/login.dart';
 
 class ForgetPassword extends StatelessWidget {
@@ -22,6 +23,16 @@ class ForgetPasswordPage extends StatefulWidget {
 }
 
 class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
+  String _email = '';
+  final _controllerEmail = TextEditingController();
+  bool _validateEmail = false;
+
+  @override
+  void dispose() {
+    _controllerEmail.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,14 +122,43 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                   ),
                 ),
                 SizedBox(
-                  height: 47,
                   child: TextField(
+                    onChanged: (value) {
+                      setState(() {
+                        _email = value;
+                      });
+                    },
+                    controller: _controllerEmail,
+                    textAlign: TextAlign.left,
+                    textAlignVertical: TextAlignVertical.center,
                     decoration: InputDecoration(
-                      hintText: 'example@gmial.com',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(24)),
+                      errorBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(30)),
                           borderSide: BorderSide(
-                            color: Colors.white,
+                            color: Color(hexColor('#DBDBDB')),
+                            width: 1,
+                          )),
+                      errorText: _validateEmail && _email == ''
+                          ? "กรุณากรอกอีเมล"
+                          : null,
+                      errorStyle: TextStyle(
+                        fontSize: 14,
+                        fontFamily: 'IBMPlexSansThai',
+                        color: Color(hexColor('#FB6262')),
+                        fontWeight: FontWeight.normal,
+                      ),
+                      contentPadding: EdgeInsets.symmetric(horizontal: 15),
+                      hintText: 'example@gmail.com',
+                      hintStyle: TextStyle(
+                        fontSize: 16,
+                        fontFamily: 'IBMPlexSansThai',
+                        color: Color(hexColor('#999999')),
+                        fontWeight: FontWeight.normal,
+                      ),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(30)),
+                          borderSide: BorderSide(
+                            color: Color(hexColor('#DBDBDB')),
                             width: 1,
                           )),
                     ),
@@ -133,8 +173,14 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
                     borderRadius: BorderRadius.circular(23.5),
                   ),
                   onPressed: () {
-                    // login by email
-                    
+                    setState(() {
+                      _validateEmail = _controllerEmail.text.isEmpty;
+                    });
+
+                    if (_email != '') {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => Home()));
+                    }
                   },
                   child: Container(
                     height: 47,

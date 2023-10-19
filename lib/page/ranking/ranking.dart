@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/page/home/home.dart';
+import 'package:page_transition/page_transition.dart';
 
 import '../../extension/Color.dart';
 
@@ -169,8 +170,11 @@ class _RankingPageState extends State<RankingPage> {
                   InkWell(
                     borderRadius: BorderRadius.circular(12),
                     onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Home()));
+                      Navigator.push(
+                          context,
+                          PageTransition(
+                              type: PageTransitionType.leftToRight,
+                              child: Home()));
                     },
                     child: Icon(
                       Icons.arrow_back_ios_new_rounded,

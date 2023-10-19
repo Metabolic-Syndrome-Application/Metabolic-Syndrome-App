@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/page/home/home.dart';
 import 'package:flutter_application_1/page/profile/profile.dart';
 
 import '../../extension/Color.dart';
@@ -93,8 +94,8 @@ class _SuccessPageState extends State<SuccessPage> {
               borderRadius: BorderRadius.circular(23.5),
             ),
             onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => Profile()));
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => Home()));
             },
             child: Container(
               height: 44,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/page/challenge/allChallenge.dart';
 import 'package:flutter_application_1/page/challenge/question.dart';
 
 import '../../extension/Color.dart';
-import '../profile/profile.dart';
 
 class JoinQuestion extends StatelessWidget {
   const JoinQuestion({super.key});
@@ -63,7 +63,7 @@ class _JoinQuestionPageState extends State<JoinQuestionPage> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Profile()));
+                                  builder: (context) => AllChallenge()));
                         },
                         child: Container(
                           child: Icon(
@@ -205,8 +205,10 @@ class _JoinQuestionPageState extends State<JoinQuestionPage> {
                         borderRadius: BorderRadius.circular(23.5),
                       ),
                       onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => Question()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Question()));
                       },
                       child: Container(
                         height: 44,

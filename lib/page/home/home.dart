@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/page/healthChart/pressureChart.dart';
+import 'package:flutter_application_1/page/learning/searchLearning.dart';
 import 'package:flutter_application_1/page/notification/notificate.dart';
+import 'package:flutter_application_1/page/profile/profile.dart';
 import 'package:flutter_application_1/page/ranking/ranking.dart';
+import 'package:flutter_application_1/page/screening/startScreening.dart';
+import 'package:page_transition/page_transition.dart';
 
 import '../../extension/Color.dart';
 
@@ -42,8 +47,10 @@ class _HomePageState extends State<HomePage> {
                         borderRadius: BorderRadius.circular(30),
                         onTap: () {
                           //profile
-                          //  Navigator.push(context,
-                          //   MaterialPageRoute(builder: (context) => Challenge()));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => Profile()));
                         },
                         child: Image.asset('assets/images/userCircle.png')),
                     Row(
@@ -53,8 +60,9 @@ class _HomePageState extends State<HomePage> {
                             onTap: () {
                               Navigator.push(
                                   context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Ranking()));
+                                  PageTransition(
+                                      type: PageTransitionType.rightToLeft,
+                                      child: Ranking()));
                             },
                             child:
                                 Image.asset('assets/images/solarRanking.png')),
@@ -64,8 +72,10 @@ class _HomePageState extends State<HomePage> {
                         InkWell(
                             borderRadius: BorderRadius.circular(30),
                             onTap: () {
-                              Navigator.push(context,
-                                  MaterialPageRoute(builder: (context) => Notificate()));
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Notificate()));
                             },
                             child: Image.asset('assets/images/bellRing.png')),
                       ],
@@ -109,6 +119,10 @@ class _HomePageState extends State<HomePage> {
                                 borderRadius: BorderRadius.circular(30),
                                 onTap: () {
                                   //points
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => Ranking()));
                                 },
                                 child:
                                     Image.asset('assets/images/piggyBank.png')),
@@ -168,7 +182,11 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            debugPrint('Hi there');
+                            //
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => StartScreening()));
                           },
                           style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.zero,
@@ -211,7 +229,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         ElevatedButton(
                             onPressed: () {
-                              debugPrint('Hi there');
+                              //
                             },
                             style: ElevatedButton.styleFrom(
                                 padding: EdgeInsets.zero,
@@ -253,7 +271,11 @@ class _HomePageState extends State<HomePage> {
                             )),
                         ElevatedButton(
                             onPressed: () {
-                              debugPrint('Hi there');
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          SearchingLearning()));
                             },
                             style: ElevatedButton.styleFrom(
                                 padding: EdgeInsets.zero,
@@ -333,7 +355,10 @@ class _HomePageState extends State<HomePage> {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(30),
                         onTap: () {
-                          print('ความดัน');
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const PressureChart()));
                         },
                         child: Padding(
                           padding: EdgeInsets.all(17),
@@ -569,28 +594,6 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class ExamplePage extends StatelessWidget {
-  final Color color;
-  final String text;
-
-  const ExamplePage(
-    this.color,
-    this.text,
-  );
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 184,
-      //width: 351,
-      color: color,
-      child: Center(
-        child: Text(text),
       ),
     );
   }

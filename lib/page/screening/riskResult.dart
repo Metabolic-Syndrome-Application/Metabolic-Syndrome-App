@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/page/home/home.dart';
 
 import '../../extension/Color.dart';
 
@@ -22,6 +23,11 @@ class RiskResultPage extends StatefulWidget {
 }
 
 class _RiskResultPageState extends State<RiskResultPage> {
+  int _diabetesLevel = 1;
+  int _pressureLevel = 2;
+  int _lipidLevel = 1;
+  int _fatLevel = 1;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,7 +102,9 @@ class _RiskResultPageState extends State<RiskResultPage> {
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Color(hexColor('#B7DBC0')),
+                                    color: _diabetesLevel == 1
+                                        ? Color(hexColor('#B7DBC0'))
+                                        : Color(hexColor('#FDFEFF')),
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                   width: 91,
@@ -136,7 +144,9 @@ class _RiskResultPageState extends State<RiskResultPage> {
                                 ),
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Color(hexColor('#FFE9C9')),
+                                    color: _diabetesLevel == 2
+                                        ? Color(hexColor('#FFE9C9'))
+                                        : Color(hexColor('#FDFEFF')),
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                   width: 91,
@@ -176,7 +186,9 @@ class _RiskResultPageState extends State<RiskResultPage> {
                                 ),
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Color(hexColor('#FFBCBC')),
+                                    color: _diabetesLevel == 3
+                                        ? Color(hexColor('#FFBCBC'))
+                                        : Color(hexColor('#FDFEFF')),
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                   width: 91,
@@ -256,7 +268,9 @@ class _RiskResultPageState extends State<RiskResultPage> {
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Color(hexColor('#B7DBC0')),
+                                    color: _pressureLevel == 1
+                                        ? Color(hexColor('#B7DBC0'))
+                                        : Color(hexColor('#FDFEFF')),
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                   width: 91,
@@ -296,7 +310,9 @@ class _RiskResultPageState extends State<RiskResultPage> {
                                 ),
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Color(hexColor('#FFE9C9')),
+                                    color: _pressureLevel == 2
+                                        ? Color(hexColor('#FFE9C9'))
+                                        : Color(hexColor('#FDFEFF')),
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                   width: 91,
@@ -336,7 +352,9 @@ class _RiskResultPageState extends State<RiskResultPage> {
                                 ),
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Color(hexColor('#FFBCBC')),
+                                    color: _pressureLevel == 3
+                                        ? Color(hexColor('#FFBCBC'))
+                                        : Color(hexColor('#FDFEFF')),
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                   width: 91,
@@ -416,7 +434,9 @@ class _RiskResultPageState extends State<RiskResultPage> {
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Color(hexColor('#B7DBC0')),
+                                    color: _lipidLevel == 1
+                                        ? Color(hexColor('#B7DBC0'))
+                                        : Color(hexColor('#FDFEFF')),
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                   width: 91,
@@ -456,7 +476,9 @@ class _RiskResultPageState extends State<RiskResultPage> {
                                 ),
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Color(hexColor('#FFE9C9')),
+                                    color: _lipidLevel == 2
+                                        ? Color(hexColor('#FFE9C9'))
+                                        : Color(hexColor('#FDFEFF')),
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                   width: 91,
@@ -496,7 +518,9 @@ class _RiskResultPageState extends State<RiskResultPage> {
                                 ),
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Color(hexColor('#FFBCBC')),
+                                    color: _lipidLevel == 3
+                                        ? Color(hexColor('#FFBCBC'))
+                                        : Color(hexColor('#FDFEFF')),
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                   width: 91,
@@ -576,7 +600,9 @@ class _RiskResultPageState extends State<RiskResultPage> {
                               children: [
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Color(hexColor('#B7DBC0')),
+                                    color: _fatLevel == 1
+                                        ? Color(hexColor('#B7DBC0'))
+                                        : Color(hexColor('#FDFEFF')),
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                   width: 91,
@@ -616,7 +642,9 @@ class _RiskResultPageState extends State<RiskResultPage> {
                                 ),
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Color(hexColor('#FFE9C9')),
+                                    color: _fatLevel == 2
+                                        ? Color(hexColor('#FFE9C9'))
+                                        : Color(hexColor('#FDFEFF')),
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                   width: 91,
@@ -656,7 +684,9 @@ class _RiskResultPageState extends State<RiskResultPage> {
                                 ),
                                 Container(
                                   decoration: BoxDecoration(
-                                    color: Color(hexColor('#FFBCBC')),
+                                    color: _fatLevel == 3
+                                        ? Color(hexColor('#FFBCBC'))
+                                        : Color(hexColor('#FDFEFF')),
                                     borderRadius: BorderRadius.circular(30),
                                   ),
                                   width: 91,
@@ -719,11 +749,10 @@ class _RiskResultPageState extends State<RiskResultPage> {
                             borderRadius: BorderRadius.circular(23.5),
                           ),
                           onPressed: () {
-                            // if (_pageController.hasClients) {
-                            //   _pageController.nextPage(
-                            //       duration: Duration(milliseconds: 200),
-                            //       curve: Curves.easeIn);
-                            // }
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Home()));
                           },
                           child: Container(
                             height: 47,

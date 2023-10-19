@@ -30,7 +30,7 @@ class _AllChallengePageState extends State<AllChallengePage> {
         backgroundColor: Color(hexColor('#FAFCFB')),
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.only(left: 15, right: 15, top: 50),
+            padding: const EdgeInsets.only(left: 15, right: 15, top: 58),
             child: Column(
               children: [
                 Text(
@@ -39,14 +39,14 @@ class _AllChallengePageState extends State<AllChallengePage> {
                     fontSize: 24,
                     fontFamily: 'IBMPlexSansThai',
                     color: Colors.black,
-                    fontWeight: FontWeight.normal,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(
                   height: 40,
                 ),
                 Row(children: [
-                  Icon(Icons.circle),
+                  Image.asset('assets/images/your_challenge_icon.png'),
                   SizedBox(
                     width: 5,
                   ),
@@ -66,11 +66,11 @@ class _AllChallengePageState extends State<AllChallengePage> {
                   height: 46,
                 ),
                 Row(children: [
-                  Icon(Icons.circle),
+                  Image.asset('assets/images/question_challenge_icon.png'),
                   SizedBox(
                     width: 5,
                   ),
-                  Text("ภารกิจของคุณ",
+                  Text("คำถามประจำวัน",
                       style: TextStyle(
                         fontSize: 20,
                         fontFamily: 'IBMPlexSansThai',
@@ -83,11 +83,11 @@ class _AllChallengePageState extends State<AllChallengePage> {
                   height: 46,
                 ),
                 Row(children: [
-                  Icon(Icons.circle),
+                  Image.asset('assets/images/hit_challenge_icon.png'),
                   SizedBox(
                     width: 5,
                   ),
-                  Text("ภารกิจของคุณ",
+                  Text("ภารกิจมาเเรง",
                       style: TextStyle(
                         fontSize: 20,
                         fontFamily: 'IBMPlexSansThai',

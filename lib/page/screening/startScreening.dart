@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/page/home/home.dart';
 import 'package:flutter_application_1/page/screening/Screening.dart';
 
 import '../../extension/Color.dart';
@@ -53,6 +54,8 @@ class _StartScreeningPageState extends State<StartScreeningPage> {
                       icon: const Icon(Icons.keyboard_arrow_left),
                       onPressed: () {
                         //
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => Home()));
                       }),
                 )
               ],
@@ -106,7 +109,7 @@ class _StartScreeningPageState extends State<StartScreeningPage> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => MyApp()));
+                                    builder: (context) => Screening()));
                           },
                           child: Container(
                             height: 47,

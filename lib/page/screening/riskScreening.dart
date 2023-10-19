@@ -5,30 +5,30 @@ import 'package:flutter_application_1/page/screening/riskResult.dart';
 import 'package:flutter_application_1/page/screening/startScreening.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(RiskScreening());
 }
 
-class MyApp extends StatelessWidget {
+class RiskScreening extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Step Progress Indicator',
-      home: MyHomePage(title: 'Step Progress Indicator'),
+      home: RiskScreeningPage(title: 'Step Progress Indicator'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
+class RiskScreeningPage extends StatefulWidget {
+  RiskScreeningPage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _RiskScreeningPageState createState() => _RiskScreeningPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _RiskScreeningPageState extends State<RiskScreeningPage> {
   final _stepsText = [
     "เพศของคุณ",
     "อาชีพของคุณ",

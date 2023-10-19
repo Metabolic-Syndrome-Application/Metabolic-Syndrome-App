@@ -1,34 +1,35 @@
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
+import 'package:flutter_application_1/page/screening/metabolicResult.dart';
 import 'package:flutter_application_1/page/screening/startScreening.dart';
 import 'package:numberpicker/numberpicker.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(Screening());
 }
 
-class MyApp extends StatelessWidget {
+class Screening extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Step Progress Indicator',
-      home: MyHomePage(title: 'Step Progress Indicator'),
+      home: ScreeningPage(title: 'Step Progress Indicator'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
+class ScreeningPage extends StatefulWidget {
+  ScreeningPage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _ScreeningPageState createState() => _ScreeningPageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _ScreeningPageState extends State<ScreeningPage> {
   final _stepsText = [
     "เพศของคุณ",
     "อาชีพของคุณ",
@@ -144,8 +145,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               initialValue: initial,
                               height: 124,
                               innerPadding: EdgeInsets.all(12),
-
-                              // controller: controller,
+                              controller: controller,
                               children: {
                                 1: Container(
                                   width: 100,
@@ -944,10 +944,15 @@ class _MyHomePageState extends State<MyHomePage> {
                             borderRadius: BorderRadius.circular(23.5),
                           ),
                           onPressed: () {
-                            if (_pageController.hasClients) {
+                            if (_pageController.hasClients && _curPage < 4) {
                               _pageController.nextPage(
                                   duration: Duration(milliseconds: 200),
                                   curve: Curves.easeIn);
+                            } else {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => MetabolicResult()));
                             }
                           },
                           child: Container(

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/page/challenge/allChallenge.dart';
 
 import '../../extension/Color.dart';
-import '../profile/profile.dart';
 
 class Challenge extends StatelessWidget {
   const Challenge({super.key});
@@ -256,7 +256,7 @@ class _ChallengePageState extends State<ChallengePage> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Profile()));
+                                  builder: (context) => AllChallenge()));
                         },
                         child: Container(
                           child: Icon(

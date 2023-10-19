@@ -3,7 +3,6 @@ import 'package:flutter_application_1/data/onboarding.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/loginRegister/login.dart';
 
-
 void main() {
   runApp(Onboarding());
 }
@@ -33,7 +32,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     _controller = PageController(initialPage: 0);
     super.initState();
   }
-
+ 
   @override
   void dispose() {
     _controller!.dispose();
@@ -42,6 +41,11 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    print(screenHeight);
+    print(screenWidth);
+
     return Scaffold(
       backgroundColor: contentsList[currentIndex].backgroundColor,
       body: SafeArea(
@@ -67,24 +71,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 },
                 itemBuilder: (context, index) {
                   return Column(
-                    crossAxisAlignment: currentIndex == 0 || currentIndex == 3
-                        ? CrossAxisAlignment.start
-                        : CrossAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          SizedBox(
-                            height: 160,
-                          ),
                           Container(
-                              height: 214,
+                              alignment: Alignment.center,
+                              height: screenHeight * 0.25,
                               child: Image.asset(contentsList[index].image)),
                           SizedBox(
-                            height: 60,
+                            height: screenHeight * 0.078,
                           ),
                           Container(
-                            height: 106,
+                            padding: EdgeInsets.symmetric(
+                                vertical: screenHeight * 0.016),
                             child: Text(contentsList[index].title,
                                 style: TextStyle(
                                   fontSize: 32,
@@ -94,17 +95,18 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                 ),
                                 textAlign: TextAlign.center),
                           ),
-                          SizedBox(
-                            height: 14,
+                          Container(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: screenWidth * .05),
+                            child: Text(contentsList[index].discription,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'IBMPlexSansThai',
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                                textAlign: TextAlign.center),
                           ),
-                          Text(contentsList[index].discription,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'IBMPlexSansThai',
-                                color: Colors.white,
-                                fontWeight: FontWeight.normal,
-                              ),
-                              textAlign: TextAlign.center),
                         ],
                       ),
                     ],
@@ -113,48 +115,48 @@ class _OnboardingPageState extends State<OnboardingPage> {
               ),
             ),
             Expanded(
-              child: Column(children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(
-                    contentsList.length,
-                    (index) => buildDot(index, context),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * .05),
+                child: Column(children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(
+                      contentsList.length,
+                      (index) => buildDot(index, context),
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: 44,
-                ),
-                MaterialButton(
-                  color: Color(hexColor('#166CF7')),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(23.5),
-                  ),
-                  onPressed: () {
-                    if (currentIndex == contentsList.length - 1) {
-                      // Go to next page...
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Login()));
-                    }
-                    _controller!.nextPage(
-                      duration: const Duration(milliseconds: 500),
-                      curve: Curves.easeInOut,
-                    );
-                  },
-                  child: Container(
-                    height: 47,
-                    width: 350,
-                    alignment: Alignment.center,
-                    child: Text(contentsList[currentIndex].titleButton,
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'IBMPlexSansThai',
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center),
-                  ),
-                )
-              ]),
+                  SizedBox(height: screenHeight * 0.05),
+                  MaterialButton(
+                    height: screenHeight*0.055,
+                    color: Color(hexColor('#166CF7')),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(23.5),
+                    ),
+                    onPressed: () {
+                      if (currentIndex == contentsList.length - 1) {
+                        // Go to next page...
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) => Login()));
+                      }
+                      _controller!.nextPage(
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    child: Container(
+                      alignment: Alignment.center,
+                      child: Text(contentsList[currentIndex].titleButton,
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'IBMPlexSansThai',
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center),
+                    ),
+                  )
+                ]),
+              ),
             ),
           ],
         ),

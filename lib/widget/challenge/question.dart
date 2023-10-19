@@ -19,14 +19,17 @@ class QuestionCard extends StatelessWidget {
       padding: EdgeInsets.only(left: 7, right: 7),
       child: Row(
         children: [
-          Container(height: 110, child: Image.asset('assets/images/login.png')),
+          Container(
+              height: 110,
+              child: Image.asset(
+                  'assets/images/question_challenge_image_default.png')),
           SizedBox(
             width: 7,
           ),
           Expanded(
             child: Container(
               padding:
-                  EdgeInsets.only(top: 18, bottom: 18, left: 10, right: 10),
+                  EdgeInsets.only(top: 18, bottom: 10, left: 10, right: 10),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

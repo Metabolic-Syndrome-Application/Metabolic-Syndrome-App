@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
+import 'package:flutter_application_1/page/home/home.dart';
+import 'package:flutter_application_1/page/screening/riskScreening.dart';
 
 void main() {
   runApp(MetabolicResult());
@@ -25,6 +27,8 @@ class MetabolicResultPage extends StatefulWidget {
 }
 
 class _MetabolicResultPageState extends State<MetabolicResultPage> {
+  int _metabolicRiskLevel = 2;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,7 +70,9 @@ class _MetabolicResultPageState extends State<MetabolicResultPage> {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      color: Color(hexColor('#B7DBC0')),
+                      color: _metabolicRiskLevel == 1
+                          ? Color(hexColor('#B7DBC0'))
+                          : Color(hexColor('#FDFEFF')),
                       borderRadius: BorderRadius.circular(30),
                     ),
                     width: 91,
@@ -105,7 +111,9 @@ class _MetabolicResultPageState extends State<MetabolicResultPage> {
                   ),
                   Container(
                     decoration: BoxDecoration(
-                      color: Color(hexColor('#FFE9C9')),
+                      color: _metabolicRiskLevel == 2
+                          ? Color(hexColor('#FFE9C9'))
+                          : Color(hexColor('#FDFEFF')),
                       borderRadius: BorderRadius.circular(30),
                     ),
                     width: 91,
@@ -144,7 +152,9 @@ class _MetabolicResultPageState extends State<MetabolicResultPage> {
                   ),
                   Container(
                     decoration: BoxDecoration(
-                      color: Color(hexColor('#FFBCBC')),
+                      color: _metabolicRiskLevel == 3
+                          ? Color(hexColor('#FFBCBC'))
+                          : Color(hexColor('#FDFEFF')),
                       borderRadius: BorderRadius.circular(30),
                     ),
                     width: 91,
@@ -196,11 +206,17 @@ class _MetabolicResultPageState extends State<MetabolicResultPage> {
                             borderRadius: BorderRadius.circular(23.5),
                           ),
                           onPressed: () {
-                            // if (_pageController.hasClients) {
-                            //   _pageController.nextPage(
-                            //       duration: Duration(milliseconds: 200),
-                            //       curve: Curves.easeIn);
-                            // }
+                            if (_metabolicRiskLevel != 1) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RiskScreening()));
+                            } else {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Home()));
+                            }
                           },
                           child: Container(
                             height: 47,

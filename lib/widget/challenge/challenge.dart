@@ -17,16 +17,18 @@ class ChallengeCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(30)),
       alignment: Alignment.centerLeft,
       padding: EdgeInsets.only(left: 7, right: 7),
-      child: Row(
+      child:Row(
         children: [
-          Container(height: 110, child: Image.asset('assets/images/login.png')),
+          Container(
+              height: 110,
+              child: Image.asset('assets/images/hit_challenge_image_default.png')),
           SizedBox(
             width: 7,
           ),
           Expanded(
             child: Container(
               padding:
-                  EdgeInsets.only(top: 18, bottom: 18, left: 10, right: 10),
+                  EdgeInsets.only(top: 18, bottom: 10, left: 10, right: 10),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

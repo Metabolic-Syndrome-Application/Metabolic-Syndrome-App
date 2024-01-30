@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/page/healthChart/bmiChart.dart';
 import 'package:flutter_application_1/page/healthChart/pressureChart.dart';
 import 'package:flutter_application_1/page/profile/profile.dart';
 
@@ -163,7 +164,12 @@ class _HealthChartPageState extends State<HealthChartPage> {
                 borderRadius: BorderRadius.circular(30),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(30),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => BMIChart()));
+                  },
                   child: Padding(
                     padding: EdgeInsets.all(17),
                     child: Column(

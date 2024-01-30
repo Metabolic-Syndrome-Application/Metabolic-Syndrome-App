@@ -1,11 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/page/healthChart/pressureChart.dart';
 import 'package:flutter_application_1/page/learning/searchLearning.dart';
+import 'package:flutter_application_1/page/note/todayNote.dart';
 import 'package:flutter_application_1/page/notification/notificate.dart';
 import 'package:flutter_application_1/page/profile/profile.dart';
 import 'package:flutter_application_1/page/ranking/ranking.dart';
 import 'package:flutter_application_1/page/screening/startScreening.dart';
+import 'package:http/http.dart' as http;
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 
 import '../../extension/Color.dart';
 
@@ -29,8 +35,20 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String? alias;
+  Future<void> getProfile(String accesstoken) async {
+    final url = Uri.parse("http://10.66.8.149:8000/api/user/profile");
+    final response = await http
+        .get(url, headers: {'Authorization': 'Bearer ${accesstoken}'});
+    print('profile Response body: ${response.body}');
+    alias = json.decode(response.body)['data']['user']['alias'];
+  }
+
   @override
   Widget build(BuildContext context) {
+    String? token = Provider.of<AuthProvider>(context).token;
+    getProfile(token!);
+
     return Scaffold(
       backgroundColor: Color(hexColor('#FAFCFB')),
       body: SingleChildScrollView(
@@ -104,7 +122,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         Text(
-                          'นันท์',
+                          alias??'',
                           style: TextStyle(
                             fontSize: 32,
                             fontFamily: 'IBMPlexSansThai',
@@ -182,11 +200,11 @@ class _HomePageState extends State<HomePage> {
                       children: [
                         ElevatedButton(
                           onPressed: () {
-                            //
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => StartScreening()));
+                                    builder: (context) =>
+                                        const StartScreening()));
                           },
                           style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.zero,
@@ -229,7 +247,10 @@ class _HomePageState extends State<HomePage> {
                         ),
                         ElevatedButton(
                             onPressed: () {
-                              //
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => TodayNote()));
                             },
                             style: ElevatedButton.styleFrom(
                                 padding: EdgeInsets.zero,

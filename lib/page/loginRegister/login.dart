@@ -1,14 +1,20 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/home/home.dart';
+import 'package:flutter_application_1/page/loginRegister/createProfile.dart';
 import 'package:flutter_application_1/page/loginRegister/forgetPassword.dart';
 import 'package:flutter_application_1/page/loginRegister/register.dart';
-
-void main() {
-  runApp(Login());
-}
+import 'package:flutter_application_1/page/screening/riskScreening.dart';
+import 'package:flutter_application_1/page/screening/startScreening.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class Login extends StatelessWidget {
+  const Login({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -24,10 +30,43 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  int status = 0;
+  String accessToken = '';
+  bool haveProfile = false;
+  String? firstname;
+  String? diseaseRisk;
+
+  void postLogin(String username, String password) async {
+    final url = Uri.parse("http://10.68.9.216:8000/api/auth/login");
+    final response = await http.post(url,
+        body: json.encode({'username': username, 'password': password}));
+
+    setState(() {
+      status = response.statusCode;
+      accessToken = json.decode(response.body)['access_token'];
+      Provider.of<AuthProvider>(context, listen: false)
+          .setToken(json.decode(response.body)['access_token']);
+    });
+
+    getProfile(json.decode(response.body)['access_token']);
+  }
+
+  Future<void> getProfile(String accesstoken) async {
+    final url = Uri.parse("http://10.68.9.216:8000/api/user/profile");
+    final response =
+        await http.get(url, headers: {'Authorization': 'Bearer $accesstoken'});
+    setState(() {
+      firstname = json.decode(response.body)['data']['user']['firstName'];
+      diseaseRisk =
+          json.decode(response.body)['data']['user']['diseaseRisk']['diabetes'];
+      print(firstname);
+      print(diseaseRisk);
+    });
+  }
+
   bool rememberLogin = false;
   bool visiblePassword = false;
   bool fillPassword = false;
-
   String _ssnEmail = '';
   String _password = '';
 
@@ -36,6 +75,8 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _validateSsnEmail = false;
   bool _validatePassword = false;
+
+  bool _wrongPassword = false;
 
   @override
   void dispose() {
@@ -131,7 +172,8 @@ class _LoginPageState extends State<LoginPage> {
                             color: Color(hexColor('#FB6262')),
                             fontWeight: FontWeight.normal,
                           ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 15),
+                          contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 15),
                           hintText: 'email@example.com',
                           hintStyle: TextStyle(
                             fontSize: 16,
@@ -170,11 +212,11 @@ class _LoginPageState extends State<LoginPage> {
                           ]),
                     ),
                     SizedBox(
-                      // height: screenHeight * 0.055,
                       child: TextField(
                         onChanged: (value) {
                           setState(() {
                             _password = value;
+                            _wrongPassword = false;
                           });
                         },
                         controller: _controllerPassword,
@@ -185,21 +227,24 @@ class _LoginPageState extends State<LoginPage> {
                         decoration: InputDecoration(
                           errorBorder: OutlineInputBorder(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(30)),
+                                  const BorderRadius.all(Radius.circular(30)),
                               borderSide: BorderSide(
                                 color: Color(hexColor('#DBDBDB')),
                                 width: 1,
                               )),
                           errorText: _validatePassword && _password == ''
                               ? "กรุณากรอกรหัสผ่าน"
-                              : null,
+                              : _wrongPassword
+                                  ? 'รหัสผ่านไม่ถูกต้อง'
+                                  : null,
                           errorStyle: TextStyle(
                             fontSize: 14,
                             fontFamily: 'IBMPlexSansThai',
                             color: Color(hexColor('#FB6262')),
                             fontWeight: FontWeight.normal,
                           ),
-                          contentPadding: EdgeInsets.symmetric(horizontal: 15),
+                          contentPadding:
+                              const EdgeInsets.symmetric(horizontal: 15),
                           hintText: '●●●●●●●●●●',
                           hintStyle: TextStyle(
                             fontSize: 16,
@@ -220,7 +265,7 @@ class _LoginPageState extends State<LoginPage> {
                               }),
                           border: OutlineInputBorder(
                               borderRadius:
-                                  BorderRadius.all(Radius.circular(30)),
+                                  const BorderRadius.all(Radius.circular(30)),
                               borderSide: BorderSide(
                                 color: Color(hexColor('#DBDBDB')),
                                 width: 1,
@@ -281,8 +326,40 @@ class _LoginPageState extends State<LoginPage> {
                         }
 
                         if (_password != '' && _ssnEmail != '') {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => Home()));
+                          postLogin(_ssnEmail, _password);
+
+                          if (status == 200 && firstname != null) {
+                            if (diseaseRisk == "") {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const StartScreening()));
+                            } else if (diseaseRisk == "metabolicLow") {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const Home()));
+                            } else if (diseaseRisk == "metabolicMedium" ||
+                                diseaseRisk == "metabolicHigh") {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RiskScreening()));
+                            } else {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => const Home()));
+                            }
+                          }
+                          if (status == 200 && firstname == null) {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const CreateProfilePage()));
+                          }
                         }
                       },
                       child: Container(
@@ -403,7 +480,8 @@ class _LoginPageState extends State<LoginPage> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => Register()));
+                                    builder: (context) =>
+                                        const RegisterPage()));
                           },
                           child: Text('สมัครใช้งาน',
                               style: TextStyle(

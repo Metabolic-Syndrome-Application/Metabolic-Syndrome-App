@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
-import 'package:flutter_application_1/page/screening/riskResult.dart';
 import 'package:flutter_application_1/page/screening/startScreening.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(RiskScreening());
@@ -30,10 +34,10 @@ class RiskScreeningPage extends StatefulWidget {
 
 class _RiskScreeningPageState extends State<RiskScreeningPage> {
   final _stepsText = [
-    "เพศของคุณ",
-    "อาชีพของคุณ",
-    "ข้อมูลสุขภาพของคุณ",
-    "ข้อมูลสุขภาพเพิ่มเติม"
+    "พฤติกรรม",
+    "ประวัติโรค",
+    "ประวัติโรคครอบครัว",
+    "ออกกำลังกาย"
   ];
 
   final _stepCircleRadius = 10.0;
@@ -58,6 +62,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
   @override
   void dispose() {
     _pageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -79,7 +84,6 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
   }
 
   String? dropdownValue;
-  bool _isObscure = false;
 
   int initial = 1;
   bool isPayment = false;
@@ -89,9 +93,10 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
   void initState() {
     super.initState();
     controller = CustomSegmentedController();
-    controller.addListener(() {
-      print('listener ${controller.value}');
-    });
+    _controllerAnother =
+        TextEditingController(text: anotherData ?? anotherData);
+    _controllerAnotherParent =
+        TextEditingController(text: anotherParentData ?? anotherParentData);
   }
 
   Color unactiveColor = Color(hexColor('#FDFEFF'));
@@ -111,6 +116,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
   bool heartAttack = false;
   bool kidney = false;
   bool another = false;
+  String? anotherData;
 
   //--Parent History step
   bool noDeseaseHistoryParent = false;
@@ -120,14 +126,45 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
   bool heartAttackParent = false;
   bool kidneyParent = false;
   bool anotherParent = false;
+  String? anotherParentData;
 
   //--Exercise step
   String? exerciseFrequency;
   String? exercisePeriod;
 
   bool isHover = false;
+
+  // Create a ScrollController instance
+  final ScrollController _scrollController = ScrollController();
+
+  late TextEditingController _controllerAnother;
+  late TextEditingController _controllerAnotherParent;
+
+  List<String> _disease = [];
+  List<String> _family = [];
+
+  String _diseaseResult = '';
+
+  Future<void> postDisease(
+      String accesstoken, List<String> disease, List<String> family) async {
+    final url = Uri.parse("http://10.68.9.216:8000/api/screening/disease");
+    final response = await http.post(url,
+        headers: {'Authorization': 'Bearer $accesstoken'},
+        body: json.encode({
+          "disease": disease,
+          "familyDisease": family,
+        }));
+    setState(() {
+      _diseaseResult = json.decode(response.body)['data']['diseaseRisk'];
+    });
+    print(_diseaseResult);
+  }
+
 //Build method of Main Page
+  @override
   Widget build(BuildContext context) {
+    String? token = Provider.of<AuthProvider>(context).token;
+
     var mediaQD = MediaQuery.of(context);
     _safeAreaSize = mediaQD.size;
 
@@ -135,29 +172,28 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
         resizeToAvoidBottomInset: false,
         body: Column(
           children: [
-            Expanded(child: _getStepProgress()),
+            _getStepProgress(),
             Expanded(
-              flex: 5,
-              child: PageView(
-                physics: new NeverScrollableScrollPhysics(),
-                controller: _pageController,
-                onPageChanged: (i) {
-                  setState(() {
-                    _curPage = i + 1;
-                  });
-                },
-                children: <Widget>[
-                  Scaffold(
-                    backgroundColor: Color(hexColor('#FAFCFB')),
-                    body: SingleChildScrollView(
-                      child: Container(
-                        alignment: Alignment.center,
+              flex: 7,
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  PageView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    controller: _pageController,
+                    onPageChanged: (i) {
+                      setState(() {
+                        _curPage = i + 1;
+                      });
+                    },
+                    children: <Widget>[
+                      SingleChildScrollView(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SizedBox(height: 44),
+                            const SizedBox(height: 44),
                             RichText(
-                              text: TextSpan(
+                              text: const TextSpan(
                                 text: 'ท่านมีพฤติกรรมดังต่อไปนี้หรือไม่',
                                 style: TextStyle(
                                   fontSize: 22,
@@ -171,7 +207,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                               height: 15,
                             ),
                             RichText(
-                              text: TextSpan(
+                              text: const TextSpan(
                                 text:
                                     'ตอบได้มากกว่า 1 ข้อ หากไม่มีพฤติกรรมเหล่านี้ กดถัดไป',
                                 style: TextStyle(
@@ -364,7 +400,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                         ],
                                       )),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   width: 31,
                                 ),
                                 Container(
@@ -428,988 +464,1149 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                           ],
                         ),
                       ),
-                    ),
-                  ),
-                  Scaffold(
-                    body: SingleChildScrollView(
-                      child: Container(
-                        alignment: Alignment.center,
-                        color: Color(hexColor('#FAFCFB')),
-                        child: Column(
-                          children: [
-                            SizedBox(height: 44),
-                            RichText(
-                              text: TextSpan(
-                                text: 'ท่านมีประวัติเป็นโรค ดังต่อไปนี้หรือไม่',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontFamily: 'IBMPlexSansThai',
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            RichText(
-                              text: TextSpan(
-                                text:
-                                    'ตอบได้มากกว่า 1 ข้อ หากไม่มีพฤติกรรมเหล่านี้ กดถัดไป',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontFamily: 'IBMPlexSansThai',
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 22,
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 22, right: 22, bottom: 20),
-                              height: 56,
-                              child: MaterialButton(
-                                color: noDeseaseHistory
-                                    ? activeColor
-                                    : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    noDeseaseHistory = !noDeseaseHistory;
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                        height: 36,
-                                        margin: EdgeInsets.only(left: 16),
-                                        child: Image.asset(
-                                            'assets/images/noHistoryIcon.png')),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text("ไม่มีโรคประจำตัว",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 22, right: 22, bottom: 20),
-                              height: 56,
-                              child: MaterialButton(
-                                color: cancer ? activeColor : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    cancer = !cancer;
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                        height: 36,
-                                        margin: EdgeInsets.only(left: 16),
-                                        child: Image.asset(
-                                            'assets/images/cancerIcon.png')),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text("โรคมะเร็ง",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 22, right: 22, bottom: 20),
-                              height: 56,
-                              child: MaterialButton(
-                                color: diabetes ? activeColor : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    diabetes = !diabetes;
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                        height: 36,
-                                        margin: EdgeInsets.only(left: 16),
-                                        child: Image.asset(
-                                            'assets/images/diabetesIcon.png')),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text("โรคเบาหวาน",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 22, right: 22, bottom: 20),
-                              height: 56,
-                              child: MaterialButton(
-                                color:
-                                    highPressure ? activeColor : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    highPressure = !highPressure;
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                        height: 36,
-                                        margin: EdgeInsets.only(left: 16),
-                                        child: Image.asset(
-                                            'assets/images/hypertensionIcon.png')),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text("โรคความดันเลือดสูง",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 22, right: 22, bottom: 20),
-                              height: 56,
-                              child: MaterialButton(
-                                color:
-                                    heartAttack ? activeColor : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    heartAttack = !heartAttack;
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                        height: 36,
-                                        margin: EdgeInsets.only(left: 16),
-                                        child: Image.asset(
-                                            'assets/images/heartAttackIcon.png')),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text("โรคหัวใจ",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 22, right: 22, bottom: 20),
-                              height: 56,
-                              child: MaterialButton(
-                                color: kidney ? activeColor : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    kidney = !kidney;
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                        height: 36,
-                                        margin: EdgeInsets.only(left: 16),
-                                        child: Image.asset(
-                                            'assets/images/kidneyIcon.png')),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text("โรคไต",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 22, right: 22, bottom: 20),
-                              height: 56,
-                              child: MaterialButton(
-                                color: another ? activeColor : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    another = !another;
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                        height: 36,
-                                        margin: EdgeInsets.only(left: 16),
-                                        child: Image.asset(
-                                            'assets/images/addIcon.png')),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text("อื่นๆ",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            another
-                                ? Container(
-                                    margin: EdgeInsets.only(
-                                        left: 22, right: 22, bottom: 20),
-                                    height: 56,
-                                    child: TextFormField(
-                                      textDirection: TextDirection.ltr,
-                                      decoration: InputDecoration(
-                                        contentPadding:
-                                            EdgeInsets.only(left: 20),
-                                        fillColor: Color(hexColor('#C9E1FD')),
-                                        border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(24)),
-                                            borderSide: BorderSide(
-                                              color: Color(hexColor('#C9E1FD')),
-                                              width: 1,
-                                            )),
-                                      ),
-                                    ),
-                                  )
-                                : SizedBox(height: 0),
-                            SizedBox(height: 20)
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Scaffold(
-                    body: SingleChildScrollView(
-                      child: Container(
-                        alignment: Alignment.center,
-                        color: Color(hexColor('#FAFCFB')),
-                        child: Column(
-                          children: [
-                            SizedBox(height: 30),
-                            RichText(
-                              text: TextSpan(
-                                text:
-                                    'ครอบครัวมีประวัติเป็นโรค\nดังต่อไปนี้หรือไม่',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontFamily: 'IBMPlexSansThai',
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            RichText(
-                              text: TextSpan(
-                                text:
-                                    'ตอบได้มากกว่า 1 ข้อ หากไม่มีพฤติกรรมเหล่านี้ กดถัดไป',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontFamily: 'IBMPlexSansThai',
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 22,
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 22, right: 22, bottom: 20),
-                              height: 56,
-                              child: MaterialButton(
-                                color: noDeseaseHistoryParent
-                                    ? activeColor
-                                    : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    noDeseaseHistoryParent =
-                                        !noDeseaseHistoryParent;
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                        height: 36,
-                                        margin: EdgeInsets.only(left: 16),
-                                        child: Image.asset(
-                                            'assets/images/noHistoryIcon.png')),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text("ไม่มีโรคประจำตัว",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 22, right: 22, bottom: 20),
-                              height: 56,
-                              child: MaterialButton(
-                                color:
-                                    cancerParent ? activeColor : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    cancerParent = !cancerParent;
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                        height: 36,
-                                        margin: EdgeInsets.only(left: 16),
-                                        child: Image.asset(
-                                            'assets/images/cancerIcon.png')),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text("โรคมะเร็ง",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 22, right: 22, bottom: 20),
-                              height: 56,
-                              child: MaterialButton(
-                                color: diabetesParent
-                                    ? activeColor
-                                    : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    diabetesParent = !diabetesParent;
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                        height: 36,
-                                        margin: EdgeInsets.only(left: 16),
-                                        child: Image.asset(
-                                            'assets/images/diabetesIcon.png')),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text("โรคเบาหวาน",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 22, right: 22, bottom: 20),
-                              height: 56,
-                              child: MaterialButton(
-                                color: highPressureParent
-                                    ? activeColor
-                                    : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    highPressureParent = !highPressureParent;
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                        height: 36,
-                                        margin: EdgeInsets.only(left: 16),
-                                        child: Image.asset(
-                                            'assets/images/hypertensionIcon.png')),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text("โรคความดันเลือดสูง",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 22, right: 22, bottom: 20),
-                              height: 56,
-                              child: MaterialButton(
-                                color: heartAttackParent
-                                    ? activeColor
-                                    : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    heartAttackParent = !heartAttackParent;
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                        height: 36,
-                                        margin: EdgeInsets.only(left: 16),
-                                        child: Image.asset(
-                                            'assets/images/heartAttackIcon.png')),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text("โรคหัวใจ",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 22, right: 22, bottom: 20),
-                              height: 56,
-                              child: MaterialButton(
-                                color:
-                                    kidneyParent ? activeColor : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    kidneyParent = !kidneyParent;
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                        height: 36,
-                                        margin: EdgeInsets.only(left: 16),
-                                        child: Image.asset(
-                                            'assets/images/kidneyIcon.png')),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text("โรคไต",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 22, right: 22, bottom: 20),
-                              height: 56,
-                              child: MaterialButton(
-                                color:
-                                    anotherParent ? activeColor : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    anotherParent = !anotherParent;
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                        height: 36,
-                                        margin: EdgeInsets.only(left: 16),
-                                        child: Image.asset(
-                                            'assets/images/addIcon.png')),
-                                    SizedBox(
-                                      width: 15,
-                                    ),
-                                    Text("อื่นๆ",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            anotherParent
-                                ? Container(
-                                    margin: EdgeInsets.only(
-                                        left: 22, right: 22, bottom: 20),
-                                    height: 56,
-                                    child: TextFormField(
-                                      textDirection: TextDirection.ltr,
-                                      decoration: InputDecoration(
-                                        contentPadding:
-                                            EdgeInsets.only(left: 20),
-                                        fillColor: Color(hexColor('#C9E1FD')),
-                                        border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(24)),
-                                            borderSide: BorderSide(
-                                              color: Color(hexColor('#C9E1FD')),
-                                              width: 1,
-                                            )),
-                                      ),
-                                    ),
-                                  )
-                                : SizedBox(height: 0),
-                            SizedBox(height: 20)
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Scaffold(
-                    backgroundColor: Color(hexColor('#FAFCFB')),
-                    body: SingleChildScrollView(
-                      child: Center(
-                        child: Column(
-                          children: [
-                            SizedBox(height: 44),
-                            RichText(
-                              text: TextSpan(
-                                text: 'คุณออกกำลังกายกี่ครั้งต่อสัปดาห์',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontFamily: 'IBMPlexSansThai',
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 27,
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 26, right: 26, bottom: 26),
-                              height: 50,
-                              child: MaterialButton(
-                                color: exerciseFrequency == "น้อยกว่า 3 วัน"
-                                    ? activeColor
-                                    : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    exerciseFrequency = "น้อยกว่า 3 วัน";
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text("น้อยกว่า 3 วัน",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 26, right: 26, bottom: 26),
-                              height: 50,
-                              child: MaterialButton(
-                                color: exerciseFrequency == "3 - 5 วัน"
-                                    ? activeColor
-                                    : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    exerciseFrequency = "3 - 5 วัน";
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text("3 - 5 วัน",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 26, right: 26, bottom: 26),
-                              height: 50,
-                              child: MaterialButton(
-                                color: exerciseFrequency == "6 - 7 วัน"
-                                    ? activeColor
-                                    : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    exerciseFrequency = "6 - 7 วัน";
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text("6 - 7 วัน",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 26, right: 26, bottom: 26),
-                              height: 50,
-                              child: MaterialButton(
-                                color: exerciseFrequency == "ไม่ออกกำลังกาย"
-                                    ? activeColor
-                                    : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    exerciseFrequency = "ไม่ออกกำลังกาย";
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text("ไม่ออกกำลังกาย",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 41,
-                            ),
-                            RichText(
-                              text: TextSpan(
-                                text: 'คุณออกกำลังกายครั้งละกี่นาที',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontFamily: 'IBMPlexSansThai',
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 27,
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 26, right: 26, bottom: 26),
-                              height: 50,
-                              child: MaterialButton(
-                                color: exercisePeriod == "น้อยกว่า 15 นาที"
-                                    ? activeColor
-                                    : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    exercisePeriod = "น้อยกว่า 15 นาที";
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text("น้อยกว่า 15 นาที",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: EdgeInsets.only(
-                                  left: 26, right: 26, bottom: 26),
-                              height: 50,
-                              child: MaterialButton(
-                                color: exercisePeriod == "15 - 30 นาที"
-                                    ? activeColor
-                                    : unactiveColor,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(28),
-                                    side: BorderSide(
-                                      color: Color(hexColor('#DBDBDB')),
-                                      width: 1,
-                                    )),
-                                onPressed: () {
-                                  setState(() {
-                                    exercisePeriod = "15 - 30 นาที";
-                                  });
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text("15 - 30 นาที",
-                                        style: TextStyle(
-                                            fontSize: 18,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Container(
-                height: 93,
-                child: Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.only(left: 22.5, right: 22.5),
-                        child: MaterialButton(
-                          height: 44,
-                          color: Color(hexColor('#2F4EF1')),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(23.5),
-                          ),
-                          onPressed: () {
-                            print('$_curPage');
-                            if (_pageController.hasClients && _curPage < 4) {
-                              _pageController.nextPage(
-                                  duration: Duration(milliseconds: 200),
-                                  curve: Curves.easeIn);
-                            } else {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => RiskResult()));
-                            }
-                          },
-                          child: Container(
-                            alignment: Alignment.center,
-                            child: Text("ถัดไป",
-                                style: TextStyle(
-                                    fontSize: 20,
+                      SingleChildScrollView(
+                        controller: _scrollController,
+                        child: Container(
+                          alignment: Alignment.center,
+                          color: Color(hexColor('#FAFCFB')),
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 44),
+                              RichText(
+                                text: const TextSpan(
+                                  text:
+                                      'ท่านมีประวัติเป็นโรค ดังต่อไปนี้หรือไม่',
+                                  style: TextStyle(
+                                    fontSize: 22,
                                     fontFamily: 'IBMPlexSansThai',
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.normal),
-                                textAlign: TextAlign.center),
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              RichText(
+                                text: const TextSpan(
+                                  text:
+                                      'ตอบได้มากกว่า 1 ข้อ หากไม่มีพฤติกรรมเหล่านี้ กดถัดไป',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontFamily: 'IBMPlexSansThai',
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 22,
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 22, right: 22, bottom: 20),
+                                height: 56,
+                                child: MaterialButton(
+                                  color: noDeseaseHistory &&
+                                          (!cancer &&
+                                              !diabetes &&
+                                              !highPressure &&
+                                              !heartAttack &&
+                                              !kidney &&
+                                              !another)
+                                      ? activeColor
+                                      : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      noDeseaseHistory = !noDeseaseHistory;
+                                      if (noDeseaseHistory == true) {
+                                        cancer = false;
+                                        diabetes = false;
+                                        highPressure = false;
+                                        heartAttack = false;
+                                        kidney = false;
+                                        another = false;
+                                      }
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                          height: 36,
+                                          margin:
+                                              const EdgeInsets.only(left: 16),
+                                          child: Image.asset(
+                                              'assets/images/noHistoryIcon.png')),
+                                      const SizedBox(
+                                        width: 15,
+                                      ),
+                                      const Text("ไม่มีโรคประจำตัว",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 22, right: 22, bottom: 20),
+                                height: 56,
+                                child: MaterialButton(
+                                  color: cancer ? activeColor : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      cancer = !cancer;
+                                      noDeseaseHistory = false;
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                          height: 36,
+                                          margin:
+                                              const EdgeInsets.only(left: 16),
+                                          child: Image.asset(
+                                              'assets/images/cancerIcon.png')),
+                                      const SizedBox(
+                                        width: 15,
+                                      ),
+                                      const Text("โรคมะเร็ง",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 22, right: 22, bottom: 20),
+                                height: 56,
+                                child: MaterialButton(
+                                  color: diabetes ? activeColor : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      diabetes = !diabetes;
+                                      noDeseaseHistory = false;
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                          height: 36,
+                                          margin:
+                                              const EdgeInsets.only(left: 16),
+                                          child: Image.asset(
+                                              'assets/images/diabetesIcon.png')),
+                                      const SizedBox(
+                                        width: 15,
+                                      ),
+                                      const Text("โรคเบาหวาน",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 22, right: 22, bottom: 20),
+                                height: 56,
+                                child: MaterialButton(
+                                  color: highPressure
+                                      ? activeColor
+                                      : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      highPressure = !highPressure;
+                                      noDeseaseHistory = false;
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                          height: 36,
+                                          margin: EdgeInsets.only(left: 16),
+                                          child: Image.asset(
+                                              'assets/images/hypertensionIcon.png')),
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      Text("โรคความดันเลือดสูง",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(
+                                    left: 22, right: 22, bottom: 20),
+                                height: 56,
+                                child: MaterialButton(
+                                  color:
+                                      heartAttack ? activeColor : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      heartAttack = !heartAttack;
+                                      noDeseaseHistory = false;
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                          height: 36,
+                                          margin: EdgeInsets.only(left: 16),
+                                          child: Image.asset(
+                                              'assets/images/heartAttackIcon.png')),
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      Text("โรคหัวใจ",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(
+                                    left: 22, right: 22, bottom: 20),
+                                height: 56,
+                                child: MaterialButton(
+                                  color: kidney ? activeColor : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      kidney = !kidney;
+                                      noDeseaseHistory = false;
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                          height: 36,
+                                          margin: EdgeInsets.only(left: 16),
+                                          child: Image.asset(
+                                              'assets/images/kidneyIcon.png')),
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      Text("โรคไต",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 22, right: 22, bottom: 20),
+                                height: 56,
+                                child: MaterialButton(
+                                  color: another ? activeColor : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      another = !another;
+                                      noDeseaseHistory = false;
+                                    });
+                                    if (another == true) {
+                                      _scrollController.animateTo(
+                                        _scrollController
+                                                .position.maxScrollExtent +
+                                            100,
+                                        duration:
+                                            const Duration(milliseconds: 200),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    }
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                          height: 36,
+                                          margin: EdgeInsets.only(left: 16),
+                                          child: Image.asset(
+                                              'assets/images/addIcon.png')),
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      Text("อื่นๆ",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              another
+                                  ? Container(
+                                      margin: EdgeInsets.only(
+                                          left: 22, right: 22, bottom: 90),
+                                      height: 56,
+                                      child: TextFormField(
+                                        controller: _controllerAnother,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            anotherData = value;
+                                          });
+                                        },
+                                        textDirection: TextDirection.ltr,
+                                        decoration: InputDecoration(
+                                          hintText: 'กรอกข้อมูลอื่นๆ',
+                                          hintStyle: TextStyle(
+                                            fontSize: 18,
+                                            fontFamily: 'IBMPlexSansThai',
+                                            color: Color(hexColor("#999999")),
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                          contentPadding:
+                                              EdgeInsets.only(left: 35),
+                                          fillColor: Color(hexColor('#C9E1FD')),
+                                          border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(24)),
+                                              borderSide: BorderSide(
+                                                color:
+                                                    Color(hexColor('#C9E1FD')),
+                                                width: 1,
+                                              )),
+                                        ),
+                                      ),
+                                    )
+                                  : const SizedBox(height: 80),
+                              const SizedBox(height: 20)
+                            ],
+                          ),
+                        ),
+                      ),
+                      SingleChildScrollView(
+                        controller: _scrollController,
+                        child: Container(
+                          alignment: Alignment.center,
+                          color: Color(hexColor('#FAFCFB')),
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 30),
+                              RichText(
+                                text: const TextSpan(
+                                  text:
+                                      'ครอบครัวมีประวัติเป็นโรค\nดังต่อไปนี้หรือไม่',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontFamily: 'IBMPlexSansThai',
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              RichText(
+                                text: const TextSpan(
+                                  text:
+                                      'ตอบได้มากกว่า 1 ข้อ หากไม่มีพฤติกรรมเหล่านี้ กดถัดไป',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontFamily: 'IBMPlexSansThai',
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 22,
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 22, right: 22, bottom: 20),
+                                height: 56,
+                                child: MaterialButton(
+                                  color: noDeseaseHistoryParent &&
+                                          (!cancerParent &&
+                                              !diabetesParent &&
+                                              !highPressureParent &&
+                                              !heartAttackParent &&
+                                              !kidneyParent &&
+                                              !anotherParent)
+                                      ? activeColor
+                                      : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      noDeseaseHistoryParent =
+                                          !noDeseaseHistoryParent;
+                                      if (noDeseaseHistoryParent == true) {
+                                        cancerParent = false;
+                                        diabetesParent = false;
+                                        highPressureParent = false;
+                                        heartAttackParent = false;
+                                        kidneyParent = false;
+                                        anotherParent = false;
+                                      }
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                          height: 36,
+                                          margin:
+                                              const EdgeInsets.only(left: 16),
+                                          child: Image.asset(
+                                              'assets/images/noHistoryIcon.png')),
+                                      const SizedBox(
+                                        width: 15,
+                                      ),
+                                      const Text("ไม่มีโรคประจำตัว",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 22, right: 22, bottom: 20),
+                                height: 56,
+                                child: MaterialButton(
+                                  color: cancerParent
+                                      ? activeColor
+                                      : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      cancerParent = !cancerParent;
+                                      noDeseaseHistoryParent = false;
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                          height: 36,
+                                          margin:
+                                              const EdgeInsets.only(left: 16),
+                                          child: Image.asset(
+                                              'assets/images/cancerIcon.png')),
+                                      const SizedBox(
+                                        width: 15,
+                                      ),
+                                      const Text("โรคมะเร็ง",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 22, right: 22, bottom: 20),
+                                height: 56,
+                                child: MaterialButton(
+                                  color: diabetesParent
+                                      ? activeColor
+                                      : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      diabetesParent = !diabetesParent;
+                                      noDeseaseHistoryParent = false;
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                          height: 36,
+                                          margin: EdgeInsets.only(left: 16),
+                                          child: Image.asset(
+                                              'assets/images/diabetesIcon.png')),
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      Text("โรคเบาหวาน",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(
+                                    left: 22, right: 22, bottom: 20),
+                                height: 56,
+                                child: MaterialButton(
+                                  color: highPressureParent
+                                      ? activeColor
+                                      : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      highPressureParent = !highPressureParent;
+                                      noDeseaseHistoryParent = false;
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                          height: 36,
+                                          margin: EdgeInsets.only(left: 16),
+                                          child: Image.asset(
+                                              'assets/images/hypertensionIcon.png')),
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      Text("โรคความดันเลือดสูง",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 22, right: 22, bottom: 20),
+                                height: 56,
+                                child: MaterialButton(
+                                  color: heartAttackParent
+                                      ? activeColor
+                                      : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      heartAttackParent = !heartAttackParent;
+                                      noDeseaseHistoryParent = false;
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                          height: 36,
+                                          margin: EdgeInsets.only(left: 16),
+                                          child: Image.asset(
+                                              'assets/images/heartAttackIcon.png')),
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      Text("โรคหัวใจ",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 22, right: 22, bottom: 20),
+                                height: 56,
+                                child: MaterialButton(
+                                  color: kidneyParent
+                                      ? activeColor
+                                      : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      kidneyParent = !kidneyParent;
+                                      noDeseaseHistoryParent = false;
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                          height: 36,
+                                          margin: EdgeInsets.only(left: 16),
+                                          child: Image.asset(
+                                              'assets/images/kidneyIcon.png')),
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      Text("โรคไต",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(
+                                    left: 22, right: 22, bottom: 20),
+                                height: 56,
+                                child: MaterialButton(
+                                  color: anotherParent
+                                      ? activeColor
+                                      : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      anotherParent = !anotherParent;
+                                      noDeseaseHistoryParent = false;
+                                    });
+                                    if (anotherParent == true) {
+                                      _scrollController.animateTo(
+                                        _scrollController
+                                                .position.maxScrollExtent +
+                                            100,
+                                        duration:
+                                            const Duration(milliseconds: 200),
+                                        curve: Curves.easeInOut,
+                                      );
+                                    }
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Container(
+                                          height: 36,
+                                          margin: EdgeInsets.only(left: 16),
+                                          child: Image.asset(
+                                              'assets/images/addIcon.png')),
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      Text("อื่นๆ",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              anotherParent
+                                  ? Container(
+                                      margin: EdgeInsets.only(
+                                          left: 22, right: 22, bottom: 90),
+                                      height: 56,
+                                      child: TextFormField(
+                                        controller: _controllerAnotherParent,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            anotherParentData = value;
+                                          });
+                                        },
+                                        textDirection: TextDirection.ltr,
+                                        decoration: InputDecoration(
+                                          hintText: 'กรอกข้อมูลอื่นๆ',
+                                          hintStyle: TextStyle(
+                                            fontSize: 18,
+                                            fontFamily: 'IBMPlexSansThai',
+                                            color: Color(hexColor("#999999")),
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                          contentPadding:
+                                              EdgeInsets.only(left: 35),
+                                          fillColor: Color(hexColor('#C9E1FD')),
+                                          border: OutlineInputBorder(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(24)),
+                                              borderSide: BorderSide(
+                                                color:
+                                                    Color(hexColor('#C9E1FD')),
+                                                width: 1,
+                                              )),
+                                        ),
+                                      ),
+                                    )
+                                  : SizedBox(height: 80),
+                              SizedBox(height: 20)
+                            ],
+                          ),
+                        ),
+                      ),
+                      SingleChildScrollView(
+                        child: Center(
+                          child: Column(
+                            children: [
+                              SizedBox(height: 44),
+                              RichText(
+                                text: TextSpan(
+                                  text: 'คุณออกกำลังกายกี่ครั้งต่อสัปดาห์',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontFamily: 'IBMPlexSansThai',
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 27,
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(
+                                    left: 26, right: 26, bottom: 26),
+                                height: 50,
+                                child: MaterialButton(
+                                  color: exerciseFrequency == "น้อยกว่า 3 วัน"
+                                      ? activeColor
+                                      : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      exerciseFrequency = "น้อยกว่า 3 วัน";
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text("น้อยกว่า 3 วัน",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(
+                                    left: 26, right: 26, bottom: 26),
+                                height: 50,
+                                child: MaterialButton(
+                                  color: exerciseFrequency == "3 - 5 วัน"
+                                      ? activeColor
+                                      : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      exerciseFrequency = "3 - 5 วัน";
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text("3 - 5 วัน",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(
+                                    left: 26, right: 26, bottom: 26),
+                                height: 50,
+                                child: MaterialButton(
+                                  color: exerciseFrequency == "6 - 7 วัน"
+                                      ? activeColor
+                                      : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      exerciseFrequency = "6 - 7 วัน";
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text("6 - 7 วัน",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(
+                                    left: 26, right: 26, bottom: 26),
+                                height: 50,
+                                child: MaterialButton(
+                                  color: exerciseFrequency == "ไม่ออกกำลังกาย"
+                                      ? activeColor
+                                      : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      exerciseFrequency = "ไม่ออกกำลังกาย";
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text("ไม่ออกกำลังกาย",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 41,
+                              ),
+                              RichText(
+                                text: TextSpan(
+                                  text: 'คุณออกกำลังกายครั้งละกี่นาที',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontFamily: 'IBMPlexSansThai',
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 27,
+                              ),
+                              Container(
+                                margin: const EdgeInsets.only(
+                                    left: 26, right: 26, bottom: 26),
+                                height: 50,
+                                child: MaterialButton(
+                                  color: exercisePeriod == "น้อยกว่า 15 นาที"
+                                      ? activeColor
+                                      : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      exercisePeriod = "น้อยกว่า 15 นาที";
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text("น้อยกว่า 15 นาที",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(
+                                    left: 26, right: 26, bottom: 26),
+                                height: 50,
+                                child: MaterialButton(
+                                  color: exercisePeriod == "15 - 30 นาที"
+                                      ? activeColor
+                                      : unactiveColor,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(28),
+                                      side: BorderSide(
+                                        color: Color(hexColor('#DBDBDB')),
+                                        width: 1,
+                                      )),
+                                  onPressed: () {
+                                    setState(() {
+                                      exercisePeriod = "15 - 30 นาที";
+                                    });
+                                  },
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text("15 - 30 นาที",
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal),
+                                          textAlign: TextAlign.center),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
                     ],
                   ),
-                )),
+                  Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      ShaderMask(
+                        shaderCallback: (Rect rect) {
+                          return const LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.purple,
+                              Colors.transparent,
+                              Colors.transparent,
+                              Colors.purple
+                            ],
+                            stops: [
+                              0.0,
+                              0.2,
+                              1.0,
+                              1.0
+                            ], // 10% purple, 80% transparent, 10% purple
+                          ).createShader(rect);
+                        },
+                        blendMode: BlendMode.dstOut,
+                        child: Container(
+                          height: 120,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 22, right: 22, bottom: 50),
+                        child: SizedBox(
+                          height: 44,
+                          child: MaterialButton(
+                            color: Color(hexColor('#2F4EF1')),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(23.5),
+                            ),
+                            onPressed: () {
+                              if (_pageController.hasClients && _curPage < 4) {
+                                _pageController.nextPage(
+                                    duration: const Duration(milliseconds: 200),
+                                    curve: Curves.easeIn);
+                              } else {
+                                if (noDeseaseHistory) {
+                                  _disease = [];
+                                } else {
+                                  if (cancer) {
+                                    _disease.add("cancer");
+                                  }
+                                  if (diabetes) {
+                                    _disease.add("diabetes");
+                                  }
+                                  if (highPressure) {
+                                    _disease.add("hypertension");
+                                  }
+                                  if (heartAttack) {
+                                    _disease.add("heartDisease");
+                                  }
+                                  if (kidney) {
+                                    _disease.add("kidneyDisease");
+                                  }
+                                }
+
+                                if (noDeseaseHistoryParent) {
+                                  _family = [];
+                                } else {
+                                  if (cancerParent) {
+                                    _family.add("cancer");
+                                  }
+                                  if (diabetesParent) {
+                                    _family.add("diabetes");
+                                  }
+                                  if (highPressureParent) {
+                                    _family.add("hypertension");
+                                  }
+                                  if (heartAttackParent) {
+                                    _family.add("heartDisease");
+                                  }
+                                  if (kidneyParent) {
+                                    _family.add("kidneyDisease");
+                                  }
+                                }
+                                print(_disease);
+                                print(_family);
+                                postDisease(token!, _disease, _family);
+                                _disease = [];
+                                _family = [];
+                                // Navigator.push(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //         builder: (context) =>
+                                //             const RiskResult()));
+                              }
+                            },
+                            child: Container(
+                              alignment: Alignment.center,
+                              child: const Text("ถัดไป",
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontFamily: 'IBMPlexSansThai',
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.normal),
+                                  textAlign: TextAlign.center),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
           ],
         ));
   }
@@ -1488,60 +1685,54 @@ class StepProgressView extends StatelessWidget {
     return wids;
   }
 
+  @override
   Widget build(BuildContext context) {
     return Container(
       padding: padding,
-      decoration: this.decoration,
+      decoration: decoration,
       child: Column(
         children: <Widget>[
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                width: 24,
-                child: IconButton(
-                    iconSize: 24,
-                    icon: const Icon(Icons.keyboard_arrow_left),
-                    onPressed: () {
-                      if (_curStep > 1) {
-                        _pageController.previousPage(
-                          duration: Duration(milliseconds: 200),
-                          curve: Curves.linear,
-                        );
-                      } else {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => StartScreening()));
-                      }
-                    }),
-              ),
-              Container(
-                child: Center(
-                  child: RichText(
-                    text: TextSpan(
-                      children: [
-                        TextSpan(
-                          text: "ขั้นตอนที่ " +
-                              (_curStep + 4).toString() +
-                              " จาก " +
-                              (_stepsText.length + 4).toString(),
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'IBMPlexSansThai',
-                            color: Color(hexColor('#2F4EF1')),
-                            fontWeight: FontWeight.normal,
-                          ),
+              IconButton(
+                  iconSize: 24,
+                  icon: const Icon(Icons.keyboard_arrow_left),
+                  onPressed: () {
+                    if (_curStep > 1) {
+                      _pageController.previousPage(
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.linear,
+                      );
+                    } else {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const StartScreening()));
+                    }
+                  }),
+              Center(
+                child: RichText(
+                  text: TextSpan(
+                    children: [
+                      TextSpan(
+                        text:
+                            "ขั้นตอนที่ ${_curStep + 3} จาก ${_stepsText.length + 3}",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: 'IBMPlexSansThai',
+                          color: Color(hexColor('#2F4EF1')),
+                          fontWeight: FontWeight.normal,
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
               ),
-              Container(width: 24)
+              Container(width: 48)
             ],
           ),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Row(

@@ -82,7 +82,7 @@ class _PermissionPageState extends State<PermissionPage> {
               height: 400,
               width: 300,
               child: Scrollbar(
-                isAlwaysShown: true,
+                //isAlwaysShown: true,
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,

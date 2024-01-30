@@ -110,11 +110,11 @@ class _CalendarPageState extends State<CalendarPage> {
                         detailsDate = f.format(details.date).toString();
                         dateTimeNow = f.format(DateTime.now()).toString();
 
-                        //control(emotional);
-                        print('สร้างใหม่');
-                        print(chooseEmoji);
-                        print(detailsDate);
-                        print(dateTimeNow);
+                        // //control(emotional);
+                        // print('สร้างใหม่');
+                        // print(chooseEmoji);
+                        // print(detailsDate);
+                        // print(dateTimeNow);
 
                         // String? emotional =
                         //     contentsList[(f.format(details.date)).toString()];

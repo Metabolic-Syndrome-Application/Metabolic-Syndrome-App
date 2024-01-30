@@ -1,4 +1,5 @@
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/calendar.dart/calendar.dart';
@@ -27,7 +28,7 @@ class SelectedDatePage extends StatefulWidget {
 class _SelectedDatePageState extends State<SelectedDatePage> {
   int initial = 1;
   late final CustomSegmentedController<int> controller;
-
+  String? selectedPlanType = 'ทั้งหมด';
   int pageChanged = 1;
   DateFormat f = DateFormat('dd/MM/yyyy');
 
@@ -53,6 +54,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
     String selectedDate = f.format(widget.selectedDate).toString();
     String today = f.format(DateTime.now()).toString();
     bool isToday;
+    final List<String> planType = ['ทั้งหมด', 'อาหาร', 'ออกกำลังกาย', 'อื่นๆ'];
 
     if (today == selectedDate) {
       isToday = true;
@@ -89,7 +91,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                               ),
                             ),
                             Text(
-                              isToday ? 'วันนี้' : 'วันที่ $selectedDate',
+                              "บันทึก",
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontFamily: 'IBMPlexSansThai',
@@ -117,7 +119,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                   fontSize: 20,
                                   fontFamily: 'IBMPlexSansThai',
                                   color: Colors.black,
-                                  fontWeight: FontWeight.normal,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               )),
                           2: Container(
@@ -128,7 +130,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                   fontSize: 20,
                                   fontFamily: 'IBMPlexSansThai',
                                   color: Colors.black,
-                                  fontWeight: FontWeight.normal,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               )),
                         },
@@ -158,18 +160,14 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                 ),
               ],
             ),
-            SizedBox(
-              height: 20,
-            ),
             Expanded(
               child: PageView(
                 physics: new NeverScrollableScrollPhysics(),
                 // pageSnapping: true,
                 controller: _pageController,
-
                 children: [
                   //พฤติกรรม
-                  widget.hasPlan
+                  !widget.hasPlan
                       ? Scaffold(
                           backgroundColor: Color(hexColor('#FAFCFB')),
                           body: SingleChildScrollView(
@@ -180,7 +178,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   SizedBox(
-                                    height: 20,
+                                    height: 27,
                                   ),
                                   Container(
                                     padding: EdgeInsets.symmetric(
@@ -195,18 +193,136 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                       children: [
                                         Row(
                                           children: [
-                                            Image.asset(
-                                                'assets/images/food_note_icon.png'),
-                                            SizedBox(width: 10),
                                             Text(
-                                              'อาหาร',
+                                              isToday
+                                                  ? 'วันนี้'
+                                                  : 'วันที่ $selectedDate',
                                               style: TextStyle(
                                                 fontSize: 20,
                                                 fontFamily: 'IBMPlexSansThai',
                                                 color: Colors.black,
                                                 fontWeight: FontWeight.bold,
                                               ),
-                                            )
+                                            ),
+                                            DropdownButtonHideUnderline(
+                                              child: DropdownButton2<String>(
+                                                isExpanded: true,
+                                                hint: const Row(
+                                                  children: [
+                                                    SizedBox(
+                                                      width: 4,
+                                                    ),
+                                                    Expanded(
+                                                      child: Text(
+                                                        'เลือกเพศของคุณ',
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          fontFamily:
+                                                              'IBMPlexSansThai',
+                                                          color: Colors.grey,
+                                                          fontWeight:
+                                                              FontWeight.normal,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                items: planType
+                                                    .map((String planType) =>
+                                                        DropdownMenuItem<
+                                                            String>(
+                                                          value: planType,
+                                                          child: Text(
+                                                            planType,
+                                                            style: TextStyle(
+                                                              fontSize: 16,
+                                                              fontFamily:
+                                                                  'IBMPlexSansThai',
+                                                              color: Color(
+                                                                  hexColor(
+                                                                      '#3D3D3D')),
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .normal,
+                                                            ),
+                                                          ),
+                                                        ))
+                                                    .toList(),
+                                                value: selectedPlanType,
+                                                onChanged: (String? value) {
+                                                  setState(() {
+                                                    selectedPlanType = value;
+                                                  });
+                                                },
+                                                buttonStyleData:
+                                                    ButtonStyleData(
+                                                  height: 47,
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 15),
+                                                  decoration: BoxDecoration(
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.white
+                                                            .withOpacity(.3),
+                                                        blurRadius: 4.0,
+                                                        spreadRadius: .1,
+                                                        offset: const Offset(
+                                                          2.0,
+                                                          4.0,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            24),
+                                                    border: Border.all(
+                                                      color: Colors.black26,
+                                                    ),
+                                                    color: Colors.white,
+                                                  ),
+                                                  elevation: 2,
+                                                ),
+                                                iconStyleData:
+                                                    const IconStyleData(
+                                                        openMenuIcon: Icon(
+                                                          Icons
+                                                              .keyboard_arrow_down_rounded,
+                                                        ),
+                                                        icon: Icon(
+                                                          Icons
+                                                              .keyboard_arrow_right_rounded,
+                                                        ),
+                                                        iconSize: 20),
+                                                dropdownStyleData:
+                                                    DropdownStyleData(
+                                                  decoration: BoxDecoration(
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.grey
+                                                            .withOpacity(.3),
+                                                        blurRadius: 4.0,
+                                                        spreadRadius: .1,
+                                                        offset: const Offset(
+                                                          2.0,
+                                                          4.0,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            0),
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                menuItemStyleData:
+                                                    const MenuItemStyleData(
+                                                  height: 40,
+                                                  padding: EdgeInsets.only(
+                                                      left: 14, right: 14),
+                                                ),
+                                              ),
+                                            ),
                                           ],
                                         ),
                                         SizedBox(

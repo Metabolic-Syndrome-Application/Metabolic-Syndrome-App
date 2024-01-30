@@ -1,19 +1,14 @@
+// import 'package:email_auth/email_auth.dart';
+import 'dart:convert';
+
+import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
-import 'package:flutter_application_1/page/home/home.dart';
+import 'package:flutter_application_1/page/loginRegister/createProfile.dart';
 import 'package:flutter_application_1/page/loginRegister/login.dart';
-
-class Register extends StatelessWidget {
-  const Register({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Register Page",
-      home: RegisterPage(),
-    );
-  }
-}
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -23,6 +18,42 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  Future postRegister(
+    String username,
+    String password,
+    String passwordConfirm,
+  ) async {
+    final response = await http.post(
+        Uri.parse('http://192.168.0.107:8000/api/auth/register'),
+        body: json.encode({
+          "username": username,
+          "password": password,
+          "passwordConfirm": passwordConfirm,
+          "role": "patient"
+        }));
+    if (response.statusCode == 400) {
+      setState(() {
+        _usedEmail = true;
+        _readyToCreateProfile = false;
+      });
+    } else {
+      setState(() {
+        _usedEmail = false;
+        _readyToCreateProfile = true;
+        print("งง");
+      });
+    }
+  }
+
+  Future postLogin(String username, String password) async {
+    final url = Uri.parse("http://192.168.0.107:8000/api/auth/login");
+    final response = await http.post(url,
+        body: json.encode({'username': username, 'password': password}));
+
+    Provider.of<AuthProvider>(context, listen: false)
+        .setToken(json.decode(response.body)['access_token']);
+  }
+
   bool visiblePassword = false;
   bool visibleConfirmPassword = false;
 
@@ -40,7 +71,9 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _validatePassword = false;
   bool _validateConfirmPassword = false;
 
+  bool _readyToCreateProfile = false;
   bool _notSame = false;
+  bool _usedEmail = false;
 
   bool _conditionPassword(String value) {
     RegExp regex =
@@ -60,6 +93,10 @@ class _RegisterPageState extends State<RegisterPage> {
     _controllerConfirmPassword.dispose();
     super.dispose();
   }
+
+  // String _otp = '';
+
+  // EmailOTP _myauth = EmailOTP();
 
   @override
   Widget build(BuildContext context) {
@@ -156,6 +193,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           onChanged: (value) {
                             setState(() {
                               _email = value;
+                              _usedEmail = false;
                             });
                           },
                           controller: _controllerEmail,
@@ -164,14 +202,19 @@ class _RegisterPageState extends State<RegisterPage> {
                           decoration: InputDecoration(
                             errorBorder: OutlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(30)),
+                                    const BorderRadius.all(Radius.circular(30)),
                                 borderSide: BorderSide(
                                   color: Color(hexColor('#DBDBDB')),
                                   width: 1,
                                 )),
                             errorText: _validateEmail && _email == ''
                                 ? "กรุณากรอกอีเมล"
-                                : null,
+                                : !EmailValidator.validate(_email) &&
+                                        _email != ''
+                                    ? "รูปแบบอีเมลไม่ถูกต้อง"
+                                    : _usedEmail
+                                        ? "อีเมลนี้มีผู้ลงทะเบียนใช้งานอยู่แล้ว"
+                                        : null,
                             errorStyle: TextStyle(
                               fontSize: 14,
                               fontFamily: 'IBMPlexSansThai',
@@ -179,7 +222,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               fontWeight: FontWeight.normal,
                             ),
                             contentPadding:
-                                EdgeInsets.symmetric(horizontal: 15),
+                                const EdgeInsets.symmetric(horizontal: 15),
                             hintText: 'email@example.com',
                             hintStyle: TextStyle(
                               fontSize: 16,
@@ -189,7 +232,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             border: OutlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(30)),
+                                    const BorderRadius.all(Radius.circular(30)),
                                 borderSide: BorderSide(
                                   color: Color(hexColor('#DBDBDB')),
                                   width: 1,
@@ -204,7 +247,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         padding: EdgeInsets.symmetric(
                             horizontal: screenWidth * .025,
                             vertical: screenHeight * 0.012),
-                        child: Row(
+                        child: const Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text("รหัสผ่าน",
@@ -233,7 +276,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             errorMaxLines: 3,
                             errorBorder: OutlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(30)),
+                                    const BorderRadius.all(Radius.circular(30)),
                                 borderSide: BorderSide(
                                   color: Color(hexColor('#DBDBDB')),
                                   width: 1,
@@ -251,7 +294,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               fontWeight: FontWeight.normal,
                             ),
                             contentPadding:
-                                EdgeInsets.symmetric(horizontal: 15),
+                                const EdgeInsets.symmetric(horizontal: 15),
                             hintText: '●●●●●●●●●●',
                             hintStyle: TextStyle(
                               fontSize: 16,
@@ -272,7 +315,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 }),
                             border: OutlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(30)),
+                                    const BorderRadius.all(Radius.circular(30)),
                                 borderSide: BorderSide(
                                   color: Color(hexColor('#DBDBDB')),
                                   width: 1,
@@ -287,7 +330,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         padding: EdgeInsets.symmetric(
                             horizontal: screenWidth * .025,
                             vertical: screenHeight * 0.012),
-                        child: Row(
+                        child: const Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               Text("ยืนยันรหัสผ่าน",
@@ -316,7 +359,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           decoration: InputDecoration(
                             errorBorder: OutlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(30)),
+                                    const BorderRadius.all(Radius.circular(30)),
                                 borderSide: BorderSide(
                                   color: Color(hexColor('#DBDBDB')),
                                   width: 1,
@@ -336,7 +379,7 @@ class _RegisterPageState extends State<RegisterPage> {
                               fontWeight: FontWeight.normal,
                             ),
                             contentPadding:
-                                EdgeInsets.symmetric(horizontal: 15),
+                                const EdgeInsets.symmetric(horizontal: 15),
                             hintText: '●●●●●●●●●●',
                             hintStyle: TextStyle(
                               fontSize: 16,
@@ -358,7 +401,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 }),
                             border: OutlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(30)),
+                                    const BorderRadius.all(Radius.circular(30)),
                                 borderSide: BorderSide(
                                   color: Color(hexColor('#DBDBDB')),
                                   width: 1,
@@ -373,10 +416,10 @@ class _RegisterPageState extends State<RegisterPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(23.5),
                         ),
-                        onPressed: () {
+                        onPressed: () async {
                           if (_controllerEmail.text.isEmpty == true) {
                             setState(() {
-                              _validateEmail = _controllerEmail.text.isEmpty;
+                              _validateEmail = true;
                               _validatePassword = false;
                               _validateConfirmPassword = false;
                               _notSame = false;
@@ -384,34 +427,37 @@ class _RegisterPageState extends State<RegisterPage> {
                           } else if (_controllerPassword.text.isEmpty == true) {
                             setState(() {
                               _validateEmail = false;
-                              _validatePassword =
-                                  _controllerPassword.text.isEmpty;
+                              _validatePassword = true;
                               _validateConfirmPassword = false;
                               _notSame = false;
                             });
-                          } else {
+                          } else if (_controllerConfirmPassword.text.isEmpty ==
+                              true) {
                             setState(() {
                               _validateEmail = false;
                               _validatePassword = false;
-                              _validateConfirmPassword =
-                                  _controllerConfirmPassword.text.isEmpty;
+                              _validateConfirmPassword = true;
                               _notSame = false;
                             });
-                          }
-                          ;
-
-                          if (_password != '' &&
-                              _email != '' &&
-                              _confirmPassword != '' &&
-                              _conditionPassword(_password)) {
+                          } else {
                             if (_password == _confirmPassword) {
                               setState(() {
                                 _notSame = false;
                               });
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Home()));
+                              await postRegister(
+                                _email,
+                                _password,
+                                _confirmPassword,
+                              );
+
+                              if (_readyToCreateProfile == true) {
+                                postLogin(_email, _password);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            CreateProfilePage()));
+                              }
                             } else {
                               setState(() {
                                 _notSame = true;
@@ -478,8 +524,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(
-                                child: Image.asset('assets/images/google.png')),
+                            Image.asset('assets/images/google.png'),
                             SizedBox(
                               width: screenWidth * .025,
                             ),

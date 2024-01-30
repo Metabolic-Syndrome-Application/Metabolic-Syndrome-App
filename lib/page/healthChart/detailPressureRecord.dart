@@ -206,39 +206,6 @@ class _DetailPressureRecordPageState extends State<DetailPressureRecordPage> {
                     SizedBox(
                       height: 15,
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'น้ำหนัก',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'IBMPlexSansThai',
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        Container(
-                          width: 130,
-                          alignment: Alignment.centerRight,
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(30),
-                              border: Border.all(
-                                  color: Color(hexColor('#E9E9E9')))),
-                          child: Text(
-                            '50 กก.',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: 'IBMPlexSansThai',
-                              color: Color(hexColor('#484554')),
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
                   ],
                 ),
               )

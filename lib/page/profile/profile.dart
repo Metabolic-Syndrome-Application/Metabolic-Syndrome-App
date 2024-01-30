@@ -1,10 +1,17 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/home/home.dart';
+import 'package:flutter_application_1/page/loginRegister/login.dart';
 import 'package:flutter_application_1/page/profile/changeProfile.dart';
 import 'package:flutter_application_1/page/profile/healthChart.dart';
 import 'package:flutter_application_1/page/profile/hospitalConnect.dart';
 import 'package:flutter_application_1/page/profile/treatmentInformation.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+
+import '../../authProvider.dart';
 
 class Profile extends StatelessWidget {
   const Profile({super.key});
@@ -26,10 +33,31 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  bool hospitalConnected = true;
+  String imageProfile = 'assets/images/defaultProfile1.png';
+  String? alias;
+  bool hospitalConnected = false;
+
+  Future<void> getProfile(String accesstoken) async {
+    final url = Uri.parse("http://10.66.8.149:8000/api/user/profile");
+    final response = await http
+        .get(url, headers: {'Authorization': 'Bearer ${accesstoken}'});
+    print('profile Response body: ${response.body}');
+    alias = json.decode(response.body)['data']['user']['alias'];
+  }
+
+  Future<void> getLogout(accesstoken) async {
+    final url = Uri.parse("http://10.66.8.149:8000/api/auth/logout");
+    final response = await http
+        .get(url, headers: {'Authorization': 'Bearer ${accesstoken}'});
+    print('logout status:${response.statusCode}');
+    print('logout message:${response.body}');
+  }
 
   @override
   Widget build(BuildContext context) {
+    String? token = Provider.of<AuthProvider>(context).token;
+    getProfile(token!);
+
     return Scaffold(
         backgroundColor: Color(hexColor('#FAFCFB')),
         body: SingleChildScrollView(
@@ -80,7 +108,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         decoration: BoxDecoration(
                             color: Color(hexColor('#999999')),
                             borderRadius: BorderRadius.circular(33)),
-                        child: Image.asset('assets/images/person.png'),
+                        child: Image.asset(imageProfile),
                       ),
                       SizedBox(
                         width: 13,
@@ -89,7 +117,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'นันท์',
+                            alias ?? '',
                             style: TextStyle(
                               fontSize: 20,
                               fontFamily: 'IBMPlexSansThai',
@@ -181,8 +209,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       InkWell(
                         onTap: () {
                           //
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => HealthChart()));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HealthChart()));
                         },
                         child: Container(
                           child: Row(
@@ -474,7 +504,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     borderRadius: BorderRadius.circular(23.5),
                   ),
                   onPressed: () {
-                    // login by email
+                    //logout
+                    getLogout(token);
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Login()));
                   },
                   child: Container(
                     height: 47,

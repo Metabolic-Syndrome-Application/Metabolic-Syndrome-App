@@ -178,11 +178,6 @@ class _TodayNotePageState extends State<TodayNotePage> {
                               children: [
                                 Row(
                                   children: [
-                                    Icon(
-                                      Icons.food_bank_outlined,
-                                      color: Colors.black,
-                                    ),
-                                    SizedBox(width: 10),
                                     Text(
                                       'อาหาร',
                                       style: TextStyle(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/page/healthChart/allBMIRecord.dart';
 import 'package:flutter_application_1/page/healthChart/allPressureRecord.dart';
 import 'package:flutter_application_1/widget/chart/pressureChart.dart/dayChart.dart';
 import 'package:flutter_application_1/widget/chart/pressureChart.dart/sixMonthChart.dart';
@@ -9,25 +10,25 @@ import '../../extension/Color.dart';
 import '../../widget/chart/pressureChart.dart/monthChart.dart';
 import '../profile/healthChart.dart';
 
-class PressureChart extends StatelessWidget {
-  const PressureChart({super.key});
+class BMIChart extends StatelessWidget {
+  const BMIChart({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      home: PressureChartPage(),
+      home: BMIChartPage(),
     );
   }
 }
 
-class PressureChartPage extends StatefulWidget {
-  const PressureChartPage({super.key});
+class BMIChartPage extends StatefulWidget {
+  const BMIChartPage({super.key});
 
   @override
-  State<PressureChartPage> createState() => _PressureChartPageState();
+  State<BMIChartPage> createState() => _BMIChartPageState();
 }
 
-class _PressureChartPageState extends State<PressureChartPage> {
+class _BMIChartPageState extends State<BMIChartPage> {
   String? period = 'day';
   String _systolicPressure = '';
   String _diastolicPressure = '';
@@ -68,7 +69,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'ความดันโลหิต',
+                        'ดัชนีมวลกาย',
                         style: TextStyle(
                           fontSize: 20,
                           fontFamily: 'IBMPlexSansThai',
@@ -94,7 +95,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'ช่วงหัวใจบีบตัว (ตัวบน)',
+                        'น้ำหนัก',
                         style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'IBMPlexSansThai',
@@ -125,7 +126,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                               padding: const EdgeInsets.only(
                                   top: 8, left: 3, right: 10),
                               child: Text(
-                                'mmHg',
+                                'กก.',
                                 style: TextStyle(
                                     fontSize: 14,
                                     fontFamily: 'IBMPlexSansThai',
@@ -155,7 +156,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'ช่วงหัวใจคลายตัว (ตัวล่าง)',
+                        'ส่วนสูง',
                         style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'IBMPlexSansThai',
@@ -179,7 +180,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                               padding: const EdgeInsets.only(
                                   top: 8, left: 3, right: 10),
                               child: Text(
-                                'mmHg',
+                                'ซม.',
                                 style: TextStyle(
                                     fontSize: 14,
                                     fontFamily: 'IBMPlexSansThai',
@@ -205,7 +206,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       const Text(
-                        'อัตราการเต้นของหัวใจ',
+                        'รอบเอว',
                         style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'IBMPlexSansThai',
@@ -229,7 +230,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                               padding: const EdgeInsets.only(
                                   top: 8, left: 3, right: 10),
                               child: Text(
-                                'ครั้ง/นาที',
+                                'นิ้ว',
                                 style: TextStyle(
                                     fontSize: 14,
                                     fontFamily: 'IBMPlexSansThai',
@@ -276,9 +277,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                         color: Color(hexColor('#2F4EF1')),
                         borderRadius: BorderRadius.circular(30),
                         child: InkWell(
-                          onTap: () {
-                            
-                          },
+                          onTap: () {},
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10),
                             decoration: BoxDecoration(
@@ -334,7 +333,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                       width: 25,
                     ),
                     const Text(
-                      'ความดันโลหิต',
+                      'ดัชนีมวลกาย',
                       style: TextStyle(
                         fontSize: 24,
                         fontFamily: 'IBMPlexSansThai',
@@ -584,7 +583,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                             width: 5,
                           ),
                           Text(
-                            'ช่วงหัวใจบีบตัว',
+                            'น้ำหนัก',
                             style: TextStyle(
                                 fontSize: 14,
                                 fontFamily: 'IBMPlexSansThai',
@@ -597,7 +596,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                         height: 16,
                       ),
                       const Text(
-                        '110 mmHg',
+                        '55 กก.',
                         style: TextStyle(
                             fontSize: 20,
                             fontFamily: 'IBMPlexSansThai',
@@ -619,7 +618,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                             width: 5,
                           ),
                           Text(
-                            'ช่วงหัวใจคลายตัว',
+                            'ค่าดัชนีมวลกาย',
                             style: TextStyle(
                                 fontSize: 14,
                                 fontFamily: 'IBMPlexSansThai',
@@ -632,7 +631,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                         height: 16,
                       ),
                       const Text(
-                        '75 mmHg',
+                        '17.2 กก./ม.',
                         style: TextStyle(
                             fontSize: 20,
                             fontFamily: 'IBMPlexSansThai',
@@ -654,7 +653,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                             width: 5,
                           ),
                           Text(
-                            'ชีพจร',
+                            'รอบเอว',
                             style: TextStyle(
                                 fontSize: 14,
                                 fontFamily: 'IBMPlexSansThai',
@@ -667,7 +666,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                         height: 16,
                       ),
                       const Text(
-                        '75 ครั้ง/นาที',
+                        '25 นิ้ว',
                         style: TextStyle(
                             fontSize: 20,
                             fontFamily: 'IBMPlexSansThai',
@@ -694,112 +693,133 @@ class _PressureChartPageState extends State<PressureChartPage> {
             const SizedBox(
               height: 35,
             ),
-            Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'เกี่ยวกับความดันโลหิต',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontFamily: 'IBMPlexSansThai',
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 10),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(20)),
-                        child: const Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '• ค่าบนเครื่องวัดความดัน\n',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'IBMPlexSansThai',
-                                color: Colors.black,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(left: 20),
-                              child: Text(
-                                '1. Systolic blood pressure (SBP) ตัวบน คือ ความดันของเลือดสูงสุดขณะหัวใจห้องล่างบีบตัว\n\n2. Diastolic blood pressure (DBP) ตัวล่าง คือ ความดันเลือดที่ต่ำสุดขณะหัวใจห้องล่างคลายตัว\n',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'IBMPlexSansThai',
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ),
-                            Text(
-                              '• เกณฑ์ความดัน\n',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontFamily: 'IBMPlexSansThai',
-                                color: Colors.black,
-                                fontWeight: FontWeight.normal,
-                              ),
-                            ),
-                            Padding(
-                              padding: EdgeInsets.only(left: 20),
-                              child: Text(
-                                '- ความดันโลหิตเกณฑ์ปกติ คือ 120/80 (mm/Hg)\n\n- ความดันโลหิตค่อนข้างสูง แต่ยังอยู่ในเกณฑ์ปกติ คือ 121-139/80-89 (mm/Hg)\n\n- ความดันโลหิตสูงมาก คือ ความดันโลหิตตัวบน มากกว่า (หรือเท่ากับ) 140 (mm/Hg) และตัวล่างมากกว่า (หรือเท่ากับ) 90 (mm/Hg)\n\n- ความดันโลหิตระดับอันตราย 160/100 (mm/Hg)',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'IBMPlexSansThai',
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ),
-                          ],
-                        )),
-                    const SizedBox(height: 40),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'ค่าดัชนีมวลกาย',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontFamily: 'IBMPlexSansThai',
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 15),
+                Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20)),
+                    child: const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Row(
-                          children: [
-                            Text(
-                              'ข้อมูลที่บันทึกทั้งหมด',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontFamily: 'IBMPlexSansThai',
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          'คือ การมีดัชนีมวลกายก่อนมากกว่าหรือเท่ากับ 2\n5 กิโลกรัม/ตารางเมตร\n\nแบ่งเป็น 4 ระดับ คือ',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'IBMPlexSansThai',
+                            color: Colors.black,
+                            fontWeight: FontWeight.normal,
+                          ),
                         ),
-                        InkWell(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const AllPressureRecord()));
-                          },
-                          child: const Icon(
-                            Icons.arrow_forward_ios_rounded,
-                            size: 14,
+                        Padding(
+                          padding: EdgeInsets.only(left: 20),
+                          child: Text(
+                            '• ระดับ 1a 25.0-29.9\n• ระดับ 1b 30-34.9\n• ระดับ 2 35.0-39.9\n• ระดับ 3 ≥ 40.0 กิโลกรัม/ตารางเมตร',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'IBMPlexSansThai',
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )),
+                SizedBox(
+                  height: 15,
+                ),
+                Text(
+                  'รอบเอว',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontFamily: 'IBMPlexSansThai',
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 15),
+                Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 10),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20)),
+                    child: const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'ค่าปกติของเส้นรอบเอว',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontFamily: 'IBMPlexSansThai',
+                            color: Colors.black,
+                            fontWeight: FontWeight.normal,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(left: 20),
+                          child: Text(
+                            '• ผู้หญิง ไม่ควรเกิน 80 เซนติเมตร / 32 นิ้ว\n• ผู้ชาย ไม่ควรเกิน 90 เซนติเมตร / 36 นิ้ว',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'IBMPlexSansThai',
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                      ],
+                    )),
+                const SizedBox(height: 40),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Row(
+                      children: [
+                        Text(
+                          'ข้อมูลที่บันทึกทั้งหมด',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontFamily: 'IBMPlexSansThai',
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(
-                      height: 50,
-                    )
+                    InkWell(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const AllBMIRecord()));
+                      },
+                      child: const Icon(
+                        Icons.arrow_forward_ios_rounded,
+                        size: 14,
+                      ),
+                    ),
                   ],
-                )),
+                ),
+                const SizedBox(
+                  height: 50,
+                )
+              ],
+            ),
           ],
         ),
       ),

@@ -24,7 +24,6 @@ class JoinQuestionPage extends StatefulWidget {
 }
 
 class _JoinQuestionPageState extends State<JoinQuestionPage> {
-  bool _showRank = false;
   bool isChecked = false;
 
   Color getColor(Set<MaterialState> states) {

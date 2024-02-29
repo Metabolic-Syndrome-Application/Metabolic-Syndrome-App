@@ -2,26 +2,51 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/challenge/joinChallenge.dart';
 
-void main() {
-  runApp(ChallengeCard());
+class ChallengeCard extends StatefulWidget {
+  final String id;
+  final String name;
+  final int points;
+  final int numDays;
+  const ChallengeCard({
+    required this.id,
+    required this.name,
+    required this.points,
+    required this.numDays,
+    super.key,
+  });
+
+  @override
+  State<ChallengeCard> createState() => _ChallengeCardState();
 }
 
-class ChallengeCard extends StatelessWidget {
-  const ChallengeCard({super.key});
-
+class _ChallengeCardState extends State<ChallengeCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 15),
       decoration: BoxDecoration(
-          color: Color(hexColor('#FFFFFF')),
-          borderRadius: BorderRadius.circular(30)),
+        color: Color(hexColor('#FFFFFF')),
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(.3),
+            blurRadius: 4.0,
+            spreadRadius: .1,
+            offset: const Offset(
+              0.0,
+              4.0,
+            ),
+          ),
+        ],
+      ),
       alignment: Alignment.centerLeft,
       padding: EdgeInsets.only(left: 7, right: 7),
-      child:Row(
+      child: Row(
         children: [
           Container(
               height: 110,
-              child: Image.asset('assets/images/hit_challenge_image_default.png')),
+              child:
+                  Image.asset('assets/images/hit_challenge_image_default.png')),
           SizedBox(
             width: 7,
           ),
@@ -32,7 +57,7 @@ class ChallengeCard extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("นอนวันละ 8 ชั่วโมง",
+                    Text(widget.name,
                         style: TextStyle(
                           fontSize: 20,
                           fontFamily: 'IBMPlexSansThai',
@@ -49,7 +74,7 @@ class ChallengeCard extends StatelessWidget {
                         ),
                         SizedBox(width: 5),
                         Text(
-                          "40 coins",
+                          "${widget.points} คะแนน",
                           style: TextStyle(
                             fontSize: 14,
                             fontFamily: 'IBMPlexSansThai',
@@ -68,7 +93,7 @@ class ChallengeCard extends StatelessWidget {
                         ),
                         SizedBox(width: 5),
                         Text(
-                          "1 สัปดาห์",
+                          "${widget.numDays} วัน",
                           style: TextStyle(
                             fontSize: 14,
                             fontFamily: 'IBMPlexSansThai',
@@ -78,9 +103,6 @@ class ChallengeCard extends StatelessWidget {
                           textAlign: TextAlign.left,
                         )
                       ],
-                    ),
-                    SizedBox(
-                      height: 5,
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -92,7 +114,9 @@ class ChallengeCard extends StatelessWidget {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => JoinChallenge()));
+                                    builder: (context) => JoinChallenge(
+                                          id: widget.id,
+                                        )));
                           },
                           color: Color(hexColor('#2F4EF1')),
                           shape: RoundedRectangleBorder(

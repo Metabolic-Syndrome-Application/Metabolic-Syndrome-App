@@ -1,20 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
-import 'package:flutter_application_1/page/challenge/joinQuestion.dart';
-
-void main() {
-  runApp(QuestionCard());
-}
+import 'package:flutter_application_1/page/challenge/question.dart';
 
 class QuestionCard extends StatelessWidget {
-  const QuestionCard({super.key});
+  final bool checkQuiz;
+  const QuestionCard({required this.checkQuiz, super.key});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-          color: Color(hexColor('#FFFFFF')),
-          borderRadius: BorderRadius.circular(30)),
+        color: Color(hexColor('#FFFFFF')),
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(.3),
+            blurRadius: 4.0,
+            spreadRadius: .1,
+            offset: const Offset(
+              0.0,
+              4.0,
+            ),
+          ),
+        ],
+      ),
       alignment: Alignment.centerLeft,
       padding: EdgeInsets.only(left: 7, right: 7),
       child: Row(
@@ -33,7 +42,7 @@ class QuestionCard extends StatelessWidget {
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("นอนวันละ 8 ชั่วโมง",
+                    Text("ตอบคำถามประจำวัน",
                         style: TextStyle(
                           fontSize: 20,
                           fontFamily: 'IBMPlexSansThai',
@@ -50,7 +59,7 @@ class QuestionCard extends StatelessWidget {
                         ),
                         SizedBox(width: 5),
                         Text(
-                          "40 coins",
+                          "150 คะแนน",
                           style: TextStyle(
                             fontSize: 14,
                             fontFamily: 'IBMPlexSansThai',
@@ -69,7 +78,7 @@ class QuestionCard extends StatelessWidget {
                         ),
                         SizedBox(width: 5),
                         Text(
-                          "1 สัปดาห์",
+                          "1 นาที",
                           style: TextStyle(
                             fontSize: 14,
                             fontFamily: 'IBMPlexSansThai',
@@ -80,9 +89,6 @@ class QuestionCard extends StatelessWidget {
                         )
                       ],
                     ),
-                    SizedBox(
-                      height: 5,
-                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -90,12 +96,19 @@ class QuestionCard extends StatelessWidget {
                           height: 32,
                           minWidth: 73,
                           onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => JoinQuestion()));
+                            checkQuiz
+                                ? Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Question()))
+                                : Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Question()));
                           },
-                          color: Color(hexColor('#2F4EF1')),
+                          color: checkQuiz
+                              ? Color(hexColor('#DBDBDB'))
+                              : Color(hexColor('#2F4EF1')),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(30),
                           ),

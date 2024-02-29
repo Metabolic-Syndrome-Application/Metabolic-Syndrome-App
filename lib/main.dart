@@ -1,35 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/page/loginRegister/login.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-//import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 import 'extension/Color.dart';
 
-void main() {
-  //await dotenv.load(fileName: ".env");
-  // initializeDateFormatting().then((_) => runApp(MyApp()));
+void main() async {
+  await dotenv.load(fileName: '.env');
 
-  runApp(ChangeNotifierProvider(
-      create: (context) => AuthProvider(), child: MyApp()));
+  initializeDateFormatting().then((_) => runApp(ChangeNotifierProvider(
+      create: (context) => AuthProvider(), child: MyApp())));
+
+  // runApp(ChangeNotifierProvider(
+  //     create: (context) => AuthProvider(), child: MyApp()));
 }
-
-// Future main() async {
-//   WidgetsFlutterBinding.ensureInitialized();
-//   await Firebase.initializeApp(
-//     options: DefaultFirebaseOptions.currentPlatform,
-//   );
-//   runApp(MyApp());
-// }
-
-// final navigatorKey = GlobalKey<NavigatorState>();
 
 //สร้าง Widget
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       //navigatorKey: navigatorKey,
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
@@ -42,7 +37,6 @@ class MyApp extends StatelessWidget {
       locale: Locale('th', 'TH'),
       title: "My App",
       home: MyHomePage(),
-      theme: ThemeData(primarySwatch: Colors.blue),
     );
   }
 }
@@ -74,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(hexColor('#FAFCFB')),
-      body: LoginPage(),
+      body: const LoginPage(),
       // body: _children[_currentIndex],
       // bottomNavigationBar: BottomNavigationBar(
       //   onTap: onTabTapped,

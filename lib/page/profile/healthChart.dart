@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/page/healthChart/bmiChart.dart';
+import 'package:flutter_application_1/page/healthChart/glucoseChart.dart';
+import 'package:flutter_application_1/page/healthChart/lipidChart.dart';
 import 'package:flutter_application_1/page/healthChart/pressureChart.dart';
 import 'package:flutter_application_1/page/profile/profile.dart';
+import 'package:flutter_application_1/response/api.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../extension/Color.dart';
 
@@ -24,6 +30,40 @@ class HealthChartPage extends StatefulWidget {
 }
 
 class _HealthChartPageState extends State<HealthChartPage> {
+  String timeStamp = '--:--';
+  String systolicBloodPressure = '-';
+  String diastolicBloodPressure = '-';
+  String bmi = '-';
+  String bloodGlucose = '-';
+  String triglyceride = '-';
+
+  Future<void> fetchLatest() async {
+    try {
+      String? token = Provider.of<AuthProvider>(context, listen: false).token;
+      Map<String, dynamic> response = await getLatestRecord(token!);
+      setState(() {
+        systolicBloodPressure =
+            response['data']['record'][0]['systolicBloodPressure'].toString();
+        diastolicBloodPressure =
+            response['data']['record'][0]['diastolicBloodPressure'].toString();
+        bmi = response['data']['record'][0]['bmi'].toStringAsFixed(2);
+        bloodGlucose = response['data']['record'][0]['bloodGlucose'].toString();
+        triglyceride = response['data']['record'][0]['triglyceride'].toString();
+        timeStamp = response['data']['record'][0]['timestamp'];
+        DateTime inputDateTime = DateTime.parse(timeStamp);
+        timeStamp = DateFormat('dd MMM HH:mm', 'th').format(inputDateTime);
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    fetchLatest();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +93,7 @@ class _HealthChartPageState extends State<HealthChartPage> {
                     fontSize: 24,
                     fontFamily: 'IBMPlexSansThai',
                     color: Colors.black,
-                    fontWeight: FontWeight.normal,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(
@@ -64,7 +104,7 @@ class _HealthChartPageState extends State<HealthChartPage> {
                 height: 22,
               ),
               Text(
-                'วันนี้',
+                'ประวัติค่าสุขภาพ',
                 style: TextStyle(
                   fontSize: 20,
                   fontFamily: 'IBMPlexSansThai',
@@ -84,10 +124,10 @@ class _HealthChartPageState extends State<HealthChartPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => PressureChart()));
+                            builder: (context) => const PressureChart()));
                   },
                   child: Padding(
-                    padding: EdgeInsets.all(17),
+                    padding: const EdgeInsets.all(17),
                     child: Column(
                       children: [
                         Row(
@@ -108,7 +148,7 @@ class _HealthChartPageState extends State<HealthChartPage> {
                             ]),
                             Row(
                               children: [
-                                Text('09:45',
+                                Text(timeStamp,
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontFamily: 'IBMPlexSansThai',
@@ -132,12 +172,16 @@ class _HealthChartPageState extends State<HealthChartPage> {
                         ),
                         Row(
                           children: [
-                            Text('110/75',
+                            Text(
+                                systolicBloodPressure == '-' ||
+                                        diastolicBloodPressure == '-'
+                                    ? '-/-'
+                                    : '$systolicBloodPressure/$diastolicBloodPressure',
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontFamily: 'IBMPlexSansThai',
                                   color: Colors.black,
-                                  fontWeight: FontWeight.normal,
+                                  fontWeight: FontWeight.bold,
                                 )),
                             SizedBox(
                               width: 5,
@@ -168,7 +212,7 @@ class _HealthChartPageState extends State<HealthChartPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => BMIChart()));
+                            builder: (context) => const BMIChart()));
                   },
                   child: Padding(
                     padding: EdgeInsets.all(17),
@@ -192,7 +236,7 @@ class _HealthChartPageState extends State<HealthChartPage> {
                             ]),
                             Row(
                               children: [
-                                Text('09:45',
+                                Text(timeStamp,
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontFamily: 'IBMPlexSansThai',
@@ -217,9 +261,19 @@ class _HealthChartPageState extends State<HealthChartPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Text('19.0',
+                            Text(bmi,
                                 style: TextStyle(
                                   fontSize: 20,
+                                  fontFamily: 'IBMPlexSansThai',
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                )),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text('กก./ม.²',
+                                style: TextStyle(
+                                  fontSize: 16,
                                   fontFamily: 'IBMPlexSansThai',
                                   color: Colors.black,
                                   fontWeight: FontWeight.normal,
@@ -239,7 +293,12 @@ class _HealthChartPageState extends State<HealthChartPage> {
                 borderRadius: BorderRadius.circular(30),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(30),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const GlucoseChart()));
+                  },
                   child: Padding(
                     padding: EdgeInsets.all(17),
                     child: Column(
@@ -248,7 +307,7 @@ class _HealthChartPageState extends State<HealthChartPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Row(children: [
-                              Image.asset('assets/images/bloodSugar.png'),
+                              Image.asset('assets/images/bloodGlucose.png'),
                               SizedBox(
                                 width: 5,
                               ),
@@ -262,7 +321,7 @@ class _HealthChartPageState extends State<HealthChartPage> {
                             ]),
                             Row(
                               children: [
-                                Text('14 ส.ค.',
+                                Text(timeStamp,
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontFamily: 'IBMPlexSansThai',
@@ -286,17 +345,17 @@ class _HealthChartPageState extends State<HealthChartPage> {
                         ),
                         Row(
                           children: [
-                            Text('110/75',
+                            Text(bloodGlucose,
                                 style: TextStyle(
                                   fontSize: 20,
                                   fontFamily: 'IBMPlexSansThai',
                                   color: Colors.black,
-                                  fontWeight: FontWeight.normal,
+                                  fontWeight: FontWeight.bold,
                                 )),
                             SizedBox(
                               width: 5,
                             ),
-                            Text('mmHg',
+                            Text('mg/dL',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontFamily: 'IBMPlexSansThai',
@@ -309,6 +368,93 @@ class _HealthChartPageState extends State<HealthChartPage> {
                     ),
                   ),
                 ),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              Material(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(30),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(30),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const LipidChart()));
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.all(17),
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(children: [
+                              Image.asset('assets/images/cholesterolIcon.png'),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text('ไขมันในเลือด',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'IBMPlexSansThai',
+                                    color: Color(hexColor('#FF9900')),
+                                    fontWeight: FontWeight.normal,
+                                  ))
+                            ]),
+                            Row(
+                              children: [
+                                Text(timeStamp,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontFamily: 'IBMPlexSansThai',
+                                      color: Color(hexColor('#484554')),
+                                      fontWeight: FontWeight.normal,
+                                    )),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Icon(
+                                  Icons.arrow_forward_ios_rounded,
+                                  size: 16,
+                                  color: Color(hexColor('#7B7B7B')),
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 15,
+                        ),
+                        Row(
+                          children: [
+                            Text(triglyceride,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontFamily: 'IBMPlexSansThai',
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                )),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text('mg/dL',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'IBMPlexSansThai',
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.normal,
+                                )),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 80,
               ),
             ],
           ),

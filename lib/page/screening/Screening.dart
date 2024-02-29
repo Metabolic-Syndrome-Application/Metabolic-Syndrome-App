@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math';
 
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
@@ -7,7 +6,7 @@ import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/screening/metabolicResult.dart';
 import 'package:flutter_application_1/page/screening/startScreening.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_application_1/response/api.dart';
 import 'package:provider/provider.dart';
 
 class ScreeningPage extends StatefulWidget {
@@ -135,7 +134,7 @@ class _ScreeningPageState extends State<ScreeningPage> {
     super.initState();
   }
 
-  Future<void> getMetabolic(
+  Future<void> fetchMetabolic(
       String accesstoken,
       String occupation,
       double heigth,
@@ -148,28 +147,29 @@ class _ScreeningPageState extends State<ScreeningPage> {
       double bloodGlucose,
       double triglyceride,
       double hdl) async {
-    final url = Uri.parse("http://10.68.9.216:8000/api/screening/metabolic");
-    final response = await http.post(url,
-        headers: {'Authorization': 'Bearer $accesstoken'},
-        body: json.encode({
-          "occupation": occupation,
-          "height": height,
-          "weight": weight,
-          "bmi": bmi,
-          "waistline": waistline,
-          "systolicBloodPressure": systolicBloodPressure,
-          "diastolicBloodPressure": diastolicBloodPressure,
-          "pulseRate": pulseRate,
-          "bloodGlucose": bloodGlucose,
-          "triglyceride": triglyceride,
-          "hdl": hdl
-        }));
-    setState(() {
-      metabolicResult = json.decode(response.body)['data']['metabolicRisk'];
-    });
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
+    try {
+      Map<String, dynamic> response = await postMetabolic(
+          token!,
+          occupation,
+          heigth,
+          weight,
+          bmi,
+          waistline,
+          systolicBloodPressure,
+          diastolicBloodPressure,
+          pulseRate,
+          bloodGlucose,
+          triglyceride,
+          hdl);
+      setState(() {
+        metabolicResult = response['data']['metabolicRisk'];
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
   }
 
-//Build method of Main Page\
   @override
   Widget build(BuildContext context) {
     String? token = Provider.of<AuthProvider>(context).token;
@@ -184,1409 +184,1639 @@ class _ScreeningPageState extends State<ScreeningPage> {
             _getStepProgress(),
             Expanded(
               flex: 7,
-              child: PageView(
-                physics: const NeverScrollableScrollPhysics(),
-                controller: _pageController,
-                onPageChanged: (i) {
-                  setState(() {
-                    _curPage = i + 1;
-                  });
-                },
-                children: <Widget>[
-                  SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 44),
-                        RichText(
-                          text: const TextSpan(
-                            text: 'อาชีพของคุณ',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontFamily: 'IBMPlexSansThai',
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 570,
-                          child: Column(
-                            children: [
-                              const SizedBox(
-                                height: 40,
-                              ),
-                              DropdownButton<String>(
-                                  icon: const Icon(
-                                      Icons.keyboard_arrow_down_outlined),
-                                  iconSize: 30,
-                                  itemHeight: 60,
-                                  dropdownColor: Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  hint: const Text(
-                                    'โปรดเลือกอาชีพ   ',
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  PageView(
+                    physics: const NeverScrollableScrollPhysics(),
+                    controller: _pageController,
+                    onPageChanged: (i) {
+                      setState(() {
+                        _curPage = i + 1;
+                      });
+                    },
+                    children: <Widget>[
+                      Scaffold(
+                        backgroundColor: Color(hexColor('#FAFCFB')),
+                        body: SingleChildScrollView(
+                          child: Center(
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 44),
+                                RichText(
+                                  text: const TextSpan(
+                                    text: 'อาชีพของคุณ',
                                     style: TextStyle(
                                       fontSize: 22,
                                       fontFamily: 'IBMPlexSansThai',
                                       color: Colors.black,
-                                      fontWeight: FontWeight.normal,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  value: dropdownValue,
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      dropdownValue = newValue!;
-                                    });
-                                  },
-                                  items: <String>[
-                                    'Apple',
-                                    'Mango',
-                                    'Banana',
-                                    'Peach'
-                                  ].map<DropdownMenuItem<String>>(
-                                      (String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(
-                                        value,
-                                        style: const TextStyle(
-                                          fontSize: 22,
-                                          fontFamily: 'IBMPlexSansThai',
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.normal,
-                                        ),
+                                ),
+                                SizedBox(
+                                  height: 570,
+                                  child: Column(
+                                    children: [
+                                      const SizedBox(
+                                        height: 40,
                                       ),
-                                    );
-                                  }).toList()),
-                              const SizedBox(
-                                height: 145,
-                              ),
-                              Image.asset('assets/images/Career.png'),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 44),
-                        RichText(
-                          text: const TextSpan(
-                            text: 'ข้อมูลสุขภาพของคุณ',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontFamily: 'IBMPlexSansThai',
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
+                                      DropdownButton<String>(
+                                          icon: const Icon(Icons
+                                              .keyboard_arrow_down_outlined),
+                                          iconSize: 30,
+                                          itemHeight: 60,
+                                          dropdownColor: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          hint: const Text(
+                                            'โปรดเลือกอาชีพ   ',
+                                            style: TextStyle(
+                                              fontSize: 22,
+                                              fontFamily: 'IBMPlexSansThai',
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                          ),
+                                          value: dropdownValue,
+                                          onChanged: (String? newValue) {
+                                            setState(() {
+                                              dropdownValue = newValue!;
+                                            });
+                                          },
+                                          items: <String>[
+                                            'Apple',
+                                            'Mango',
+                                            'Banana',
+                                            'Peach'
+                                          ].map<DropdownMenuItem<String>>(
+                                              (String value) {
+                                            return DropdownMenuItem<String>(
+                                              value: value,
+                                              child: Text(
+                                                value,
+                                                style: const TextStyle(
+                                                  fontSize: 22,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.normal,
+                                                ),
+                                              ),
+                                            );
+                                          }).toList()),
+                                      const SizedBox(
+                                        height: 145,
+                                      ),
+                                      Image.asset('assets/images/Career.png'),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.only(left: 38, right: 38),
+                      ),
+                      Scaffold(
+                        backgroundColor: Color(hexColor('#FAFCFB')),
+                        body: SingleChildScrollView(
                           child: Column(
                             children: [
-                              const SizedBox(
-                                height: 40,
+                              const SizedBox(height: 44),
+                              RichText(
+                                text: const TextSpan(
+                                  text: 'ข้อมูลสุขภาพของคุณ',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontFamily: 'IBMPlexSansThai',
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  SizedBox(
-                                    child: Row(
+                              Container(
+                                padding:
+                                    const EdgeInsets.only(left: 38, right: 38),
+                                child: Column(
+                                  children: [
+                                    const SizedBox(
+                                      height: 40,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
-                                        const Text('ส่วนสูง ',
+                                        SizedBox(
+                                          child: Row(
+                                            children: [
+                                              const Text('ส่วนสูง ',
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontFamily:
+                                                          'IBMPlexSansThai',
+                                                      color: Colors.black,
+                                                      fontWeight:
+                                                          FontWeight.normal),
+                                                  textAlign: TextAlign.start),
+                                              Text('*',
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontFamily:
+                                                          'IBMPlexSansThai',
+                                                      color: Color(
+                                                          hexColor('#FB6262')),
+                                                      fontWeight:
+                                                          FontWeight.normal),
+                                                  textAlign: TextAlign.start),
+                                            ],
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 36,
+                                          width: 205,
+                                          child: TextFormField(
+                                            controller: _controllerHeight,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                checkHeight = false;
+                                                height = (value == '' ||
+                                                        value == '0')
+                                                    ? 0
+                                                    : double.parse(value);
+                                                bmi =
+                                                    (height == 0 || weight == 0)
+                                                        ? 0
+                                                        : weight /
+                                                            pow(
+                                                                double.parse(
+                                                                        value) /
+                                                                    100,
+                                                                2);
+                                                _controllerBmi.text =
+                                                    bmi.toStringAsFixed(2);
+                                              });
+                                            },
+                                            keyboardType: const TextInputType
+                                                .numberWithOptions(
+                                                decimal: true),
+                                            textDirection: TextDirection.rtl,
+                                            decoration: InputDecoration(
+                                              enabledBorder: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          30.0),
+                                                  borderSide: BorderSide(
+                                                    color: checkHeight == true
+                                                        ? Color(
+                                                            hexColor('#FB6262'))
+                                                        : Color(hexColor(
+                                                            '#484554')),
+                                                  )),
+                                              focusedBorder: OutlineInputBorder(
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(24)),
+                                                  borderSide: BorderSide(
+                                                    color: checkHeight == true
+                                                        ? Color(
+                                                            hexColor('#FB6262'))
+                                                        : Color(hexColor(
+                                                            '#484554')),
+                                                    width: 1,
+                                                  )),
+                                              contentPadding:
+                                                  const EdgeInsets.only(
+                                                      left: 20),
+                                              fillColor: Colors.white,
+                                              suffixIcon: Container(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8,
+                                                    left: 15,
+                                                    right: 20),
+                                                child: Text(
+                                                  'ซม.',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontFamily:
+                                                          'IBMPlexSansThai',
+                                                      color: Color(
+                                                          hexColor('#484554')),
+                                                      fontWeight:
+                                                          FontWeight.normal),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(24)),
+                                                  borderSide: BorderSide(
+                                                    color: Color(
+                                                        hexColor('#E9E9E9')),
+                                                    width: 1,
+                                                  )),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    checkHeight == true
+                                        ? Container(
+                                            padding: const EdgeInsets.only(
+                                                right: 10),
+                                            alignment: Alignment.centerRight,
+                                            child: Text(
+                                              "กรุณากรอกส่วนสูง",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  color: Color(
+                                                      hexColor('#FB6262')),
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          )
+                                        : const Text(
+                                            "",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontFamily: 'IBMPlexSansThai',
+                                                fontWeight: FontWeight.normal),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                    const SizedBox(
+                                      height: 32,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const Text('น้ำหนัก ',
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontFamily:
+                                                        'IBMPlexSansThai',
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                                textAlign: TextAlign.start),
+                                            Text('*',
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontFamily:
+                                                        'IBMPlexSansThai',
+                                                    color: Color(
+                                                        hexColor('#FB6262')),
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                                textAlign: TextAlign.start),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 36,
+                                          width: 205,
+                                          child: TextFormField(
+                                            controller: _controllerWeight,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                weight = (value == '' ||
+                                                        value == '0')
+                                                    ? 0
+                                                    : double.parse(value);
+                                                bmi = (height == 0 ||
+                                                        weight == 0)
+                                                    ? 0
+                                                    : weight /
+                                                        pow(height / 100, 2);
+                                                _controllerBmi.text =
+                                                    bmi.toStringAsFixed(2);
+                                                checkWeight = false;
+                                              });
+                                            },
+                                            keyboardType: TextInputType.number,
+                                            textDirection: TextDirection.rtl,
+                                            decoration: InputDecoration(
+                                              enabledBorder: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          30.0),
+                                                  borderSide: BorderSide(
+                                                    color: checkWeight == true
+                                                        ? Color(
+                                                            hexColor('#FB6262'))
+                                                        : Color(hexColor(
+                                                            '#484554')),
+                                                  )),
+                                              focusedBorder: OutlineInputBorder(
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(24)),
+                                                  borderSide: BorderSide(
+                                                    color: checkWeight == true
+                                                        ? Color(
+                                                            hexColor('#FB6262'))
+                                                        : Color(hexColor(
+                                                            '#484554')),
+                                                    width: 1,
+                                                  )),
+                                              contentPadding:
+                                                  const EdgeInsets.only(
+                                                      left: 20),
+                                              fillColor: Colors.white,
+                                              suffixIcon: Container(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8,
+                                                    left: 20,
+                                                    right: 20),
+                                                child: Text(
+                                                  'กก.',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontFamily:
+                                                          'IBMPlexSansThai',
+                                                      color: Color(
+                                                          hexColor('#484554')),
+                                                      fontWeight:
+                                                          FontWeight.normal),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(24)),
+                                                  borderSide: BorderSide(
+                                                    color: Color(
+                                                        hexColor('#E9E9E9')),
+                                                    width: 1,
+                                                  )),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    checkWeight == true
+                                        ? Container(
+                                            padding: const EdgeInsets.only(
+                                                right: 10),
+                                            alignment: Alignment.centerRight,
+                                            child: Text(
+                                              "กรุณากรอกน้ำหนัก",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  color: Color(
+                                                      hexColor('#FB6262')),
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          )
+                                        : const Text(
+                                            "",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                fontFamily: 'IBMPlexSansThai',
+                                                fontWeight: FontWeight.normal),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                    const SizedBox(
+                                      height: 32,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text('BMI ',
                                             style: TextStyle(
                                                 fontSize: 20,
                                                 fontFamily: 'IBMPlexSansThai',
                                                 color: Colors.black,
                                                 fontWeight: FontWeight.normal),
                                             textAlign: TextAlign.start),
-                                        Text('*',
-                                            style: TextStyle(
-                                                fontSize: 20,
-                                                fontFamily: 'IBMPlexSansThai',
-                                                color:
-                                                    Color(hexColor('#FB6262')),
-                                                fontWeight: FontWeight.normal),
-                                            textAlign: TextAlign.start),
+                                        SizedBox(
+                                          height: 36,
+                                          width: 205,
+                                          child: TextField(
+                                            enableInteractiveSelection: false,
+                                            readOnly: true,
+                                            controller: _controllerBmi,
+                                            textDirection: TextDirection.rtl,
+                                            decoration: InputDecoration(
+                                              focusedBorder: OutlineInputBorder(
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(24)),
+                                                  borderSide: BorderSide(
+                                                    color: Color(
+                                                        hexColor('#484554')),
+                                                    width: 1,
+                                                  )),
+                                              contentPadding:
+                                                  const EdgeInsets.only(
+                                                      left: 20),
+                                              fillColor: Colors.white,
+                                              suffixIcon: Container(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8,
+                                                    left: 20,
+                                                    right: 20),
+                                                child: Text(
+                                                  'กก./ม.²',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontFamily:
+                                                          'IBMPlexSansThai',
+                                                      color: Color(
+                                                          hexColor('#484554')),
+                                                      fontWeight:
+                                                          FontWeight.normal),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(24)),
+                                                  borderSide: BorderSide(
+                                                    color: Color(
+                                                        hexColor('#484554')),
+                                                    width: 1,
+                                                  )),
+                                            ),
+                                          ),
+                                        ),
                                       ],
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: 36,
-                                    width: 205,
-                                    child: TextFormField(
-                                      controller: _controllerHeight,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          checkHeight = false;
-                                          height = (value == '' || value == '0')
-                                              ? 0
-                                              : double.parse(value);
-                                          bmi = (height == 0 || weight == 0)
-                                              ? 0
-                                              : weight /
-                                                  pow(double.parse(value) / 100,
-                                                      2);
-                                          _controllerBmi.text =
-                                              bmi.toStringAsFixed(2);
-                                        });
-                                      },
-                                      keyboardType:
-                                          const TextInputType.numberWithOptions(
-                                              decimal: true),
-                                      textDirection: TextDirection.rtl,
-                                      decoration: InputDecoration(
-                                        enabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(30.0),
-                                            borderSide: BorderSide(
-                                              color: checkHeight == true
-                                                  ? Color(hexColor('#FB6262'))
-                                                  : Color(hexColor('#484554')),
-                                            )),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(24)),
-                                            borderSide: BorderSide(
-                                              color: checkHeight == true
-                                                  ? Color(hexColor('#FB6262'))
-                                                  : Color(hexColor('#484554')),
-                                              width: 1,
-                                            )),
-                                        contentPadding:
-                                            const EdgeInsets.only(left: 20),
-                                        fillColor: Colors.white,
-                                        suffixIcon: Container(
-                                          padding: const EdgeInsets.only(
-                                              top: 8, left: 15, right: 20),
-                                          child: Text(
-                                            'ซม.',
+                                    const SizedBox(
+                                      height: 55,
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            const Text('รอบเอว ',
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontFamily:
+                                                        'IBMPlexSansThai',
+                                                    color: Colors.black,
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                                textAlign: TextAlign.start),
+                                            Text('*',
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontFamily:
+                                                        'IBMPlexSansThai',
+                                                    color: Color(
+                                                        hexColor('#FB6262')),
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                                textAlign: TextAlign.start),
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 36,
+                                          width: 205,
+                                          child: TextFormField(
+                                            controller: _controllerWaistline,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                waistline = (value == '' ||
+                                                        value == '0')
+                                                    ? 0
+                                                    : double.parse(value);
+                                                checkWaistline = false;
+                                              });
+                                            },
+                                            keyboardType: TextInputType.number,
+                                            textDirection: TextDirection.rtl,
+                                            decoration: InputDecoration(
+                                              enabledBorder: OutlineInputBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          30.0),
+                                                  borderSide: BorderSide(
+                                                    color: checkWaistline ==
+                                                            true
+                                                        ? Color(
+                                                            hexColor('#FB6262'))
+                                                        : Color(hexColor(
+                                                            '#484554')),
+                                                  )),
+                                              focusedBorder: OutlineInputBorder(
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(24)),
+                                                  borderSide: BorderSide(
+                                                    color: checkWaistline ==
+                                                            true
+                                                        ? Color(
+                                                            hexColor('#FB6262'))
+                                                        : Color(hexColor(
+                                                            '#484554')),
+                                                    width: 1,
+                                                  )),
+                                              contentPadding:
+                                                  const EdgeInsets.only(
+                                                      left: 20),
+                                              fillColor: Colors.white,
+                                              suffixIcon: Container(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8,
+                                                    left: 20,
+                                                    right: 20),
+                                                child: Text(
+                                                  'นิ้ว',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontFamily:
+                                                          'IBMPlexSansThai',
+                                                      color: Color(
+                                                          hexColor('#484554')),
+                                                      fontWeight:
+                                                          FontWeight.normal),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                              border: OutlineInputBorder(
+                                                  borderRadius:
+                                                      const BorderRadius.all(
+                                                          Radius.circular(24)),
+                                                  borderSide: BorderSide(
+                                                    color: Color(
+                                                        hexColor('#E9E9E9')),
+                                                    width: 1,
+                                                  )),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    checkWaistline == true
+                                        ? Container(
+                                            padding: const EdgeInsets.only(
+                                                right: 10),
+                                            alignment: Alignment.centerRight,
+                                            child: Text(
+                                              "กรุณากรอกค่ารอบเอว",
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  color: Color(
+                                                      hexColor('#FB6262')),
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          )
+                                        : const Text(
+                                            "",
                                             style: TextStyle(
                                                 fontSize: 16,
                                                 fontFamily: 'IBMPlexSansThai',
-                                                color:
-                                                    Color(hexColor('#484554')),
                                                 fontWeight: FontWeight.normal),
                                             textAlign: TextAlign.center,
                                           ),
-                                        ),
-                                        border: OutlineInputBorder(
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(24)),
-                                            borderSide: BorderSide(
-                                              color: Color(hexColor('#E9E9E9')),
-                                              width: 1,
-                                            )),
-                                      ),
+                                    const SizedBox(
+                                      height: 32,
                                     ),
-                                  ),
-                                ],
-                              ),
-                              checkHeight == true
-                                  ? Container(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      alignment: Alignment.centerRight,
-                                      child: Text(
-                                        "กรุณากรอกส่วนสูง",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Color(hexColor('#FB6262')),
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    )
-                                  : const Text(
-                                      "",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontFamily: 'IBMPlexSansThai',
-                                          fontWeight: FontWeight.normal),
-                                      textAlign: TextAlign.center,
-                                    ),
-                              const SizedBox(
-                                height: 32,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      const Text('น้ำหนัก ',
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.start),
-                                      Text('*',
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Color(hexColor('#FB6262')),
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.start),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 36,
-                                    width: 205,
-                                    child: TextFormField(
-                                      controller: _controllerWeight,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          weight = (value == '' || value == '0')
-                                              ? 0
-                                              : double.parse(value);
-                                          bmi = (height == 0 || weight == 0)
-                                              ? 0
-                                              : weight / pow(height / 100, 2);
-                                          _controllerBmi.text =
-                                              bmi.toStringAsFixed(2);
-                                          checkWeight = false;
-                                        });
-                                      },
-                                      keyboardType: TextInputType.number,
-                                      textDirection: TextDirection.rtl,
-                                      decoration: InputDecoration(
-                                        enabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(30.0),
-                                            borderSide: BorderSide(
-                                              color: checkWeight == true
-                                                  ? Color(hexColor('#FB6262'))
-                                                  : Color(hexColor('#484554')),
-                                            )),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(24)),
-                                            borderSide: BorderSide(
-                                              color: checkWeight == true
-                                                  ? Color(hexColor('#FB6262'))
-                                                  : Color(hexColor('#484554')),
-                                              width: 1,
-                                            )),
-                                        contentPadding:
-                                            const EdgeInsets.only(left: 20),
-                                        fillColor: Colors.white,
-                                        suffixIcon: Container(
-                                          padding: const EdgeInsets.only(
-                                              top: 8, left: 20, right: 20),
-                                          child: Text(
-                                            'กก.',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontFamily: 'IBMPlexSansThai',
-                                                color:
-                                                    Color(hexColor('#484554')),
-                                                fontWeight: FontWeight.normal),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                        border: OutlineInputBorder(
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(24)),
-                                            borderSide: BorderSide(
-                                              color: Color(hexColor('#E9E9E9')),
-                                              width: 1,
-                                            )),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              checkWeight == true
-                                  ? Container(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      alignment: Alignment.centerRight,
-                                      child: Text(
-                                        "กรุณากรอกน้ำหนัก",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Color(hexColor('#FB6262')),
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    )
-                                  : const Text(
-                                      "",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontFamily: 'IBMPlexSansThai',
-                                          fontWeight: FontWeight.normal),
-                                      textAlign: TextAlign.center,
-                                    ),
-                              const SizedBox(
-                                height: 32,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text('BMI ',
-                                      style: TextStyle(
-                                          fontSize: 20,
-                                          fontFamily: 'IBMPlexSansThai',
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.normal),
-                                      textAlign: TextAlign.start),
-                                  SizedBox(
-                                    height: 36,
-                                    width: 205,
-                                    child: TextField(
-                                      enableInteractiveSelection: false,
-                                      readOnly: true,
-                                      controller: _controllerBmi,
-                                      textDirection: TextDirection.rtl,
-                                      decoration: InputDecoration(
-                                        focusedBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(24)),
-                                            borderSide: BorderSide(
-                                              color: Color(hexColor('#484554')),
-                                              width: 1,
-                                            )),
-                                        contentPadding:
-                                            const EdgeInsets.only(left: 20),
-                                        fillColor: Colors.white,
-                                        suffixIcon: Container(
-                                          padding: const EdgeInsets.only(
-                                              top: 8, left: 20, right: 20),
-                                          child: Text(
-                                            'กก./ม.²',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontFamily: 'IBMPlexSansThai',
-                                                color:
-                                                    Color(hexColor('#484554')),
-                                                fontWeight: FontWeight.normal),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                        border: OutlineInputBorder(
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(24)),
-                                            borderSide: BorderSide(
-                                              color: Color(hexColor('#484554')),
-                                              width: 1,
-                                            )),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 55,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      const Text('รอบเอว ',
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.start),
-                                      Text('*',
-                                          style: TextStyle(
-                                              fontSize: 20,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Color(hexColor('#FB6262')),
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.start),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 36,
-                                    width: 205,
-                                    child: TextFormField(
-                                      controller: _controllerWaistline,
-                                      onChanged: (value) {
-                                        setState(() {
-                                          waistline =
-                                              (value == '' || value == '0')
-                                                  ? 0
-                                                  : double.parse(value);
-                                          checkWaistline = false;
-                                        });
-                                      },
-                                      keyboardType: TextInputType.number,
-                                      textDirection: TextDirection.rtl,
-                                      decoration: InputDecoration(
-                                        enabledBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(30.0),
-                                            borderSide: BorderSide(
-                                              color: checkWaistline == true
-                                                  ? Color(hexColor('#FB6262'))
-                                                  : Color(hexColor('#484554')),
-                                            )),
-                                        focusedBorder: OutlineInputBorder(
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(24)),
-                                            borderSide: BorderSide(
-                                              color: checkWaistline == true
-                                                  ? Color(hexColor('#FB6262'))
-                                                  : Color(hexColor('#484554')),
-                                              width: 1,
-                                            )),
-                                        contentPadding:
-                                            const EdgeInsets.only(left: 20),
-                                        fillColor: Colors.white,
-                                        suffixIcon: Container(
-                                          padding: const EdgeInsets.only(
-                                              top: 8, left: 20, right: 20),
-                                          child: Text(
-                                            'นิ้ว',
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontFamily: 'IBMPlexSansThai',
-                                                color:
-                                                    Color(hexColor('#484554')),
-                                                fontWeight: FontWeight.normal),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                        border: OutlineInputBorder(
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                                    Radius.circular(24)),
-                                            borderSide: BorderSide(
-                                              color: Color(hexColor('#E9E9E9')),
-                                              width: 1,
-                                            )),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              checkWaistline == true
-                                  ? Container(
-                                      padding: const EdgeInsets.only(right: 10),
-                                      alignment: Alignment.centerRight,
-                                      child: Text(
-                                        "กรุณากรอกค่ารอบเอว",
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Color(hexColor('#FB6262')),
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    )
-                                  : const Text(
-                                      "",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontFamily: 'IBMPlexSansThai',
-                                          fontWeight: FontWeight.normal),
-                                      textAlign: TextAlign.center,
-                                    ),
-                              const SizedBox(
-                                height: 32,
+                                  ],
+                                ),
                               ),
                             ],
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                  SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 44),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'ข้อมูลสุขภาพเพิ่มเติม',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontFamily: 'IBMPlexSansThai',
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
+                      ),
+                      Scaffold(
+                        backgroundColor: Color(hexColor('#FAFCFB')),
+                        body: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 44),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    'ข้อมูลสุขภาพเพิ่มเติม',
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontFamily: 'IBMPlexSansThai',
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(' *',
+                                      style: TextStyle(
+                                          fontSize: 22,
+                                          fontFamily: 'IBMPlexSansThai',
+                                          color: Color(hexColor('#FB6262')),
+                                          fontWeight: FontWeight.bold),
+                                      textAlign: TextAlign.start),
+                                ],
                               ),
-                            ),
-                            Text(' *',
-                                style: TextStyle(
-                                    fontSize: 22,
-                                    fontFamily: 'IBMPlexSansThai',
-                                    color: Color(hexColor('#FB6262')),
-                                    fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.start),
-                          ],
-                        ),
-                        SingleChildScrollView(
-                          child: Container(
-                            padding: const EdgeInsets.only(left: 28, right: 28),
-                            alignment: Alignment.centerLeft,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              children: [
-                                const SizedBox(
-                                  height: 26,
-                                ),
-                                Row(
-                                  children: [
-                                    const Text('ความดันโลหิต',
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold),
-                                        textAlign: TextAlign.left),
-                                    Text(' *',
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Color(hexColor('#FB6262')),
-                                            fontWeight: FontWeight.bold),
-                                        textAlign: TextAlign.start),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 15,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text('ช่วงหัวใจบีบตัว (ตัวบน)',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.start),
-                                    SizedBox(
-                                      height: 34,
-                                      width: 137,
-                                      child: TextFormField(
-                                        controller:
-                                            _controllerSystolicBloodPressure,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            systolicBloodPressure =
-                                                (value == '' || value == '0')
-                                                    ? 0
-                                                    : int.parse(value);
-                                            checkSystolic = false;
-                                          });
-                                        },
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(signed: false),
-                                        textDirection: TextDirection.rtl,
-                                        decoration: InputDecoration(
-                                          enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(30.0),
-                                              borderSide: BorderSide(
-                                                color: checkSystolic == true
-                                                    ? Color(hexColor('#FB6262'))
-                                                    : Color(
-                                                        hexColor('#484554')),
-                                              )),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                      Radius.circular(24)),
-                                              borderSide: BorderSide(
-                                                color: checkSystolic == true
-                                                    ? Color(hexColor('#FB6262'))
-                                                    : Color(
-                                                        hexColor('#484554')),
-                                                width: 1,
-                                              )),
-                                          contentPadding:
-                                              const EdgeInsets.only(left: 20),
-                                          fillColor: Colors.white,
-                                          suffixIcon: Container(
-                                            padding: const EdgeInsets.only(
-                                                top: 9, left: 15, right: 15),
-                                            child: Text(
-                                              'mmHg',
+                              SingleChildScrollView(
+                                child: Container(
+                                  padding: const EdgeInsets.only(
+                                      left: 28, right: 28),
+                                  alignment: Alignment.centerLeft,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      const SizedBox(
+                                        height: 26,
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Text('ความดันโลหิต',
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold),
+                                              textAlign: TextAlign.left),
+                                          Text(' *',
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  color: Color(
+                                                      hexColor('#FB6262')),
+                                                  fontWeight: FontWeight.bold),
+                                              textAlign: TextAlign.start),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 15,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text('ช่วงหัวใจบีบตัว (ตัวบน)',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  color: Colors.black,
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                              textAlign: TextAlign.start),
+                                          SizedBox(
+                                            height: 34,
+                                            width: 137,
+                                            child: TextFormField(
+                                              controller:
+                                                  _controllerSystolicBloodPressure,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  systolicBloodPressure =
+                                                      (value == '' ||
+                                                              value == '0')
+                                                          ? 0
+                                                          : int.parse(value);
+                                                  checkSystolic = false;
+                                                });
+                                              },
+                                              keyboardType: const TextInputType
+                                                  .numberWithOptions(
+                                                  signed: false),
+                                              textDirection: TextDirection.rtl,
+                                              decoration: InputDecoration(
+                                                enabledBorder:
+                                                    OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(30.0),
+                                                        borderSide: BorderSide(
+                                                          color: checkSystolic ==
+                                                                  true
+                                                              ? Color(hexColor(
+                                                                  '#FB6262'))
+                                                              : Color(hexColor(
+                                                                  '#484554')),
+                                                        )),
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                        borderRadius:
+                                                            const BorderRadius
+                                                                .all(
+                                                                Radius.circular(
+                                                                    24)),
+                                                        borderSide: BorderSide(
+                                                          color: checkSystolic ==
+                                                                  true
+                                                              ? Color(hexColor(
+                                                                  '#FB6262'))
+                                                              : Color(hexColor(
+                                                                  '#484554')),
+                                                          width: 1,
+                                                        )),
+                                                contentPadding:
+                                                    const EdgeInsets.only(
+                                                        left: 20),
+                                                fillColor: Colors.white,
+                                                suffixIcon: Container(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 9,
+                                                          left: 15,
+                                                          right: 15),
+                                                  child: Text(
+                                                    'mmHg',
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontFamily:
+                                                            'IBMPlexSansThai',
+                                                        color: Color(hexColor(
+                                                            '#484554')),
+                                                        fontWeight:
+                                                            FontWeight.normal),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ),
+                                                border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        const BorderRadius.all(
+                                                            Radius.circular(
+                                                                24)),
+                                                    borderSide: BorderSide(
+                                                      color: Color(
+                                                          hexColor('#E9E9E9')),
+                                                      width: 1,
+                                                    )),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      checkSystolic == true
+                                          ? Container(
+                                              padding: const EdgeInsets.only(
+                                                  right: 10),
+                                              alignment: Alignment.centerRight,
+                                              child: Text(
+                                                "กรุณากรอกค่า",
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontFamily:
+                                                        'IBMPlexSansThai',
+                                                    color: Color(
+                                                        hexColor('#FB6262')),
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            )
+                                          : const Text(
+                                              "",
                                               style: TextStyle(
                                                   fontSize: 14,
                                                   fontFamily: 'IBMPlexSansThai',
-                                                  color: Color(
-                                                      hexColor('#484554')),
                                                   fontWeight:
                                                       FontWeight.normal),
                                               textAlign: TextAlign.center,
                                             ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text(
+                                              'ช่วงหัวใจคลายตัว (ตัวล่าง)',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  color: Colors.black,
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                              textAlign: TextAlign.start),
+                                          SizedBox(
+                                            height: 34,
+                                            width: 137,
+                                            child: TextFormField(
+                                              controller:
+                                                  _controllerDiastolicBloodPressure,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  diastolicBloodPressure =
+                                                      (value == '' ||
+                                                              value == '0')
+                                                          ? 0
+                                                          : int.parse(value);
+                                                  checkDiastolic = false;
+                                                });
+                                              },
+                                              keyboardType: const TextInputType
+                                                  .numberWithOptions(
+                                                  signed: false),
+                                              textDirection: TextDirection.rtl,
+                                              decoration: InputDecoration(
+                                                enabledBorder:
+                                                    OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(30.0),
+                                                        borderSide: BorderSide(
+                                                          color: checkDiastolic ==
+                                                                  true
+                                                              ? Color(hexColor(
+                                                                  '#FB6262'))
+                                                              : Color(hexColor(
+                                                                  '#484554')),
+                                                        )),
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                        borderRadius:
+                                                            const BorderRadius
+                                                                .all(
+                                                                Radius.circular(
+                                                                    24)),
+                                                        borderSide: BorderSide(
+                                                          color: checkDiastolic ==
+                                                                  true
+                                                              ? Color(hexColor(
+                                                                  '#FB6262'))
+                                                              : Color(hexColor(
+                                                                  '#484554')),
+                                                          width: 1,
+                                                        )),
+                                                contentPadding:
+                                                    const EdgeInsets.only(
+                                                        left: 20),
+                                                fillColor: Colors.white,
+                                                suffixIcon: Container(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 9,
+                                                          left: 15,
+                                                          right: 15),
+                                                  child: Text(
+                                                    'mmHg',
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontFamily:
+                                                            'IBMPlexSansThai',
+                                                        color: Color(hexColor(
+                                                            '#484554')),
+                                                        fontWeight:
+                                                            FontWeight.normal),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ),
+                                                border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        const BorderRadius.all(
+                                                            Radius.circular(
+                                                                24)),
+                                                    borderSide: BorderSide(
+                                                      color: Color(
+                                                          hexColor('#E9E9E9')),
+                                                      width: 1,
+                                                    )),
+                                              ),
+                                            ),
                                           ),
-                                          border: OutlineInputBorder(
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                      Radius.circular(24)),
-                                              borderSide: BorderSide(
-                                                color:
-                                                    Color(hexColor('#E9E9E9')),
-                                                width: 1,
-                                              )),
-                                        ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                checkSystolic == true
-                                    ? Container(
-                                        padding:
-                                            const EdgeInsets.only(right: 10),
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                          "กรุณากรอกค่า",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Color(hexColor('#FB6262')),
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      )
-                                    : const Text(
-                                        "",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text('ช่วงหัวใจคลายตัว (ตัวล่าง)',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.start),
-                                    SizedBox(
-                                      height: 34,
-                                      width: 137,
-                                      child: TextFormField(
-                                        controller:
-                                            _controllerDiastolicBloodPressure,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            diastolicBloodPressure =
-                                                (value == '' || value == '0')
-                                                    ? 0
-                                                    : int.parse(value);
-                                            checkDiastolic = false;
-                                          });
-                                        },
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(signed: false),
-                                        textDirection: TextDirection.rtl,
-                                        decoration: InputDecoration(
-                                          enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(30.0),
-                                              borderSide: BorderSide(
-                                                color: checkDiastolic == true
-                                                    ? Color(hexColor('#FB6262'))
-                                                    : Color(
-                                                        hexColor('#484554')),
-                                              )),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                      Radius.circular(24)),
-                                              borderSide: BorderSide(
-                                                color: checkDiastolic == true
-                                                    ? Color(hexColor('#FB6262'))
-                                                    : Color(
-                                                        hexColor('#484554')),
-                                                width: 1,
-                                              )),
-                                          contentPadding:
-                                              const EdgeInsets.only(left: 20),
-                                          fillColor: Colors.white,
-                                          suffixIcon: Container(
-                                            padding: const EdgeInsets.only(
-                                                top: 9, left: 15, right: 15),
-                                            child: Text(
-                                              'mmHg',
+                                      checkDiastolic == true
+                                          ? Container(
+                                              padding: const EdgeInsets.only(
+                                                  right: 10),
+                                              alignment: Alignment.centerRight,
+                                              child: Text(
+                                                "กรุณากรอกค่า",
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontFamily:
+                                                        'IBMPlexSansThai',
+                                                    color: Color(
+                                                        hexColor('#FB6262')),
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            )
+                                          : const Text(
+                                              "",
                                               style: TextStyle(
                                                   fontSize: 14,
                                                   fontFamily: 'IBMPlexSansThai',
-                                                  color: Color(
-                                                      hexColor('#484554')),
                                                   fontWeight:
                                                       FontWeight.normal),
                                               textAlign: TextAlign.center,
                                             ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          const Text('อัตราการเต้นของหัวใจ',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  color: Colors.black,
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                              textAlign: TextAlign.start),
+                                          SizedBox(
+                                            height: 34,
+                                            width: 137,
+                                            child: TextFormField(
+                                              controller: _controllerPulseRate,
+                                              onChanged: (value) {
+                                                setState(() {
+                                                  pulseRate = (value == '' ||
+                                                          value == '0')
+                                                      ? 0
+                                                      : int.parse(value);
+                                                  checkPulse = false;
+                                                });
+                                              },
+                                              keyboardType: const TextInputType
+                                                  .numberWithOptions(
+                                                  signed: false),
+                                              textDirection: TextDirection.rtl,
+                                              decoration: InputDecoration(
+                                                enabledBorder:
+                                                    OutlineInputBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(30.0),
+                                                        borderSide: BorderSide(
+                                                          color: checkPulse ==
+                                                                  true
+                                                              ? Color(hexColor(
+                                                                  '#FB6262'))
+                                                              : Color(hexColor(
+                                                                  '#484554')),
+                                                        )),
+                                                focusedBorder:
+                                                    OutlineInputBorder(
+                                                        borderRadius:
+                                                            const BorderRadius
+                                                                .all(
+                                                                Radius.circular(
+                                                                    24)),
+                                                        borderSide: BorderSide(
+                                                          color: checkPulse ==
+                                                                  true
+                                                              ? Color(hexColor(
+                                                                  '#FB6262'))
+                                                              : Color(hexColor(
+                                                                  '#484554')),
+                                                          width: 1,
+                                                        )),
+                                                contentPadding:
+                                                    const EdgeInsets.only(
+                                                        left: 20),
+                                                fillColor: Colors.white,
+                                                suffixIcon: Container(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          top: 9,
+                                                          left: 3,
+                                                          right: 15),
+                                                  child: Text(
+                                                    'ครั้ง/นาที',
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontFamily:
+                                                            'IBMPlexSansThai',
+                                                        color: Color(hexColor(
+                                                            '#484554')),
+                                                        fontWeight:
+                                                            FontWeight.normal),
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ),
+                                                border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        const BorderRadius.all(
+                                                            Radius.circular(
+                                                                24)),
+                                                    borderSide: BorderSide(
+                                                      color: Color(
+                                                          hexColor('#E9E9E9')),
+                                                      width: 1,
+                                                    )),
+                                              ),
+                                            ),
                                           ),
-                                          border: OutlineInputBorder(
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                      Radius.circular(24)),
-                                              borderSide: BorderSide(
-                                                color:
-                                                    Color(hexColor('#E9E9E9')),
-                                                width: 1,
-                                              )),
-                                        ),
+                                        ],
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                checkDiastolic == true
-                                    ? Container(
-                                        padding:
-                                            const EdgeInsets.only(right: 10),
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                          "กรุณากรอกค่า",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Color(hexColor('#FB6262')),
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      )
-                                    : const Text(
-                                        "",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text('อัตราการเต้นของหัวใจ',
-                                        style: TextStyle(
-                                            fontSize: 16,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.start),
-                                    SizedBox(
-                                      height: 34,
-                                      width: 137,
-                                      child: TextFormField(
-                                        controller: _controllerPulseRate,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            pulseRate =
-                                                (value == '' || value == '0')
-                                                    ? 0
-                                                    : int.parse(value);
-                                            checkPulse = false;
-                                          });
-                                        },
-                                        keyboardType: const TextInputType
-                                            .numberWithOptions(signed: false),
-                                        textDirection: TextDirection.rtl,
-                                        decoration: InputDecoration(
-                                          enabledBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(30.0),
-                                              borderSide: BorderSide(
-                                                color: checkPulse == true
-                                                    ? Color(hexColor('#FB6262'))
-                                                    : Color(
-                                                        hexColor('#484554')),
-                                              )),
-                                          focusedBorder: OutlineInputBorder(
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                      Radius.circular(24)),
-                                              borderSide: BorderSide(
-                                                color: checkPulse == true
-                                                    ? Color(hexColor('#FB6262'))
-                                                    : Color(
-                                                        hexColor('#484554')),
-                                                width: 1,
-                                              )),
-                                          contentPadding:
-                                              const EdgeInsets.only(left: 20),
-                                          fillColor: Colors.white,
-                                          suffixIcon: Container(
-                                            padding: const EdgeInsets.only(
-                                                top: 9, left: 3, right: 15),
-                                            child: Text(
-                                              'ครั้ง/นาที',
+                                      checkPulse == true
+                                          ? Container(
+                                              padding: const EdgeInsets.only(
+                                                  right: 10),
+                                              alignment: Alignment.centerRight,
+                                              child: Text(
+                                                "กรุณากรอกค่า",
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontFamily:
+                                                        'IBMPlexSansThai',
+                                                    color: Color(
+                                                        hexColor('#FB6262')),
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            )
+                                          : const Text(
+                                              "",
                                               style: TextStyle(
                                                   fontSize: 14,
                                                   fontFamily: 'IBMPlexSansThai',
-                                                  color: Color(
-                                                      hexColor('#484554')),
                                                   fontWeight:
                                                       FontWeight.normal),
                                               textAlign: TextAlign.center,
                                             ),
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Text('น้ำตาลในเลือด',
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold),
+                                              textAlign: TextAlign.left),
+                                          Text(' *',
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  color: Color(
+                                                      hexColor('#FB6262')),
+                                                  fontWeight: FontWeight.bold),
+                                              textAlign: TextAlign.start),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 14,
+                                      ),
+                                      SizedBox(
+                                        height: 36,
+                                        child: TextFormField(
+                                          controller: _controllerBloodGlucose,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              bloodGlucose =
+                                                  (value == '' || value == '0')
+                                                      ? 0
+                                                      : double.parse(value);
+                                              checkGlucose = false;
+                                            });
+                                          },
+                                          keyboardType: const TextInputType
+                                              .numberWithOptions(signed: false),
+                                          textDirection: TextDirection.rtl,
+                                          decoration: InputDecoration(
+                                            enabledBorder: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(30.0),
+                                                borderSide: BorderSide(
+                                                  color: checkGlucose == true
+                                                      ? Color(
+                                                          hexColor('#FB6262'))
+                                                      : Color(
+                                                          hexColor('#484554')),
+                                                )),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(24)),
+                                                borderSide: BorderSide(
+                                                  color: checkGlucose == true
+                                                      ? Color(
+                                                          hexColor('#FB6262'))
+                                                      : Color(
+                                                          hexColor('#484554')),
+                                                  width: 1,
+                                                )),
+                                            contentPadding:
+                                                const EdgeInsets.only(left: 20),
+                                            fillColor: Colors.white,
+                                            suffixIcon: Container(
+                                              padding: const EdgeInsets.only(
+                                                  top: 8, left: 15, right: 15),
+                                              child: Text(
+                                                'mg/dl.',
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontFamily:
+                                                        'IBMPlexSansThai',
+                                                    color: Color(
+                                                        hexColor('#484554')),
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                            border: OutlineInputBorder(
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(24)),
+                                                borderSide: BorderSide(
+                                                  color: Color(
+                                                      hexColor('#E9E9E9')),
+                                                  width: 1,
+                                                )),
                                           ),
-                                          border: OutlineInputBorder(
-                                              borderRadius:
-                                                  const BorderRadius.all(
-                                                      Radius.circular(24)),
-                                              borderSide: BorderSide(
-                                                color:
-                                                    Color(hexColor('#E9E9E9')),
-                                                width: 1,
-                                              )),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                checkPulse == true
-                                    ? Container(
-                                        padding:
-                                            const EdgeInsets.only(right: 10),
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                          "กรุณากรอกค่า",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Color(hexColor('#FB6262')),
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      )
-                                    : const Text(
-                                        "",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center,
+                                      checkGlucose == true
+                                          ? Container(
+                                              padding: const EdgeInsets.only(
+                                                  right: 10),
+                                              alignment: Alignment.centerRight,
+                                              child: Text(
+                                                "กรุณากรอกค่าน้ำตาล",
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontFamily:
+                                                        'IBMPlexSansThai',
+                                                    color: Color(
+                                                        hexColor('#FB6262')),
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            )
+                                          : const Text(
+                                              "",
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                      const SizedBox(
+                                        height: 10,
                                       ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                                Row(
-                                  children: [
-                                    const Text('น้ำตาลในเลือด',
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold),
-                                        textAlign: TextAlign.left),
-                                    Text(' *',
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Color(hexColor('#FB6262')),
-                                            fontWeight: FontWeight.bold),
-                                        textAlign: TextAlign.start),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 14,
-                                ),
-                                SizedBox(
-                                  height: 36,
-                                  child: TextFormField(
-                                    controller: _controllerBloodGlucose,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        bloodGlucose =
-                                            (value == '' || value == '0')
-                                                ? 0
-                                                : double.parse(value);
-                                        checkGlucose = false;
-                                      });
-                                    },
-                                    keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                            signed: false),
-                                    textDirection: TextDirection.rtl,
-                                    decoration: InputDecoration(
-                                      enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30.0),
-                                          borderSide: BorderSide(
-                                            color: checkGlucose == true
-                                                ? Color(hexColor('#FB6262'))
-                                                : Color(hexColor('#484554')),
-                                          )),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(24)),
-                                          borderSide: BorderSide(
-                                            color: checkGlucose == true
-                                                ? Color(hexColor('#FB6262'))
-                                                : Color(hexColor('#484554')),
-                                            width: 1,
-                                          )),
-                                      contentPadding:
-                                          const EdgeInsets.only(left: 20),
-                                      fillColor: Colors.white,
-                                      suffixIcon: Container(
-                                        padding: const EdgeInsets.only(
-                                            top: 8, left: 15, right: 15),
-                                        child: Text(
-                                          'mg/dl.',
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Color(hexColor('#484554')),
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.center,
+                                      Row(
+                                        children: [
+                                          const Text('ไตรกลีเซอไรด์ในเลือด',
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold),
+                                              textAlign: TextAlign.left),
+                                          Text(' *',
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  color: Color(
+                                                      hexColor('#FB6262')),
+                                                  fontWeight: FontWeight.bold),
+                                              textAlign: TextAlign.start),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 14,
+                                      ),
+                                      SizedBox(
+                                        height: 36,
+                                        child: TextFormField(
+                                          controller: _controllerTriglyceride,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              triglyceride =
+                                                  (value == '' || value == '0')
+                                                      ? 0
+                                                      : double.parse(value);
+                                              checkTrigly = false;
+                                            });
+                                          },
+                                          keyboardType: const TextInputType
+                                              .numberWithOptions(signed: false),
+                                          textDirection: TextDirection.rtl,
+                                          decoration: InputDecoration(
+                                            enabledBorder: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(30.0),
+                                                borderSide: BorderSide(
+                                                  color: checkTrigly == true
+                                                      ? Color(
+                                                          hexColor('#FB6262'))
+                                                      : Color(
+                                                          hexColor('#484554')),
+                                                )),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(24)),
+                                                borderSide: BorderSide(
+                                                  color: checkTrigly == true
+                                                      ? Color(
+                                                          hexColor('#FB6262'))
+                                                      : Color(
+                                                          hexColor('#484554')),
+                                                  width: 1,
+                                                )),
+                                            contentPadding:
+                                                const EdgeInsets.only(left: 20),
+                                            fillColor: Colors.white,
+                                            suffixIcon: Container(
+                                              padding: const EdgeInsets.only(
+                                                  top: 8, left: 15, right: 15),
+                                              child: Text(
+                                                'mg/dl.',
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontFamily:
+                                                        'IBMPlexSansThai',
+                                                    color: Color(
+                                                        hexColor('#484554')),
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                            border: OutlineInputBorder(
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(24)),
+                                                borderSide: BorderSide(
+                                                  color: Color(
+                                                      hexColor('#E9E9E9')),
+                                                  width: 1,
+                                                )),
+                                          ),
                                         ),
                                       ),
-                                      border: OutlineInputBorder(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(24)),
-                                          borderSide: BorderSide(
-                                            color: Color(hexColor('#E9E9E9')),
-                                            width: 1,
-                                          )),
-                                    ),
+                                      checkTrigly == true
+                                          ? Container(
+                                              padding: const EdgeInsets.only(
+                                                  right: 10),
+                                              alignment: Alignment.centerRight,
+                                              child: Text(
+                                                "กรุณากรอกค่าไตรกลีเซอไรด์",
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontFamily:
+                                                        'IBMPlexSansThai',
+                                                    color: Color(
+                                                        hexColor('#FB6262')),
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            )
+                                          : const Text(
+                                              "",
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                      const SizedBox(
+                                        height: 10,
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Text('ไขมันดี (HDL)',
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  color: Colors.black,
+                                                  fontWeight: FontWeight.bold),
+                                              textAlign: TextAlign.left),
+                                          Text(' *',
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  color: Color(
+                                                      hexColor('#FB6262')),
+                                                  fontWeight: FontWeight.bold),
+                                              textAlign: TextAlign.start),
+                                        ],
+                                      ),
+                                      const SizedBox(
+                                        height: 14,
+                                      ),
+                                      SizedBox(
+                                        height: 36,
+                                        child: TextFormField(
+                                          controller: _controllerHdl,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              hdl =
+                                                  (value == '' || value == '0')
+                                                      ? 0
+                                                      : double.parse(value);
+                                              checkHdl = false;
+                                            });
+                                          },
+                                          keyboardType: const TextInputType
+                                              .numberWithOptions(signed: false),
+                                          textDirection: TextDirection.rtl,
+                                          decoration: InputDecoration(
+                                            enabledBorder: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(30.0),
+                                                borderSide: BorderSide(
+                                                  color: checkHdl == true
+                                                      ? Color(
+                                                          hexColor('#FB6262'))
+                                                      : Color(
+                                                          hexColor('#484554')),
+                                                )),
+                                            focusedBorder: OutlineInputBorder(
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(24)),
+                                                borderSide: BorderSide(
+                                                  color: checkHdl == true
+                                                      ? Color(
+                                                          hexColor('#FB6262'))
+                                                      : Color(
+                                                          hexColor('#484554')),
+                                                  width: 1,
+                                                )),
+                                            contentPadding:
+                                                const EdgeInsets.only(left: 20),
+                                            fillColor: Colors.white,
+                                            suffixIcon: Container(
+                                              padding: const EdgeInsets.only(
+                                                  top: 8, left: 15, right: 15),
+                                              child: Text(
+                                                'mg/dl.',
+                                                style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontFamily:
+                                                        'IBMPlexSansThai',
+                                                    color: Color(
+                                                        hexColor('#484554')),
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                            border: OutlineInputBorder(
+                                                borderRadius:
+                                                    const BorderRadius.all(
+                                                        Radius.circular(24)),
+                                                borderSide: BorderSide(
+                                                  color: Color(
+                                                      hexColor('#E9E9E9')),
+                                                  width: 1,
+                                                )),
+                                          ),
+                                        ),
+                                      ),
+                                      checkHdl == true
+                                          ? Container(
+                                              padding: const EdgeInsets.only(
+                                                  right: 10),
+                                              alignment: Alignment.centerRight,
+                                              child: Text(
+                                                "กรุณากรอกค่าไตรกลีเซอไรด์",
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontFamily:
+                                                        'IBMPlexSansThai',
+                                                    color: Color(
+                                                        hexColor('#FB6262')),
+                                                    fontWeight:
+                                                        FontWeight.normal),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            )
+                                          : const Text(
+                                              "",
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontFamily: 'IBMPlexSansThai',
+                                                  fontWeight:
+                                                      FontWeight.normal),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                checkGlucose == true
-                                    ? Container(
-                                        padding:
-                                            const EdgeInsets.only(right: 10),
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                          "กรุณากรอกค่าน้ำตาล",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Color(hexColor('#FB6262')),
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      )
-                                    : const Text(
-                                        "",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
-                                  children: [
-                                    const Text('ไตรกลีเซอไรด์ในเลือด',
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold),
-                                        textAlign: TextAlign.left),
-                                    Text(' *',
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Color(hexColor('#FB6262')),
-                                            fontWeight: FontWeight.bold),
-                                        textAlign: TextAlign.start),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 14,
-                                ),
-                                SizedBox(
-                                  height: 36,
-                                  child: TextFormField(
-                                    controller: _controllerTriglyceride,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        triglyceride =
-                                            (value == '' || value == '0')
-                                                ? 0
-                                                : double.parse(value);
-                                        checkTrigly = false;
-                                      });
-                                    },
-                                    keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                            signed: false),
-                                    textDirection: TextDirection.rtl,
-                                    decoration: InputDecoration(
-                                      enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30.0),
-                                          borderSide: BorderSide(
-                                            color: checkTrigly == true
-                                                ? Color(hexColor('#FB6262'))
-                                                : Color(hexColor('#484554')),
-                                          )),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(24)),
-                                          borderSide: BorderSide(
-                                            color: checkTrigly == true
-                                                ? Color(hexColor('#FB6262'))
-                                                : Color(hexColor('#484554')),
-                                            width: 1,
-                                          )),
-                                      contentPadding:
-                                          const EdgeInsets.only(left: 20),
-                                      fillColor: Colors.white,
-                                      suffixIcon: Container(
-                                        padding: const EdgeInsets.only(
-                                            top: 8, left: 15, right: 15),
-                                        child: Text(
-                                          'mg/dl.',
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Color(hexColor('#484554')),
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                      border: OutlineInputBorder(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(24)),
-                                          borderSide: BorderSide(
-                                            color: Color(hexColor('#E9E9E9')),
-                                            width: 1,
-                                          )),
-                                    ),
-                                  ),
-                                ),
-                                checkTrigly == true
-                                    ? Container(
-                                        padding:
-                                            const EdgeInsets.only(right: 10),
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                          "กรุณากรอกค่าไตรกลีเซอไรด์",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Color(hexColor('#FB6262')),
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      )
-                                    : const Text(
-                                        "",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Row(
-                                  children: [
-                                    const Text('ไขมันดี (HDL)',
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Colors.black,
-                                            fontWeight: FontWeight.bold),
-                                        textAlign: TextAlign.left),
-                                    Text(' *',
-                                        style: TextStyle(
-                                            fontSize: 20,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            color: Color(hexColor('#FB6262')),
-                                            fontWeight: FontWeight.bold),
-                                        textAlign: TextAlign.start),
-                                  ],
-                                ),
-                                const SizedBox(
-                                  height: 14,
-                                ),
-                                SizedBox(
-                                  height: 36,
-                                  child: TextFormField(
-                                    controller: _controllerHdl,
-                                    onChanged: (value) {
-                                      setState(() {
-                                        hdl = (value == '' || value == '0')
-                                            ? 0
-                                            : double.parse(value);
-                                        checkHdl = false;
-                                      });
-                                    },
-                                    keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                            signed: false),
-                                    textDirection: TextDirection.rtl,
-                                    decoration: InputDecoration(
-                                      enabledBorder: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30.0),
-                                          borderSide: BorderSide(
-                                            color: checkHdl == true
-                                                ? Color(hexColor('#FB6262'))
-                                                : Color(hexColor('#484554')),
-                                          )),
-                                      focusedBorder: OutlineInputBorder(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(24)),
-                                          borderSide: BorderSide(
-                                            color: checkHdl == true
-                                                ? Color(hexColor('#FB6262'))
-                                                : Color(hexColor('#484554')),
-                                            width: 1,
-                                          )),
-                                      contentPadding:
-                                          const EdgeInsets.only(left: 20),
-                                      fillColor: Colors.white,
-                                      suffixIcon: Container(
-                                        padding: const EdgeInsets.only(
-                                            top: 8, left: 15, right: 15),
-                                        child: Text(
-                                          'mg/dl.',
-                                          style: TextStyle(
-                                              fontSize: 16,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Color(hexColor('#484554')),
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                      border: OutlineInputBorder(
-                                          borderRadius: const BorderRadius.all(
-                                              Radius.circular(24)),
-                                          borderSide: BorderSide(
-                                            color: Color(hexColor('#E9E9E9')),
-                                            width: 1,
-                                          )),
-                                    ),
-                                  ),
-                                ),
-                                checkHdl == true
-                                    ? Container(
-                                        padding:
-                                            const EdgeInsets.only(right: 10),
-                                        alignment: Alignment.centerRight,
-                                        child: Text(
-                                          "กรุณากรอกค่าไตรกลีเซอไรด์",
-                                          style: TextStyle(
-                                              fontSize: 14,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Color(hexColor('#FB6262')),
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      )
-                                    : const Text(
-                                        "",
-                                        style: TextStyle(
-                                            fontSize: 14,
-                                            fontFamily: 'IBMPlexSansThai',
-                                            fontWeight: FontWeight.normal),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                const SizedBox(
-                                  height: 20,
-                                ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                  Stack(
+                    alignment: Alignment.bottomCenter,
+                    children: [
+                      ShaderMask(
+                        shaderCallback: (Rect rect) {
+                          return const LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.purple,
+                              Colors.transparent,
+                              Colors.transparent,
+                              Colors.purple
+                            ],
+                            stops: [
+                              0.0,
+                              0.2,
+                              1.0,
+                              1.0
+                            ], // 10% purple, 80% transparent, 10% purple
+                          ).createShader(rect);
+                        },
+                        blendMode: BlendMode.dstOut,
+                        child: Container(
+                          height: 120,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 22.5, right: 22.5, bottom: 50),
+                        child: MaterialButton(
+                          height: 44,
+                          color: Color(hexColor('#2F4EF1')),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(23.5),
+                          ),
+                          onPressed: () async {
+                            if (_pageController.hasClients && _curPage < 3) {
+                              if (_curPage == 1) {
+                                _pageController.nextPage(
+                                    duration: const Duration(milliseconds: 200),
+                                    curve: Curves.easeIn);
+                              } else if (_curPage == 2) {
+                                if (_controllerHeight.text.isEmpty == true ||
+                                    height == 0) {
+                                  setState(() {
+                                    checkHeight = true;
+                                    checkWeight = false;
+                                    checkWaistline = false;
+                                  });
+                                } else if (_controllerWeight.text.isEmpty ==
+                                        true ||
+                                    weight == 0) {
+                                  setState(() {
+                                    checkHeight = false;
+                                    checkWeight = true;
+                                    checkWaistline = false;
+                                  });
+                                } else if (_controllerWaistline.text.isEmpty ==
+                                        true ||
+                                    waistline == 0) {
+                                  setState(() {
+                                    checkHeight = false;
+                                    checkWeight = false;
+                                    checkWaistline = true;
+                                  });
+                                } else {
+                                  _pageController.nextPage(
+                                      duration:
+                                          const Duration(milliseconds: 200),
+                                      curve: Curves.easeIn);
+                                }
+                              }
+                            } else {
+                              if (_controllerSystolicBloodPressure
+                                          .text.isEmpty ==
+                                      true ||
+                                  systolicBloodPressure == 0) {
+                                setState(() {
+                                  checkDiastolic = false;
+                                  checkSystolic = true;
+                                  checkPulse = false;
+                                  checkGlucose = false;
+                                  checkTrigly = false;
+                                  checkHdl = false;
+                                });
+                              } else if (_controllerDiastolicBloodPressure
+                                          .text.isEmpty ==
+                                      true ||
+                                  diastolicBloodPressure == 0) {
+                                setState(() {
+                                  checkDiastolic = true;
+                                  checkSystolic = false;
+                                  checkPulse = false;
+                                  checkGlucose = false;
+                                  checkTrigly = false;
+                                  checkHdl = false;
+                                });
+                              } else if (_controllerPulseRate.text.isEmpty ==
+                                      true ||
+                                  pulseRate == 0) {
+                                setState(() {
+                                  checkDiastolic = false;
+                                  checkSystolic = false;
+                                  checkPulse = true;
+                                  checkGlucose = false;
+                                  checkTrigly = false;
+                                  checkHdl = false;
+                                });
+                              } else if (_controllerBloodGlucose.text.isEmpty ==
+                                      true ||
+                                  bloodGlucose == 0) {
+                                setState(() {
+                                  checkDiastolic = false;
+                                  checkSystolic = false;
+                                  checkPulse = false;
+                                  checkGlucose = true;
+                                  checkTrigly = false;
+                                  checkHdl = false;
+                                });
+                              } else if (_controllerTriglyceride.text.isEmpty ==
+                                      true ||
+                                  triglyceride == 0) {
+                                setState(() {
+                                  checkDiastolic = false;
+                                  checkSystolic = false;
+                                  checkPulse = false;
+                                  checkGlucose = false;
+                                  checkTrigly = true;
+                                  checkHdl = false;
+                                });
+                              } else if (_controllerHdl.text.isEmpty == true ||
+                                  hdl == 0) {
+                                setState(() {
+                                  checkDiastolic = false;
+                                  checkSystolic = false;
+                                  checkPulse = false;
+                                  checkGlucose = false;
+                                  checkTrigly = false;
+                                  checkHdl = true;
+                                });
+                              } else {
+                                if (height != 0 &&
+                                    weight != 0 &&
+                                    bmi != 0 &&
+                                    waistline != 0 &&
+                                    systolicBloodPressure != 0 &&
+                                    diastolicBloodPressure != 0 &&
+                                    pulseRate != 0 &&
+                                    bloodGlucose != 0 &&
+                                    triglyceride != 0 &&
+                                    hdl != 0) {
+                                  await fetchMetabolic(
+                                      token!,
+                                      dropdownValue!,
+                                      height,
+                                      weight,
+                                      bmi,
+                                      waistline,
+                                      systolicBloodPressure,
+                                      diastolicBloodPressure,
+                                      pulseRate,
+                                      bloodGlucose,
+                                      triglyceride,
+                                      hdl);
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              MetabolicResultPage(
+                                                metabolicResult:
+                                                    metabolicResult,
+                                              )));
+                                }
+                              }
+                            }
+                          },
+                          child: Container(
+                            height: 47,
+                            alignment: Alignment.center,
+                            child: const Text("ถัดไป",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontFamily: 'IBMPlexSansThai',
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.normal),
+                                textAlign: TextAlign.center),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               ),
             ),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.only(left: 22.5, right: 22.5),
-                    child: MaterialButton(
-                      height: 44,
-                      color: Color(hexColor('#2F4EF1')),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(23.5),
-                      ),
-                      onPressed: () {
-                        if (_pageController.hasClients && _curPage < 3) {
-                          if (_curPage == 1) {
-                            _pageController.nextPage(
-                                duration: const Duration(milliseconds: 200),
-                                curve: Curves.easeIn);
-                          } else if (_curPage == 2) {
-                            if (_controllerHeight.text.isEmpty == true ||
-                                height == 0) {
-                              setState(() {
-                                checkHeight = true;
-                                checkWeight = false;
-                                checkWaistline = false;
-                              });
-                            } else if (_controllerWeight.text.isEmpty == true ||
-                                weight == 0) {
-                              setState(() {
-                                checkHeight = false;
-                                checkWeight = true;
-                                checkWaistline = false;
-                              });
-                            } else if (_controllerWaistline.text.isEmpty ==
-                                    true ||
-                                waistline == 0) {
-                              setState(() {
-                                checkHeight = false;
-                                checkWeight = false;
-                                checkWaistline = true;
-                              });
-                            } else {
-                              _pageController.nextPage(
-                                  duration: const Duration(milliseconds: 200),
-                                  curve: Curves.easeIn);
-                            }
-                          }
-                        } else {
-                          if (_controllerSystolicBloodPressure.text.isEmpty ==
-                                  true ||
-                              systolicBloodPressure == 0) {
-                            setState(() {
-                              checkDiastolic = false;
-                              checkSystolic = true;
-                              checkPulse = false;
-                              checkGlucose = false;
-                              checkTrigly = false;
-                              checkHdl = false;
-                            });
-                          } else if (_controllerDiastolicBloodPressure
-                                      .text.isEmpty ==
-                                  true ||
-                              diastolicBloodPressure == 0) {
-                            setState(() {
-                              checkDiastolic = true;
-                              checkSystolic = false;
-                              checkPulse = false;
-                              checkGlucose = false;
-                              checkTrigly = false;
-                              checkHdl = false;
-                            });
-                          } else if (_controllerPulseRate.text.isEmpty ==
-                                  true ||
-                              pulseRate == 0) {
-                            setState(() {
-                              checkDiastolic = false;
-                              checkSystolic = false;
-                              checkPulse = true;
-                              checkGlucose = false;
-                              checkTrigly = false;
-                              checkHdl = false;
-                            });
-                          } else if (_controllerBloodGlucose.text.isEmpty ==
-                                  true ||
-                              bloodGlucose == 0) {
-                            setState(() {
-                              checkDiastolic = false;
-                              checkSystolic = false;
-                              checkPulse = false;
-                              checkGlucose = true;
-                              checkTrigly = false;
-                              checkHdl = false;
-                            });
-                          } else if (_controllerTriglyceride.text.isEmpty ==
-                                  true ||
-                              triglyceride == 0) {
-                            setState(() {
-                              checkDiastolic = false;
-                              checkSystolic = false;
-                              checkPulse = false;
-                              checkGlucose = false;
-                              checkTrigly = true;
-                              checkHdl = false;
-                            });
-                          } else if (_controllerHdl.text.isEmpty == true ||
-                              hdl == 0) {
-                            setState(() {
-                              checkDiastolic = false;
-                              checkSystolic = false;
-                              checkPulse = false;
-                              checkGlucose = false;
-                              checkTrigly = false;
-                              checkHdl = true;
-                            });
-                          } else {
-                            if (height != 0 &&
-                                weight != 0 &&
-                                bmi != 0 &&
-                                waistline != 0 &&
-                                systolicBloodPressure != 0 &&
-                                diastolicBloodPressure != 0 &&
-                                pulseRate != 0 &&
-                                bloodGlucose != 0 &&
-                                triglyceride != 0 &&
-                                hdl != 0) {
-                              getMetabolic(
-                                  token!,
-                                  dropdownValue!,
-                                  height,
-                                  weight,
-                                  bmi,
-                                  waistline,
-                                  systolicBloodPressure,
-                                  diastolicBloodPressure,
-                                  pulseRate,
-                                  bloodGlucose,
-                                  triglyceride,
-                                  hdl);
-
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => MetabolicResultPage(
-                                            metabolicResult: metabolicResult,
-                                          )));
-                            }
-                          }
-                        }
-                      },
-                      child: Container(
-                        height: 47,
-                        alignment: Alignment.center,
-                        child: const Text("ถัดไป",
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontFamily: 'IBMPlexSansThai',
-                                color: Colors.white,
-                                fontWeight: FontWeight.normal),
-                            textAlign: TextAlign.center),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            )
           ],
         ));
   }

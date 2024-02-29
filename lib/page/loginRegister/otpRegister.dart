@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/loginRegister/createProfile.dart';
-import 'package:flutter_application_1/page/loginRegister/register.dart';
 
 class Otp extends StatelessWidget {
   const Otp({
@@ -27,12 +26,11 @@ class Otp extends StatelessWidget {
                 validColor == null ? Color(hexColor('#DBDBDB')) : validColor!,
           ),
           borderRadius: BorderRadius.circular(10)),
-      width: 40,
-      height: 50,
+      width: 65,
+      height: 85,
       child: TextFormField(
         controller: otpController,
         keyboardType: TextInputType.number,
-        style: Theme.of(context).textTheme.headline6,
         textAlign: TextAlign.center,
         inputFormatters: [
           LengthLimitingTextInputFormatter(1),
@@ -132,10 +130,10 @@ class _OTPRegisterState extends State<OTPRegister> {
                       InkWell(
                         borderRadius: BorderRadius.circular(12),
                         onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Register()));
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //         builder: (context) => Register()));
                         },
                         child: Icon(
                           Icons.arrow_back_ios_new_rounded,

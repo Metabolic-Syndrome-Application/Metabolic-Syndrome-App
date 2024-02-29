@@ -39,7 +39,7 @@ class _NotificationPageState extends State<NotificationPage> {
                     borderRadius: BorderRadius.circular(12),
                     onTap: () {
                       Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Home()));
+                          MaterialPageRoute(builder: (context) => HomePage()));
                     },
                     child: Icon(
                       Icons.arrow_back_ios_new_rounded,

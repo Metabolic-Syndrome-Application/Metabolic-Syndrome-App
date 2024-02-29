@@ -293,7 +293,9 @@ class _PermissionPageState extends State<PermissionPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => StartScreening()));
+                            builder: (context) => StartScreening(
+                                  firsttime: true,
+                                )));
                   }
                 },
                 child: Container(

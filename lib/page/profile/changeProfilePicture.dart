@@ -333,6 +333,7 @@ class _ChangeProfilePicturePageState extends State<ChangeProfilePicturePage> {
                     borderRadius: BorderRadius.circular(23.5),
                   ),
                   onPressed: () {
+                    print(_selectImage);
                     Navigator.push(
                         context,
                         MaterialPageRoute(

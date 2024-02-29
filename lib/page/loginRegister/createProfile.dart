@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 //import 'package:email_auth/email_auth.dart';
@@ -9,7 +8,7 @@ import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/loginRegister/login.dart';
 import 'package:flutter_application_1/page/loginRegister/selectProfilePicture.dart';
 import 'package:flutter_application_1/page/screening/startScreening.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_application_1/response/api.dart';
 import 'package:provider/provider.dart';
 
 class CreateProfilePage extends StatefulWidget {
@@ -45,42 +44,31 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
   int? yearOfBirth;
   String? gender;
 
-  Future<void> updateProfile(
-      String? accesstoken,
-      String? alias,
-      String? firstname,
-      String? lastname,
-      int? yearOfBirth,
-      String? gender,
-      String? photo) async {
-    final url = Uri.parse("http://192.168.0.107:8000/api/user/profile");
-    final response = await http.put(url,
-        headers: {'Authorization': 'Bearer $accesstoken'},
-        body: json.encode({
-          "alias": alias,
-          "firstName": firstname,
-          "lastName": lastname,
-          "yearOfBirth": yearOfBirth,
-          "gender": gender,
-          "photo": photo
-        }));
-
-    print('update profile:${response.statusCode}');
-    print('update profile:${response.body}');
+  Future<void> fetchUpdateProfile(String? alias, String? firstname,
+      String? lastname, int? yearOfBirth, String? gender, String? photo) async {
+    try {
+      String? token = Provider.of<AuthProvider>(context, listen: false).token;
+      print(token);
+      await updateProfile(
+          token!, alias, firstname, lastname, yearOfBirth, gender, photo);
+      setState(() {});
+    } catch (e) {
+      print('Error fetching profile: $e');
+    }
   }
 
-  Future<void> refreshToken(
-    String? accesstoken,
-  ) async {
-    final url = Uri.parse("http://192.168.0.107:8000/api/auth/refresh");
-    final response = await http.post(
-      url,
-      headers: {'Authorization': 'Bearer $accesstoken'},
-    );
+  // Future<void> refreshToken(
+  //   String? accesstoken,
+  // ) async {
+  //   final url = Uri.parse("http://10.66.11.232:8000/api/auth/refresh");
+  //   final response = await http.post(
+  //     url,
+  //     headers: {'Authorization': 'Bearer $accesstoken'},
+  //   );
 
-    print('refresh:${response.statusCode}');
-    print('update token:${response.body}');
-  }
+  //   print('refresh:${response.statusCode}');
+  //   print('update token:${response.body}');
+  // }
 
   late TextEditingController _controllerAlias;
   late TextEditingController _controllerFirstname;
@@ -275,7 +263,6 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    String? token = Provider.of<AuthProvider>(context).token;
     final List<int> items = [];
 
     for (int i = 2499; i <= 2550; i++) {
@@ -392,6 +379,7 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                 textAlign: TextAlign.left,
                 textAlignVertical: TextAlignVertical.center,
                 decoration: InputDecoration(
+                  fillColor: Colors.white,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 15),
                   errorBorder: OutlineInputBorder(
                       borderRadius: const BorderRadius.all(Radius.circular(30)),
@@ -465,6 +453,7 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                           textAlign: TextAlign.left,
                           textAlignVertical: TextAlignVertical.center,
                           decoration: InputDecoration(
+                            fillColor: Colors.white,
                             hintText: 'ชื่อจริง',
                             contentPadding:
                                 const EdgeInsets.symmetric(horizontal: 15),
@@ -549,6 +538,7 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                           textAlign: TextAlign.left,
                           textAlignVertical: TextAlignVertical.center,
                           decoration: InputDecoration(
+                            fillColor: Colors.white,
                             contentPadding:
                                 const EdgeInsets.symmetric(horizontal: 15),
                             hintText: 'นามสกุล',
@@ -881,6 +871,7 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                   borderRadius: BorderRadius.circular(23.5),
                 ),
                 onPressed: () async {
+                  print('pop');
                   alias = alias ?? widget.alias;
                   firstname = firstname ?? widget.firstname;
                   lastname = lastname ?? widget.lastname;
@@ -933,8 +924,8 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                         selectedYear != null &&
                         selectedGender != null &&
                         isChecked == true) {
-                      updateProfile(
-                          token,
+                      print('here');
+                      fetchUpdateProfile(
                           alias ?? widget.alias,
                           firstname ?? widget.firstname,
                           lastname ?? widget.lastname,
@@ -946,7 +937,9 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const StartScreening()));
+                              builder: (context) => const StartScreening(
+                                    firsttime: true,
+                                  )));
                     }
                   }
                 },

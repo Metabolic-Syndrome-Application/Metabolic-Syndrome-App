@@ -2,12 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/challenge/challenge.dart';
 
-void main() {
-  runApp(YourChallengeCard());
-}
+// void main() {
+//   runApp(YourChallengeCard());
+// }
 
 class YourChallengeCard extends StatelessWidget {
-  const YourChallengeCard({super.key});
+  final String id;
+  final String name;
+  final int points;
+  final int numDays;
+  final int day;
+  const YourChallengeCard(
+      {super.key,
+      required this.name,
+      required this.points,
+      required this.numDays,
+      required this.day,
+      required this.id});
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +28,8 @@ class YourChallengeCard extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(30),
         onTap: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => Challenge()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ChallengePage(id: id)));
         },
         child: Container(
           decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
@@ -39,7 +50,7 @@ class YourChallengeCard extends StatelessWidget {
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text("ลงทะเบียน",
+                      Text(name,
                           style: TextStyle(
                             fontSize: 20,
                             fontFamily: 'IBMPlexSansThai',
@@ -55,7 +66,7 @@ class YourChallengeCard extends StatelessWidget {
                           ),
                           SizedBox(width: 5),
                           Text(
-                            "100 coins",
+                            "${points == 0 ? '-' : points} คะแนน",
                             style: TextStyle(
                               fontSize: 14,
                               fontFamily: 'IBMPlexSansThai',
@@ -74,7 +85,7 @@ class YourChallengeCard extends StatelessWidget {
                           ),
                           SizedBox(width: 5),
                           Text(
-                            "30 - 45 นาที",
+                            "${numDays == 0 ? '-' : numDays} วัน",
                             style: TextStyle(
                               fontSize: 14,
                               fontFamily: 'IBMPlexSansThai',
@@ -94,7 +105,7 @@ class YourChallengeCard extends StatelessWidget {
                         child: ClipRRect(
                           borderRadius: BorderRadius.all(Radius.circular(10)),
                           child: LinearProgressIndicator(
-                            value: 0.7,
+                            value: day == 0 || numDays == 0 ? 0 : day / numDays,
                             valueColor: AlwaysStoppedAnimation<Color>(
                                 Color(hexColor('#FFC556'))),
                             backgroundColor: Color(hexColor('#D9D9D9')),

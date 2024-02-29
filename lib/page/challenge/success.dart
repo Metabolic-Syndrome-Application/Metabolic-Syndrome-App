@@ -1,29 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/page/challenge/allChallenge.dart';
 import 'package:flutter_application_1/page/home/home.dart';
 import 'package:flutter_application_1/page/profile/profile.dart';
 
 import '../../extension/Color.dart';
 
-class Success extends StatelessWidget {
-  const Success({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Question Page",
-      home: SuccessPage(),
-    );
-  }
-}
-
 class SuccessPage extends StatefulWidget {
-  const SuccessPage({super.key});
+  final String result;
+  const SuccessPage({required this.result, super.key});
 
   @override
   State<SuccessPage> createState() => _SuccessPageState();
 }
 
 class _SuccessPageState extends State<SuccessPage> {
+  @override
+  void initState() {
+    print(widget.result);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +34,7 @@ class _SuccessPageState extends State<SuccessPage> {
               InkWell(
                 onTap: () {
                   Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Profile()));
+                      MaterialPageRoute(builder: (context) => AllChallenge()));
                 },
                 child: Container(
                   child: Icon(
@@ -64,7 +60,7 @@ class _SuccessPageState extends State<SuccessPage> {
             height: 42,
           ),
           Text(
-            'ภารกิจสำเร็จ !',
+            widget.result == 'correct' ? 'ภารกิจสำเร็จ !' : 'คำตอบผิด !',
             style: TextStyle(
               fontSize: 24,
               fontFamily: 'IBMPlexSansThai',
@@ -75,8 +71,8 @@ class _SuccessPageState extends State<SuccessPage> {
           SizedBox(
             height: 42,
           ),
-          Text(
-            'คุณทำได้ดีมาก\nไว้มาท้าดวลภารกิจถัดไปกันต่อนะ',
+          Text( widget.result == 'correct' ? 
+            'คุณทำได้ดีมาก\nไว้มาท้าดวลภารกิจถัดไปกันต่อนะ':'คุณพยายามที่สุดแล้ว เก่งมาก ไว้มาตอบคำถามใหม่ในวันพรุ่งนี้นะ',
             style: TextStyle(
               fontSize: 20,
               fontFamily: 'IBMPlexSansThai',
@@ -95,7 +91,7 @@ class _SuccessPageState extends State<SuccessPage> {
             ),
             onPressed: () {
               Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Home()));
+                  context, MaterialPageRoute(builder: (context) => HomePage()));
             },
             child: Container(
               height: 44,

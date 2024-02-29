@@ -1,13 +1,11 @@
 // import 'package:email_auth/email_auth.dart';
-import 'dart:convert';
-
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/loginRegister/createProfile.dart';
 import 'package:flutter_application_1/page/loginRegister/login.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_application_1/response/api.dart';
 import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -18,20 +16,23 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  Future postRegister(
+  String accessToken = '';
+  bool _wrongPassword = false;
+
+  Future<void> fetchRegister(
     String username,
     String password,
     String passwordConfirm,
   ) async {
-    final response = await http.post(
-        Uri.parse('http://192.168.0.107:8000/api/auth/register'),
-        body: json.encode({
-          "username": username,
-          "password": password,
-          "passwordConfirm": passwordConfirm,
-          "role": "patient"
-        }));
-    if (response.statusCode == 400) {
+    print(username);
+    print(password);
+    print(passwordConfirm);
+
+    Map<String, dynamic> response =
+        await postRegister(username, password, passwordConfirm);
+
+    if (response["status"] == "fail") {
+      print(response["status"]);
       setState(() {
         _usedEmail = true;
         _readyToCreateProfile = false;
@@ -40,19 +41,67 @@ class _RegisterPageState extends State<RegisterPage> {
       setState(() {
         _usedEmail = false;
         _readyToCreateProfile = true;
-        print("งง");
       });
+    }
+    // }
+    // print('success');
+    // setState(() {
+    //   _usedEmail = false;
+    //   _readyToCreateProfile = true;
+    // });
+
+    // setState(() {
+    //   _usedEmail = true;
+    //   _readyToCreateProfile = false;
+    // });
+  }
+
+  // Future postRegister(
+  //   String username,
+  //   String password,
+  //   String passwordConfirm,
+  // ) async {
+  //   final response =
+  //       await http.post(Uri.parse('http://10.27.7.81:8000/api/auth/register'),
+  //           body: json.encode({
+  //             "username": username,
+  //             "password": password,
+  //             "passwordConfirm": passwordConfirm,
+  //             "role": "patient"
+  //           }));
+  //   if (response.statusCode == 400) {
+  //     setState(() {
+  //       _usedEmail = true;
+  //       _readyToCreateProfile = false;
+  //     });
+  //   } else {
+  //     setState(() {
+  //       _usedEmail = false;
+  //       _readyToCreateProfile = true;
+  //     });
+  //   }
+  // }
+
+  Future<void> fetchLogin(String username, String password) async {
+    try {
+      Map<String, dynamic> response = await postLogin(username, password);
+      setState(() {
+        accessToken = response['access_token'];
+        Provider.of<AuthProvider>(context, listen: false).setToken(accessToken);
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
     }
   }
 
-  Future postLogin(String username, String password) async {
-    final url = Uri.parse("http://192.168.0.107:8000/api/auth/login");
-    final response = await http.post(url,
-        body: json.encode({'username': username, 'password': password}));
+  // Future postLogin(String username, String password) async {
+  //   final url = Uri.parse("http://10.27.7.81:8000/api/auth/login");
+  //   final response = await http.post(url,
+  //       body: json.encode({'username': username, 'password': password}));
 
-    Provider.of<AuthProvider>(context, listen: false)
-        .setToken(json.decode(response.body)['access_token']);
-  }
+  //   Provider.of<AuthProvider>(context, listen: false)
+  //       .setToken(json.decode(response.body)['access_token']);
+  // }
 
   bool visiblePassword = false;
   bool visibleConfirmPassword = false;
@@ -444,14 +493,14 @@ class _RegisterPageState extends State<RegisterPage> {
                               setState(() {
                                 _notSame = false;
                               });
-                              await postRegister(
+                              await fetchRegister(
                                 _email,
                                 _password,
                                 _confirmPassword,
                               );
 
                               if (_readyToCreateProfile == true) {
-                                postLogin(_email, _password);
+                                await fetchLogin(_email, _password);
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(

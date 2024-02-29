@@ -1,94 +1,204 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/page/home/home.dart';
+import 'package:flutter_application_1/response/api.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:provider/provider.dart';
 
 import '../../extension/Color.dart';
 
-class Ranking extends StatelessWidget {
+class Ranking extends StatefulWidget {
   const Ranking({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Ranking Page',
-      home: RankingPage(),
-    );
-  }
+  State<Ranking> createState() => _RankingState();
 }
 
-class RankingPage extends StatefulWidget {
-  const RankingPage({super.key});
+class _RankingState extends State<Ranking> {
+  int myRank = 0;
+  int collectPoints = 0;
+  String name = '';
+  String firstname = '';
+
+  Future<void> fetchProfile() async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
+    try {
+      Map<String, dynamic> response = await getProfile(token!);
+      setState(() {
+        firstname = response['data']['user']['firstName'];
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
+  }
+
+  Future<void> fetchMyRank() async {
+    try {
+      String? token = Provider.of<AuthProvider>(context, listen: false).token;
+      Map<String, dynamic> response = await getMyRank(token!);
+      setState(() {
+        myRank = response['data']['rank'];
+        collectPoints = response['data']['collectPoints'];
+        name = response['data']['name'];
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
+  }
+
+  dynamic listOfRank = '';
+  Future<void> fetchAllRank() async {
+    try {
+      String? token = Provider.of<AuthProvider>(context, listen: false).token;
+      Map<String, dynamic> response = await getTopFive(token!);
+      setState(() {
+        listOfRank = response['data'];
+        print(listOfRank);
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
+  }
 
   @override
-  State<RankingPage> createState() => _RankingPageState();
-}
+  void initState() {
+    fetchProfile();
+    fetchMyRank();
+    fetchAllRank();
+    super.initState();
+  }
 
-class _RankingPageState extends State<RankingPage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> rank = [];
-    for (int x = 1; x <= 5; x++) {
-      rank.add(Container(
-        margin: EdgeInsets.only(bottom: 13),
-        padding: EdgeInsets.only(left: 20, right: 20),
-        height: 70,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(30), color: Colors.white),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Text(
-                  '0$x',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontFamily: 'IBMPlexSansThai',
-                    color: Colors.black,
-                    fontWeight: FontWeight.normal,
+    for (int x = 0; x <= 4; x++) {
+      if (x <= listOfRank.length - 1) {
+        rank.add(Container(
+          margin: EdgeInsets.only(bottom: 13),
+          padding: EdgeInsets.only(left: 20, right: 20),
+          height: 70,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30), color: Colors.white),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    '0${x + 1}',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontFamily: 'IBMPlexSansThai',
+                      color: Colors.black,
+                      fontWeight: FontWeight.normal,
+                    ),
                   ),
-                ),
-                SizedBox(
-                  width: 10,
-                ),
-                CircleAvatar(
-                  radius: 20,
-                  backgroundImage: AssetImage('assets/images/person.png'),
-                ),
-                SizedBox(
-                  width: 7,
-                ),
-                Text(
-                  'นันท์',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'IBMPlexSansThai',
-                    color: Colors.black,
-                    fontWeight: FontWeight.normal,
+                  SizedBox(
+                    width: 10,
                   ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Image.asset('assets/images/coin.png', height: 24),
-                SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  '3400',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontFamily: 'IBMPlexSansThai',
-                    color: Color(hexColor('#42884B')),
-                    fontWeight: FontWeight.normal,
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundImage: AssetImage('assets/images/person.png'),
                   ),
-                )
-              ],
-            )
-          ],
-        ),
-      ));
+                  SizedBox(
+                    width: 7,
+                  ),
+                  Text(
+                    listOfRank[x]['name'] == ''
+                        ? firstname
+                        : listOfRank[x]['name'],
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'IBMPlexSansThai',
+                      color: Colors.black,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Image.asset('assets/images/coin.png', height: 24),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    listOfRank[x]['collectPoints'].toString(),
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'IBMPlexSansThai',
+                      color: Color(hexColor('#42884B')),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
+        ));
+      } else {
+        rank.add(Container(
+          margin: EdgeInsets.only(bottom: 13),
+          padding: EdgeInsets.only(left: 20, right: 20),
+          height: 70,
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(30), color: Colors.white),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    '0${x + 1}',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontFamily: 'IBMPlexSansThai',
+                      color: Colors.black,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 10,
+                  ),
+                  CircleAvatar(
+                    radius: 20,
+                    backgroundImage: AssetImage('assets/images/person.png'),
+                  ),
+                  SizedBox(
+                    width: 7,
+                  ),
+                  Text(
+                    '-',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'IBMPlexSansThai',
+                      color: Colors.black,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  Image.asset('assets/images/coin.png', height: 24),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  Text(
+                    '0',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontFamily: 'IBMPlexSansThai',
+                      color: Color(hexColor('#42884B')),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
+        ));
+      }
     }
     rank.add(Container(
       margin: EdgeInsets.only(bottom: 13),
@@ -104,9 +214,10 @@ class _RankingPageState extends State<RankingPage> {
             children: [
               Container(
                 alignment: Alignment.center,
-                width: 29,
                 child: Text(
-                  '-',
+                  myRank.toString().length == 1
+                      ? '0$myRank'
+                      : myRank.toString(),
                   style: TextStyle(
                     fontSize: 24,
                     fontFamily: 'IBMPlexSansThai',
@@ -126,7 +237,7 @@ class _RankingPageState extends State<RankingPage> {
                 width: 7,
               ),
               Text(
-                'นันท์',
+                name == '' ? firstname : name,
                 style: TextStyle(
                   fontSize: 16,
                   fontFamily: 'IBMPlexSansThai',
@@ -143,12 +254,12 @@ class _RankingPageState extends State<RankingPage> {
                 width: 5,
               ),
               Text(
-                '3400',
+                collectPoints.toString(),
                 style: TextStyle(
                   fontSize: 16,
                   fontFamily: 'IBMPlexSansThai',
                   color: Color(hexColor('#42884B')),
-                  fontWeight: FontWeight.normal,
+                  fontWeight: FontWeight.bold,
                 ),
               )
             ],
@@ -174,7 +285,7 @@ class _RankingPageState extends State<RankingPage> {
                           context,
                           PageTransition(
                               type: PageTransitionType.leftToRight,
-                              child: Home()));
+                              child: HomePage()));
                     },
                     child: Icon(
                       Icons.arrow_back_ios_new_rounded,
@@ -188,7 +299,7 @@ class _RankingPageState extends State<RankingPage> {
                       fontSize: 24,
                       fontFamily: 'IBMPlexSansThai',
                       color: Colors.black,
-                      fontWeight: FontWeight.normal,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   SizedBox(
@@ -214,6 +325,7 @@ class _RankingPageState extends State<RankingPage> {
                     children: [
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'เก่งที่สุด !',
@@ -221,7 +333,7 @@ class _RankingPageState extends State<RankingPage> {
                               fontSize: 20,
                               fontFamily: 'IBMPlexSansThai',
                               color: Colors.black,
-                              fontWeight: FontWeight.normal,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
@@ -253,7 +365,7 @@ class _RankingPageState extends State<RankingPage> {
                       fontSize: 20,
                       fontFamily: 'IBMPlexSansThai',
                       color: Colors.black,
-                      fontWeight: FontWeight.normal,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
@@ -262,6 +374,9 @@ class _RankingPageState extends State<RankingPage> {
                 height: 18,
               ),
               Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    color: Colors.white),
                 child: Column(
                   children: rank,
                 ),
@@ -303,7 +418,7 @@ class _RankingPageState extends State<RankingPage> {
                     width: 10,
                   ),
                   Text(
-                    '100 คะแนน',
+                    collectPoints.toString() + " คะแนน",
                     style: TextStyle(
                       fontSize: 20,
                       fontFamily: 'IBMPlexSansThai',
@@ -316,36 +431,36 @@ class _RankingPageState extends State<RankingPage> {
               SizedBox(
                 height: 21,
               ),
-              Container(
-                height: 42,
-                padding: EdgeInsets.only(left: 10, right: 10),
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(30),
-                    color: Colors.white),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'คุณมีคะเเนนสะสมทั้งหมด',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'IBMPlexSansThai',
-                        color: Colors.black,
-                        fontWeight: FontWeight.normal,
-                      ),
-                    ),
-                    Text(
-                      '+ 100',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: 'IBMPlexSansThai',
-                        color: Color(hexColor('#42884B')),
-                        fontWeight: FontWeight.normal,
-                      ),
-                    )
-                  ],
-                ),
-              ),
+              // Container(
+              //   height: 42,
+              //   padding: EdgeInsets.only(left: 10, right: 10),
+              //   decoration: BoxDecoration(
+              //       borderRadius: BorderRadius.circular(30),
+              //       color: Colors.white),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //     children: [
+              //       Text(
+              //         'คุณมีคะเเนนสะสมทั้งหมด',
+              //         style: TextStyle(
+              //           fontSize: 16,
+              //           fontFamily: 'IBMPlexSansThai',
+              //           color: Colors.black,
+              //           fontWeight: FontWeight.normal,
+              //         ),
+              //       ),
+              //       Text(
+              //         '+ 100',
+              //         style: TextStyle(
+              //           fontSize: 16,
+              //           fontFamily: 'IBMPlexSansThai',
+              //           color: Color(hexColor('#42884B')),
+              //           fontWeight: FontWeight.normal,
+              //         ),
+              //       )
+              //     ],
+              //   ),
+              // ),
               SizedBox(
                 height: 220,
               )

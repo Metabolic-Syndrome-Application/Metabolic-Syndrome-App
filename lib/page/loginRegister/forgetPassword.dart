@@ -179,7 +179,7 @@ class _ForgetPasswordPageState extends State<ForgetPasswordPage> {
 
                     if (_email != '') {
                       Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Home()));
+                          MaterialPageRoute(builder: (context) => HomePage()));
                     }
                   },
                   child: Container(

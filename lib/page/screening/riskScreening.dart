@@ -1,11 +1,10 @@
-import 'dart:convert';
-
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
+import 'package:flutter_application_1/page/screening/riskResult.dart';
 import 'package:flutter_application_1/page/screening/startScreening.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_application_1/response/api.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -134,7 +133,6 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
 
   bool isHover = false;
 
-  // Create a ScrollController instance
   final ScrollController _scrollController = ScrollController();
 
   late TextEditingController _controllerAnother;
@@ -143,28 +141,31 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
   List<String> _disease = [];
   List<String> _family = [];
 
-  String _diseaseResult = '';
+  // var _diseaseResult;
+  String diabetesResult = "";
+  String hyperlipidemiaResult = "";
+  String hypertensionResult = "";
+  String obesityResult = "";
 
-  Future<void> postDisease(
-      String accesstoken, List<String> disease, List<String> family) async {
-    final url = Uri.parse("http://10.68.9.216:8000/api/screening/disease");
-    final response = await http.post(url,
-        headers: {'Authorization': 'Bearer $accesstoken'},
-        body: json.encode({
-          "disease": disease,
-          "familyDisease": family,
-        }));
-    setState(() {
-      _diseaseResult = json.decode(response.body)['data']['diseaseRisk'];
-    });
-    print(_diseaseResult);
+  Future<void> fetchDisease(List<String> disease, List<String> family) async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
+    try {
+      Map<String, dynamic> response =
+          await postDisease(token!, disease, family);
+      setState(() {
+        diabetesResult = response['data']['diseaseRisk']['diabetes'];
+        hyperlipidemiaResult =
+            response['data']['diseaseRisk']['hyperlipidemia'];
+        hypertensionResult = response['data']['diseaseRisk']['hypertension'];
+        obesityResult = response['data']['diseaseRisk']['obesity'];
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
   }
 
-//Build method of Main Page
   @override
   Widget build(BuildContext context) {
-    String? token = Provider.of<AuthProvider>(context).token;
-
     var mediaQD = MediaQuery.of(context);
     _safeAreaSize = mediaQD.size;
 
@@ -187,288 +188,295 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                       });
                     },
                     children: <Widget>[
-                      SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const SizedBox(height: 44),
-                            RichText(
-                              text: const TextSpan(
-                                text: 'ท่านมีพฤติกรรมดังต่อไปนี้หรือไม่',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontFamily: 'IBMPlexSansThai',
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
+                      Scaffold(
+                        backgroundColor: Color(hexColor('#FAFCFB')),
+                        body: SingleChildScrollView(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const SizedBox(height: 44),
+                              RichText(
+                                text: const TextSpan(
+                                  text: 'ท่านมีพฤติกรรมดังต่อไปนี้หรือไม่',
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontFamily: 'IBMPlexSansThai',
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(
-                              height: 15,
-                            ),
-                            RichText(
-                              text: const TextSpan(
-                                text:
-                                    'ตอบได้มากกว่า 1 ข้อ หากไม่มีพฤติกรรมเหล่านี้ กดถัดไป',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontFamily: 'IBMPlexSansThai',
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.normal,
+                              SizedBox(
+                                height: 15,
+                              ),
+                              RichText(
+                                text: const TextSpan(
+                                  text:
+                                      'ตอบได้มากกว่า 1 ข้อ หากไม่มีพฤติกรรมเหล่านี้ กดถัดไป',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontFamily: 'IBMPlexSansThai',
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.normal,
+                                  ),
                                 ),
                               ),
-                            ),
-                            SizedBox(
-                              height: 22,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: 150,
-                                  height: 150,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(.3),
-                                        blurRadius: 4.0,
-                                        spreadRadius: 1.0,
-                                        offset: const Offset(
-                                          2.0,
-                                          4.0,
+                              SizedBox(
+                                height: 22,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 150,
+                                    height: 150,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(.3),
+                                          blurRadius: 4.0,
+                                          spreadRadius: 1.0,
+                                          offset: const Offset(
+                                            2.0,
+                                            4.0,
+                                          ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  child: MaterialButton(
-                                      color:
-                                          sleep ? activeColor : unactiveColor,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30),
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          sleep = !sleep;
-                                        });
-                                      },
-                                      child: Column(
-                                        children: [
-                                          SizedBox(
-                                            height: 21,
-                                          ),
-                                          Container(
-                                            width: 50,
-                                            height: 50,
-                                            child: Image.asset(
-                                                'assets/images/sleep.png'),
-                                          ),
-                                          SizedBox(
-                                            height: 12,
-                                          ),
-                                          Text(
-                                            'นอนกรนและเหนื่อย\nเพลียหลังตื่นนอน',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ],
-                                      )),
-                                ),
-                                SizedBox(
-                                  width: 31,
-                                ),
-                                Container(
-                                  width: 150,
-                                  height: 150,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(.3),
-                                        blurRadius: 4.0,
-                                        spreadRadius: 1.0,
-                                        offset: const Offset(
-                                          2.0,
-                                          4.0,
+                                      ],
+                                    ),
+                                    child: MaterialButton(
+                                        color:
+                                            sleep ? activeColor : unactiveColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  child: MaterialButton(
-                                      color:
-                                          alcohol ? activeColor : unactiveColor,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30),
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          alcohol = !alcohol;
-                                        });
-                                      },
-                                      child: Column(
-                                        children: [
-                                          SizedBox(
-                                            height: 15,
-                                          ),
-                                          Container(
-                                            width: 50,
-                                            height: 50,
-                                            child: Image.asset(
-                                                'assets/images/alcohol.png'),
-                                          ),
-                                          SizedBox(
-                                            height: 12,
-                                          ),
-                                          Text(
-                                            'ดื่มแอลกอฮอล์เกิน\nกว่าวันละ 2 แก้วเป็น\nประจำ',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.normal,
+                                        onPressed: () {
+                                          setState(() {
+                                            sleep = !sleep;
+                                          });
+                                        },
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              height: 21,
                                             ),
-                                            textAlign: TextAlign.center,
+                                            Container(
+                                              width: 50,
+                                              height: 50,
+                                              child: Image.asset(
+                                                  'assets/images/sleep.png'),
+                                            ),
+                                            SizedBox(
+                                              height: 12,
+                                            ),
+                                            Text(
+                                              'นอนกรนและเหนื่อย\nเพลียหลังตื่นนอน',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontFamily: 'IBMPlexSansThai',
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ],
+                                        )),
+                                  ),
+                                  SizedBox(
+                                    width: 31,
+                                  ),
+                                  Container(
+                                    width: 150,
+                                    height: 150,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(.3),
+                                          blurRadius: 4.0,
+                                          spreadRadius: 1.0,
+                                          offset: const Offset(
+                                            2.0,
+                                            4.0,
                                           ),
-                                        ],
-                                      )),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 31,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Container(
-                                  width: 150,
-                                  height: 130,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(.3),
-                                        blurRadius: 4.0,
-                                        spreadRadius: 1.0,
-                                        offset: const Offset(
-                                          2.0,
-                                          4.0,
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  child: MaterialButton(
-                                      color:
-                                          smoke ? activeColor : unactiveColor,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30),
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          smoke = !smoke;
-                                        });
-                                      },
-                                      child: Column(
-                                        children: [
-                                          SizedBox(
-                                            height: 21,
-                                          ),
-                                          Container(
-                                            width: 50,
-                                            height: 50,
-                                            child: Image.asset(
-                                                'assets/images/smoking.png'),
-                                          ),
-                                          SizedBox(
-                                            height: 12,
-                                          ),
-                                          Text(
-                                            'สูบบุหรี่',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.normal,
-                                            ),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ],
-                                      )),
-                                ),
-                                const SizedBox(
-                                  width: 31,
-                                ),
-                                Container(
-                                  width: 150,
-                                  height: 130,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(30),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(.3),
-                                        blurRadius: 4.0,
-                                        spreadRadius: 1.0,
-                                        offset: const Offset(
-                                          2.0,
-                                          4.0,
+                                      ],
+                                    ),
+                                    child: MaterialButton(
+                                        color: alcohol
+                                            ? activeColor
+                                            : unactiveColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  child: MaterialButton(
-                                      color: healthCheck
-                                          ? activeColor
-                                          : unactiveColor,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(30),
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          healthCheck = !healthCheck;
-                                        });
-                                      },
-                                      child: Column(
-                                        children: [
-                                          SizedBox(
-                                            height: 21,
-                                          ),
-                                          Container(
-                                            width: 50,
-                                            height: 50,
-                                            child: Image.asset(
-                                                'assets/images/medicalReport.png'),
-                                          ),
-                                          SizedBox(
-                                            height: 18,
-                                          ),
-                                          Text(
-                                            'ไม่เคยตรวจสุขภาพ',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.normal,
+                                        onPressed: () {
+                                          setState(() {
+                                            alcohol = !alcohol;
+                                          });
+                                        },
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              height: 15,
                                             ),
-                                            textAlign: TextAlign.center,
+                                            Container(
+                                              width: 50,
+                                              height: 50,
+                                              child: Image.asset(
+                                                  'assets/images/alcohol.png'),
+                                            ),
+                                            SizedBox(
+                                              height: 12,
+                                            ),
+                                            Text(
+                                              'ดื่มแอลกอฮอล์เกิน\nกว่าวันละ 2 แก้วเป็น\nประจำ',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontFamily: 'IBMPlexSansThai',
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ],
+                                        )),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 31,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    width: 150,
+                                    height: 130,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(.3),
+                                          blurRadius: 4.0,
+                                          spreadRadius: 1.0,
+                                          offset: const Offset(
+                                            2.0,
+                                            4.0,
                                           ),
-                                        ],
-                                      )),
-                                ),
-                              ],
-                            ),
-                          ],
+                                        ),
+                                      ],
+                                    ),
+                                    child: MaterialButton(
+                                        color:
+                                            smoke ? activeColor : unactiveColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            smoke = !smoke;
+                                          });
+                                        },
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              height: 21,
+                                            ),
+                                            Container(
+                                              width: 50,
+                                              height: 50,
+                                              child: Image.asset(
+                                                  'assets/images/smoking.png'),
+                                            ),
+                                            SizedBox(
+                                              height: 12,
+                                            ),
+                                            Text(
+                                              'สูบบุหรี่',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontFamily: 'IBMPlexSansThai',
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ],
+                                        )),
+                                  ),
+                                  const SizedBox(
+                                    width: 31,
+                                  ),
+                                  Container(
+                                    width: 150,
+                                    height: 130,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black.withOpacity(.3),
+                                          blurRadius: 4.0,
+                                          spreadRadius: 1.0,
+                                          offset: const Offset(
+                                            2.0,
+                                            4.0,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    child: MaterialButton(
+                                        color: healthCheck
+                                            ? activeColor
+                                            : unactiveColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            healthCheck = !healthCheck;
+                                          });
+                                        },
+                                        child: Column(
+                                          children: [
+                                            SizedBox(
+                                              height: 21,
+                                            ),
+                                            Container(
+                                              width: 50,
+                                              height: 50,
+                                              child: Image.asset(
+                                                  'assets/images/medicalReport.png'),
+                                            ),
+                                            SizedBox(
+                                              height: 18,
+                                            ),
+                                            Text(
+                                              'ไม่เคยตรวจสุขภาพ',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontFamily: 'IBMPlexSansThai',
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ],
+                                        )),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      SingleChildScrollView(
-                        controller: _scrollController,
-                        child: Container(
-                          alignment: Alignment.center,
-                          color: Color(hexColor('#FAFCFB')),
+                      Scaffold(
+                        backgroundColor: Color(hexColor('#FAFCFB')),
+                        body: SingleChildScrollView(
+                          controller: _scrollController,
                           child: Column(
                             children: [
                               const SizedBox(height: 44),
@@ -1254,241 +1262,250 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                           ),
                         ),
                       ),
-                      SingleChildScrollView(
-                        child: Center(
-                          child: Column(
-                            children: [
-                              SizedBox(height: 44),
-                              RichText(
-                                text: TextSpan(
-                                  text: 'คุณออกกำลังกายกี่ครั้งต่อสัปดาห์',
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontFamily: 'IBMPlexSansThai',
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
+                      Scaffold(
+                        backgroundColor: Color(hexColor('#FAFCFB')),
+                        body: SingleChildScrollView(
+                          child: Center(
+                            child: Column(
+                              children: [
+                                SizedBox(height: 44),
+                                RichText(
+                                  text: TextSpan(
+                                    text: 'คุณออกกำลังกายกี่ครั้งต่อสัปดาห์',
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontFamily: 'IBMPlexSansThai',
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                height: 27,
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(
-                                    left: 26, right: 26, bottom: 26),
-                                height: 50,
-                                child: MaterialButton(
-                                  color: exerciseFrequency == "น้อยกว่า 3 วัน"
-                                      ? activeColor
-                                      : unactiveColor,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(28),
-                                      side: BorderSide(
-                                        color: Color(hexColor('#DBDBDB')),
-                                        width: 1,
-                                      )),
-                                  onPressed: () {
-                                    setState(() {
-                                      exerciseFrequency = "น้อยกว่า 3 วัน";
-                                    });
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("น้อยกว่า 3 วัน",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.center),
-                                    ],
+                                SizedBox(
+                                  height: 27,
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(
+                                      left: 26, right: 26, bottom: 26),
+                                  height: 50,
+                                  child: MaterialButton(
+                                    color: exerciseFrequency == "น้อยกว่า 3 วัน"
+                                        ? activeColor
+                                        : unactiveColor,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(28),
+                                        side: BorderSide(
+                                          color: Color(hexColor('#DBDBDB')),
+                                          width: 1,
+                                        )),
+                                    onPressed: () {
+                                      setState(() {
+                                        exerciseFrequency = "น้อยกว่า 3 วัน";
+                                      });
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text("น้อยกว่า 3 วัน",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontFamily: 'IBMPlexSansThai',
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.normal),
+                                            textAlign: TextAlign.center),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(
-                                    left: 26, right: 26, bottom: 26),
-                                height: 50,
-                                child: MaterialButton(
-                                  color: exerciseFrequency == "3 - 5 วัน"
-                                      ? activeColor
-                                      : unactiveColor,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(28),
-                                      side: BorderSide(
-                                        color: Color(hexColor('#DBDBDB')),
-                                        width: 1,
-                                      )),
-                                  onPressed: () {
-                                    setState(() {
-                                      exerciseFrequency = "3 - 5 วัน";
-                                    });
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("3 - 5 วัน",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.center),
-                                    ],
+                                Container(
+                                  margin: EdgeInsets.only(
+                                      left: 26, right: 26, bottom: 26),
+                                  height: 50,
+                                  child: MaterialButton(
+                                    color: exerciseFrequency == "3 - 5 วัน"
+                                        ? activeColor
+                                        : unactiveColor,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(28),
+                                        side: BorderSide(
+                                          color: Color(hexColor('#DBDBDB')),
+                                          width: 1,
+                                        )),
+                                    onPressed: () {
+                                      setState(() {
+                                        exerciseFrequency = "3 - 5 วัน";
+                                      });
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text("3 - 5 วัน",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontFamily: 'IBMPlexSansThai',
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.normal),
+                                            textAlign: TextAlign.center),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(
-                                    left: 26, right: 26, bottom: 26),
-                                height: 50,
-                                child: MaterialButton(
-                                  color: exerciseFrequency == "6 - 7 วัน"
-                                      ? activeColor
-                                      : unactiveColor,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(28),
-                                      side: BorderSide(
-                                        color: Color(hexColor('#DBDBDB')),
-                                        width: 1,
-                                      )),
-                                  onPressed: () {
-                                    setState(() {
-                                      exerciseFrequency = "6 - 7 วัน";
-                                    });
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("6 - 7 วัน",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.center),
-                                    ],
+                                Container(
+                                  margin: EdgeInsets.only(
+                                      left: 26, right: 26, bottom: 26),
+                                  height: 50,
+                                  child: MaterialButton(
+                                    color: exerciseFrequency == "6 - 7 วัน"
+                                        ? activeColor
+                                        : unactiveColor,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(28),
+                                        side: BorderSide(
+                                          color: Color(hexColor('#DBDBDB')),
+                                          width: 1,
+                                        )),
+                                    onPressed: () {
+                                      setState(() {
+                                        exerciseFrequency = "6 - 7 วัน";
+                                      });
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text("6 - 7 วัน",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontFamily: 'IBMPlexSansThai',
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.normal),
+                                            textAlign: TextAlign.center),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(
-                                    left: 26, right: 26, bottom: 26),
-                                height: 50,
-                                child: MaterialButton(
-                                  color: exerciseFrequency == "ไม่ออกกำลังกาย"
-                                      ? activeColor
-                                      : unactiveColor,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(28),
-                                      side: BorderSide(
-                                        color: Color(hexColor('#DBDBDB')),
-                                        width: 1,
-                                      )),
-                                  onPressed: () {
-                                    setState(() {
-                                      exerciseFrequency = "ไม่ออกกำลังกาย";
-                                    });
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("ไม่ออกกำลังกาย",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.center),
-                                    ],
+                                Container(
+                                  margin: EdgeInsets.only(
+                                      left: 26, right: 26, bottom: 26),
+                                  height: 50,
+                                  child: MaterialButton(
+                                    color: exerciseFrequency == "ไม่ออกกำลังกาย"
+                                        ? activeColor
+                                        : unactiveColor,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(28),
+                                        side: BorderSide(
+                                          color: Color(hexColor('#DBDBDB')),
+                                          width: 1,
+                                        )),
+                                    onPressed: () {
+                                      setState(() {
+                                        exerciseFrequency = "ไม่ออกกำลังกาย";
+                                      });
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text("ไม่ออกกำลังกาย",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontFamily: 'IBMPlexSansThai',
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.normal),
+                                            textAlign: TextAlign.center),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(
-                                height: 41,
-                              ),
-                              RichText(
-                                text: TextSpan(
-                                  text: 'คุณออกกำลังกายครั้งละกี่นาที',
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontFamily: 'IBMPlexSansThai',
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.bold,
+                                SizedBox(
+                                  height: 41,
+                                ),
+                                RichText(
+                                  text: TextSpan(
+                                    text: 'คุณออกกำลังกายครั้งละกี่นาที',
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontFamily: 'IBMPlexSansThai',
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(
-                                height: 27,
-                              ),
-                              Container(
-                                margin: const EdgeInsets.only(
-                                    left: 26, right: 26, bottom: 26),
-                                height: 50,
-                                child: MaterialButton(
-                                  color: exercisePeriod == "น้อยกว่า 15 นาที"
-                                      ? activeColor
-                                      : unactiveColor,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(28),
-                                      side: BorderSide(
-                                        color: Color(hexColor('#DBDBDB')),
-                                        width: 1,
-                                      )),
-                                  onPressed: () {
-                                    setState(() {
-                                      exercisePeriod = "น้อยกว่า 15 นาที";
-                                    });
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("น้อยกว่า 15 นาที",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.center),
-                                    ],
+                                const SizedBox(
+                                  height: 27,
+                                ),
+                                Container(
+                                  margin: const EdgeInsets.only(
+                                      left: 26, right: 26, bottom: 26),
+                                  height: 50,
+                                  child: MaterialButton(
+                                    color: exercisePeriod == "น้อยกว่า 15 นาที"
+                                        ? activeColor
+                                        : unactiveColor,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(28),
+                                        side: BorderSide(
+                                          color: Color(hexColor('#DBDBDB')),
+                                          width: 1,
+                                        )),
+                                    onPressed: () {
+                                      setState(() {
+                                        exercisePeriod = "น้อยกว่า 15 นาที";
+                                      });
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text("น้อยกว่า 15 นาที",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontFamily: 'IBMPlexSansThai',
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.normal),
+                                            textAlign: TextAlign.center),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(
-                                    left: 26, right: 26, bottom: 26),
-                                height: 50,
-                                child: MaterialButton(
-                                  color: exercisePeriod == "15 - 30 นาที"
-                                      ? activeColor
-                                      : unactiveColor,
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(28),
-                                      side: BorderSide(
-                                        color: Color(hexColor('#DBDBDB')),
-                                        width: 1,
-                                      )),
-                                  onPressed: () {
-                                    setState(() {
-                                      exercisePeriod = "15 - 30 นาที";
-                                    });
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text("15 - 30 นาที",
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontFamily: 'IBMPlexSansThai',
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.normal),
-                                          textAlign: TextAlign.center),
-                                    ],
+                                Container(
+                                  margin: EdgeInsets.only(
+                                      left: 26, right: 26, bottom: 26),
+                                  height: 50,
+                                  child: MaterialButton(
+                                    color: exercisePeriod == "15 - 30 นาที"
+                                        ? activeColor
+                                        : unactiveColor,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(28),
+                                        side: BorderSide(
+                                          color: Color(hexColor('#DBDBDB')),
+                                          width: 1,
+                                        )),
+                                    onPressed: () {
+                                      setState(() {
+                                        exercisePeriod = "15 - 30 นาที";
+                                      });
+                                    },
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text("15 - 30 นาที",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontFamily: 'IBMPlexSansThai',
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.normal),
+                                            textAlign: TextAlign.center),
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ),
@@ -1532,7 +1549,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(23.5),
                             ),
-                            onPressed: () {
+                            onPressed: () async {
                               if (_pageController.hasClients && _curPage < 4) {
                                 _pageController.nextPage(
                                     duration: const Duration(milliseconds: 200),
@@ -1577,16 +1594,14 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                     _family.add("kidneyDisease");
                                   }
                                 }
-                                print(_disease);
-                                print(_family);
-                                postDisease(token!, _disease, _family);
+                                await fetchDisease(_disease, _family);
                                 _disease = [];
                                 _family = [];
-                                // Navigator.push(
-                                //     context,
-                                //     MaterialPageRoute(
-                                //         builder: (context) =>
-                                //             const RiskResult()));
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            RiskResultPage()));
                               }
                             },
                             child: Container(
@@ -1692,8 +1707,8 @@ class StepProgressView extends StatelessWidget {
       decoration: decoration,
       child: Column(
         children: <Widget>[
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Stack(
+            alignment: Alignment.centerLeft,
             children: [
               IconButton(
                   iconSize: 24,
@@ -1711,25 +1726,29 @@ class StepProgressView extends StatelessWidget {
                               builder: (context) => const StartScreening()));
                     }
                   }),
-              Center(
-                child: RichText(
-                  text: TextSpan(
-                    children: [
-                      TextSpan(
-                        text:
-                            "ขั้นตอนที่ ${_curStep + 3} จาก ${_stepsText.length + 3}",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'IBMPlexSansThai',
-                          color: Color(hexColor('#2F4EF1')),
-                          fontWeight: FontWeight.normal,
-                        ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Center(
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text:
+                                "ขั้นตอนที่ ${_curStep + 3} จาก ${_stepsText.length + 3}",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'IBMPlexSansThai',
+                              color: Color(hexColor('#2F4EF1')),
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
+                ],
               ),
-              Container(width: 48)
             ],
           ),
           const SizedBox(

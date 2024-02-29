@@ -60,18 +60,17 @@ dependencies:
       sdk: flutter
   intl: any
   persistent_bottom_nav_bar_v2: ^4.0.3
-  fl_chart: ^0.63.0
+  flutter_charts: ^0.5.2
   shared_preferences: ^2.2.2
   cloud_firestore: ^4.11.0
-  firebase_core: ^2.19.0
-  firebase_auth: ^4.11.1
   image_picker: ^1.0.4
   email_validator: ^2.1.17
   email_otp: ^2.0.1
   timer_count_down: ^2.2.2
   http: ^1.1.2
-  flutter_dotenv: ^5.0.2
   provider: ^6.1.1
+  flutter_dotenv: ^5.1.0
+  dots_indicator: ^3.0.0
   
 flutter_icons:
   android: true

@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/page/healthChart/allBMIRecord.dart';
-import 'package:flutter_application_1/page/healthChart/allPressureRecord.dart';
-import 'package:flutter_application_1/widget/chart/pressureChart.dart/dayChart.dart';
-import 'package:flutter_application_1/widget/chart/pressureChart.dart/sixMonthChart.dart';
-import 'package:flutter_application_1/widget/chart/pressureChart.dart/threeMonthChart.dart';
-import 'package:flutter_application_1/widget/chart/pressureChart.dart/weekChart.dart';
+import 'package:flutter_application_1/response/api.dart';
+import 'package:flutter_application_1/widget/chart/bmiChart.dart/dayChart.dart';
+import 'package:flutter_application_1/widget/chart/bmiChart.dart/sixMonthChart.dart';
+import 'package:flutter_application_1/widget/chart/bmiChart.dart/threeMonthChart.dart';
+import 'package:flutter_application_1/widget/chart/bmiChart.dart/weekChart.dart';
+import 'package:provider/provider.dart';
 
 import '../../extension/Color.dart';
-import '../../widget/chart/pressureChart.dart/monthChart.dart';
+import '../../widget/chart/bmiChart.dart/monthChart.dart';
 import '../profile/healthChart.dart';
 
 class BMIChart extends StatelessWidget {
@@ -33,12 +35,35 @@ class _BMIChartPageState extends State<BMIChartPage> {
   String _systolicPressure = '';
   String _diastolicPressure = '';
   String _pulseRate = '';
+  double _bmi = 0;
+  int _waistline = 0;
+  int _weight = 0;
   final _controllerSystolicPressure = TextEditingController();
   final _controllerDiastolicPressure = TextEditingController();
   final _controllerPulseRate = TextEditingController();
   final bool _validateSystolicPressure = false;
   final bool _validateDiastolicPressure = false;
   final bool _validatePulseRate = false;
+
+  Future<void> fetchLatestBmi() async {
+    try {
+      String? token = Provider.of<AuthProvider>(context, listen: false).token;
+      Map<String, dynamic> response = await getLatestRecord(token!);
+      setState(() {
+        _weight = response['data']['record'][0]['weight'];
+        _bmi = response['data']['record'][0]['bmi'];
+        _waistline = response['data']['record'][0]['waistline'];
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    fetchLatestBmi();
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -312,9 +337,10 @@ class _BMIChartPageState extends State<BMIChartPage> {
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 20, right: 20, top: 58),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Row(children: [
                     InkWell(
                       borderRadius: BorderRadius.circular(12),
                       onTap: () {
@@ -329,55 +355,55 @@ class _BMIChartPageState extends State<BMIChartPage> {
                         size: 24,
                       ),
                     ),
-                    const SizedBox(
-                      width: 25,
-                    ),
-                    const Text(
-                      'ดัชนีมวลกาย',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontFamily: 'IBMPlexSansThai',
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Material(
-                      color: Color(hexColor('#2F4EF1')),
-                      borderRadius: BorderRadius.circular(30),
-                      child: InkWell(
-                        onTap: () {
-                          _addPressure();
-                        },
-                        child: Container(
-                          width: 76,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.add_circle_outline_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text("เพิ่ม",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontFamily: 'IBMPlexSansThai',
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
-                                  textAlign: TextAlign.center),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
+
+                    // Material(
+                    //   color: Color(hexColor('#2F4EF1')),
+                    //   borderRadius: BorderRadius.circular(30),
+                    //   child: InkWell(
+                    //     onTap: () {
+                    //       _addPressure();
+                    //     },
+                    //     child: Container(
+                    //       width: 76,
+                    //       alignment: Alignment.center,
+                    //       decoration: BoxDecoration(
+                    //         borderRadius: BorderRadius.circular(30),
+                    //       ),
+                    //       child: const Row(
+                    //         mainAxisAlignment: MainAxisAlignment.center,
+                    //         children: [
+                    //           Icon(
+                    //             Icons.add_circle_outline_rounded,
+                    //             color: Colors.white,
+                    //             size: 20,
+                    //           ),
+                    //           SizedBox(
+                    //             width: 5,
+                    //           ),
+                    //           Text("เพิ่ม",
+                    //               style: TextStyle(
+                    //                   fontSize: 18,
+                    //                   fontFamily: 'IBMPlexSansThai',
+                    //                   color: Colors.white,
+                    //                   fontWeight: FontWeight.bold),
+                    //               textAlign: TextAlign.center),
+                    //         ],
+                    //       ),
+                    //     ),
+                    //   ),
+                    // )
                   ]),
+                  const Text(
+                    'ดัชนีมวลกาย',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontFamily: 'IBMPlexSansThai',
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(
               height: 25,
@@ -595,8 +621,8 @@ class _BMIChartPageState extends State<BMIChartPage> {
                       const SizedBox(
                         height: 16,
                       ),
-                      const Text(
-                        '55 กก.',
+                      Text(
+                        '$_weight กก.',
                         style: TextStyle(
                             fontSize: 20,
                             fontFamily: 'IBMPlexSansThai',
@@ -630,9 +656,9 @@ class _BMIChartPageState extends State<BMIChartPage> {
                       const SizedBox(
                         height: 16,
                       ),
-                      const Text(
-                        '17.2 กก./ม.',
-                        style: TextStyle(
+                      Text(
+                        '${_bmi.toStringAsFixed(2)} กก./ม.²',
+                        style: const TextStyle(
                             fontSize: 20,
                             fontFamily: 'IBMPlexSansThai',
                             color: Colors.black,
@@ -665,8 +691,8 @@ class _BMIChartPageState extends State<BMIChartPage> {
                       const SizedBox(
                         height: 16,
                       ),
-                      const Text(
-                        '25 นิ้ว',
+                      Text(
+                        '$_waistline นิ้ว',
                         style: TextStyle(
                             fontSize: 20,
                             fontFamily: 'IBMPlexSansThai',
@@ -693,132 +719,135 @@ class _BMIChartPageState extends State<BMIChartPage> {
             const SizedBox(
               height: 35,
             ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'ค่าดัชนีมวลกาย',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontFamily: 'IBMPlexSansThai',
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 15),
-                Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20)),
-                    child: const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'คือ การมีดัชนีมวลกายก่อนมากกว่าหรือเท่ากับ 2\n5 กิโลกรัม/ตารางเมตร\n\nแบ่งเป็น 4 ระดับ คือ',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'IBMPlexSansThai',
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 20),
-                          child: Text(
-                            '• ระดับ 1a 25.0-29.9\n• ระดับ 1b 30-34.9\n• ระดับ 2 35.0-39.9\n• ระดับ 3 ≥ 40.0 กิโลกรัม/ตารางเมตร',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'IBMPlexSansThai',
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        ),
-                      ],
-                    )),
-                SizedBox(
-                  height: 15,
-                ),
-                Text(
-                  'รอบเอว',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontFamily: 'IBMPlexSansThai',
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 15),
-                Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 10),
-                    decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(20)),
-                    child: const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'ค่าปกติของเส้นรอบเอว',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'IBMPlexSansThai',
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(left: 20),
-                          child: Text(
-                            '• ผู้หญิง ไม่ควรเกิน 80 เซนติเมตร / 32 นิ้ว\n• ผู้ชาย ไม่ควรเกิน 90 เซนติเมตร / 36 นิ้ว',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'IBMPlexSansThai',
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal,
-                            ),
-                          ),
-                        ),
-                      ],
-                    )),
-                const SizedBox(height: 40),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const Row(
-                      children: [
-                        Text(
-                          'ข้อมูลที่บันทึกทั้งหมด',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontFamily: 'IBMPlexSansThai',
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'ค่าดัชนีมวลกาย',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontFamily: 'IBMPlexSansThai',
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
                     ),
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const AllBMIRecord()));
-                      },
-                      child: const Icon(
-                        Icons.arrow_forward_ios_rounded,
-                        size: 14,
+                  ),
+                  const SizedBox(height: 15),
+                  Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20)),
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'คือ ค่าดัชนีที่ใช้ชี้วัดความสมดุลของน้ำหนักตัว (กิโลกรัม) และส่วนสูง (เซนติเมตร) ซึ่งสามารถระบุได้ว่า ตอนนี้รูปร่างของคนนั้นอยู่ในระดับใด ตั้งแต่อ้วนมากไป จนถึงผอมเกินไป\n',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'IBMPlexSansThai',
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 20),
+                            child: Text(
+                              '• ต่ำกว่าเกณฑ์ น้อยกว่า 18.5\n• ปกติสมส่วน 18.5 - 22.9\n• น้ำหนักเกินมาตรฐาน 23.0 - 24.9\n• น้ำหนักอยู่ในเกณฑ์อ้วน 25.0 - 29.9\n• น้ำหนักอยู่ในเกณฑ์มาก มากกว่า 30',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'IBMPlexSansThai',
+                                color: Colors.black,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )),
+                  SizedBox(
+                    height: 15,
+                  ),
+                  Text(
+                    'รอบเอว',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontFamily: 'IBMPlexSansThai',
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
+                      decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20)),
+                      child: const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'ค่าปกติของเส้นรอบเอว',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'IBMPlexSansThai',
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(left: 20),
+                            child: Text(
+                              '• ผู้หญิง ไม่ควรเกิน 80 เซนติเมตร / 32 นิ้ว\n• ผู้ชาย ไม่ควรเกิน 90 เซนติเมตร / 36 นิ้ว',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'IBMPlexSansThai',
+                                color: Colors.black,
+                                fontWeight: FontWeight.normal,
+                              ),
+                            ),
+                          ),
+                        ],
+                      )),
+                  const SizedBox(height: 40),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Row(
+                        children: [
+                          Text(
+                            'ข้อมูลที่บันทึกทั้งหมด',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontFamily: 'IBMPlexSansThai',
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 50,
-                )
-              ],
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const AllBMIRecord()));
+                        },
+                        child: const Icon(
+                          Icons.arrow_forward_ios_rounded,
+                          size: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(
+                    height: 50,
+                  )
+                ],
+              ),
             ),
           ],
         ),

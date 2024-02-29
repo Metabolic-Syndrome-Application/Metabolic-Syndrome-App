@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
@@ -7,9 +5,10 @@ import 'package:flutter_application_1/page/home/home.dart';
 import 'package:flutter_application_1/page/loginRegister/createProfile.dart';
 import 'package:flutter_application_1/page/loginRegister/forgetPassword.dart';
 import 'package:flutter_application_1/page/loginRegister/register.dart';
+import 'package:flutter_application_1/page/nav.dart/nav.dart';
 import 'package:flutter_application_1/page/screening/riskScreening.dart';
 import 'package:flutter_application_1/page/screening/startScreening.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_application_1/response/api.dart';
 import 'package:provider/provider.dart';
 
 class Login extends StatelessWidget {
@@ -25,43 +24,45 @@ class Login extends StatelessWidget {
 }
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
-  int status = 0;
   String accessToken = '';
   bool haveProfile = false;
   String? firstname;
   String? diseaseRisk;
+  bool checkLogin = false;
 
-  void postLogin(String username, String password) async {
-    final url = Uri.parse("http://10.68.9.216:8000/api/auth/login");
-    final response = await http.post(url,
-        body: json.encode({'username': username, 'password': password}));
-
-    setState(() {
-      status = response.statusCode;
-      accessToken = json.decode(response.body)['access_token'];
-      Provider.of<AuthProvider>(context, listen: false)
-          .setToken(json.decode(response.body)['access_token']);
-    });
-
-    getProfile(json.decode(response.body)['access_token']);
+  Future<void> fetchLogin(String username, String password) async {
+    try {
+      Map<String, dynamic> response = await postLogin(username, password);
+      setState(() {
+        accessToken = response['access_token'];
+        print(accessToken);
+        Provider.of<AuthProvider>(context, listen: false).setToken(accessToken);
+      });
+    } catch (e) {
+      setState(() {
+        _wrongPassword = true;
+      });
+      print('Error fetching profile: $e');
+    }
   }
 
-  Future<void> getProfile(String accesstoken) async {
-    final url = Uri.parse("http://10.68.9.216:8000/api/user/profile");
-    final response =
-        await http.get(url, headers: {'Authorization': 'Bearer $accesstoken'});
-    setState(() {
-      firstname = json.decode(response.body)['data']['user']['firstName'];
-      diseaseRisk =
-          json.decode(response.body)['data']['user']['diseaseRisk']['diabetes'];
-      print(firstname);
-      print(diseaseRisk);
-    });
+  Future<void> fetchProfile() async {
+    try {
+      Map<String, dynamic> response = await getProfile(accessToken);
+      setState(() {
+        firstname = response['data']['user']['firstName'];
+        diseaseRisk = response['data']['user']['diseaseRisk']['diabetes'];
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
   }
 
   bool rememberLogin = false;
@@ -106,13 +107,13 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 child: Column(
                   children: [
-                    Container(
+                    SizedBox(
                         height: screenHeight * 0.195,
                         child: Image.asset('assets/images/login.png')),
                     SizedBox(
                       height: screenHeight * 0.023,
                     ),
-                    Text("เข้าสู่ระบบ",
+                    const Text("เข้าสู่ระบบ",
                         style: TextStyle(
                           fontSize: 32,
                           fontFamily: 'IBMPlexSansThai',
@@ -131,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
                       padding: EdgeInsets.symmetric(
                           horizontal: screenWidth * .025,
                           vertical: screenHeight * 0.012),
-                      child: Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Text("เลขบัตรประชาชนหรืออีเมล",
@@ -150,6 +151,7 @@ class _LoginPageState extends State<LoginPage> {
                         onChanged: (value) {
                           setState(() {
                             _ssnEmail = value;
+                            _validateSsnEmail = false;
                           });
                         },
                         controller: _controllerSsnEmail,
@@ -160,7 +162,7 @@ class _LoginPageState extends State<LoginPage> {
                               borderRadius:
                                   BorderRadius.all(Radius.circular(30)),
                               borderSide: BorderSide(
-                                color: Color(hexColor('#DBDBDB')),
+                                color: Color(hexColor('#FB6262')),
                                 width: 1,
                               )),
                           errorText: _validateSsnEmail && _ssnEmail == ''
@@ -216,6 +218,7 @@ class _LoginPageState extends State<LoginPage> {
                         onChanged: (value) {
                           setState(() {
                             _password = value;
+                            _validatePassword = false;
                             _wrongPassword = false;
                           });
                         },
@@ -229,13 +232,13 @@ class _LoginPageState extends State<LoginPage> {
                               borderRadius:
                                   const BorderRadius.all(Radius.circular(30)),
                               borderSide: BorderSide(
-                                color: Color(hexColor('#DBDBDB')),
+                                color: Color(hexColor('#FB6262')),
                                 width: 1,
                               )),
                           errorText: _validatePassword && _password == ''
                               ? "กรุณากรอกรหัสผ่าน"
                               : _wrongPassword
-                                  ? 'รหัสผ่านไม่ถูกต้อง'
+                                  ? 'บัญชีหรือรหัสผ่านของคุณไม่ถูกต้อง'
                                   : null,
                           errorStyle: TextStyle(
                             fontSize: 14,
@@ -310,55 +313,65 @@ class _LoginPageState extends State<LoginPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(23.5),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
                         if (_controllerSsnEmail.text.isEmpty == true) {
                           setState(() {
-                            _validateSsnEmail =
-                                _controllerSsnEmail.text.isEmpty;
+                            _validateSsnEmail = true;
                             _validatePassword = false;
+                            _wrongPassword = false;
                           });
                         } else {
                           setState(() {
                             _validateSsnEmail = false;
-                            _validatePassword =
-                                _controllerPassword.text.isEmpty;
+                            _validatePassword = true;
+                            _wrongPassword = false;
                           });
                         }
 
                         if (_password != '' && _ssnEmail != '') {
-                          postLogin(_ssnEmail, _password);
-
-                          if (status == 200 && firstname != null) {
-                            if (diseaseRisk == "") {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const StartScreening()));
-                            } else if (diseaseRisk == "metabolicLow") {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const Home()));
-                            } else if (diseaseRisk == "metabolicMedium" ||
-                                diseaseRisk == "metabolicHigh") {
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => RiskScreening()));
+                          await fetchLogin(_ssnEmail, _password);
+                          if (_wrongPassword == false) {
+                            await fetchProfile();
+                            if (firstname != null && firstname != "") {
+                              if (diseaseRisk == "") {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const StartScreening(
+                                              firsttime: true,
+                                            )));
+                              } else if (diseaseRisk == "metabolicLow") {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const Navbar(selectedIndex: 0)));
+                              } else if (diseaseRisk == "metabolicMedium" ||
+                                  diseaseRisk == "metabolicHigh") {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => RiskScreening()));
+                              } else {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => const Navbar(
+                                              selectedIndex: 0,
+                                            )));
+                              }
                             } else {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const Home()));
+                                      builder: (context) =>
+                                          const CreateProfilePage()));
                             }
-                          }
-                          if (status == 200 && firstname == null) {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const CreateProfilePage()));
+                            setState(() {
+                              firstname = null;
+                              diseaseRisk = "";
+                            });
                           }
                         }
                       },

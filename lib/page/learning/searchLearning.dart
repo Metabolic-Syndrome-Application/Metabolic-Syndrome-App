@@ -4,26 +4,14 @@ import 'package:flutter_application_1/widget/learning/learningCard.dart';
 
 import '../../extension/Color.dart';
 
-class SearchingLearning extends StatelessWidget {
+class SearchingLearning extends StatefulWidget {
   const SearchingLearning({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'SearchingLearning Page',
-      home: SearchingLearningPage(),
-    );
-  }
+  State<SearchingLearning> createState() => _SearchingLearningState();
 }
 
-class SearchingLearningPage extends StatefulWidget {
-  const SearchingLearningPage({super.key});
-
-  @override
-  State<SearchingLearningPage> createState() => _SearchingLearningPageState();
-}
-
-class _SearchingLearningPageState extends State<SearchingLearningPage> {
+class _SearchingLearningState extends State<SearchingLearning> {
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -38,8 +26,8 @@ class _SearchingLearningPageState extends State<SearchingLearningPage> {
               InkWell(
                 borderRadius: BorderRadius.circular(12),
                 onTap: () {
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Home()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => HomePage()));
                 },
                 child: Icon(
                   Icons.arrow_back_ios_new_rounded,
@@ -53,7 +41,7 @@ class _SearchingLearningPageState extends State<SearchingLearningPage> {
                   fontSize: 24,
                   fontFamily: 'IBMPlexSansThai',
                   color: Colors.black,
-                  fontWeight: FontWeight.normal,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               SizedBox(

@@ -1,31 +1,21 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
+import 'package:flutter_application_1/page/calendar.dart/selectCalendar.dart';
+import 'package:flutter_application_1/page/healthChart/GlucoseChart.dart';
+import 'package:flutter_application_1/page/healthChart/bmiChart.dart';
+import 'package:flutter_application_1/page/healthChart/lipidChart.dart';
 import 'package:flutter_application_1/page/healthChart/pressureChart.dart';
 import 'package:flutter_application_1/page/learning/searchLearning.dart';
-import 'package:flutter_application_1/page/note/todayNote.dart';
 import 'package:flutter_application_1/page/notification/notificate.dart';
 import 'package:flutter_application_1/page/profile/profile.dart';
 import 'package:flutter_application_1/page/ranking/ranking.dart';
 import 'package:flutter_application_1/page/screening/startScreening.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_application_1/response/api.dart';
+import 'package:intl/intl.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 
 import '../../extension/Color.dart';
-
-class Home extends StatelessWidget {
-  const Home({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Home Page',
-      home: HomePage(),
-    );
-  }
-}
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -36,28 +26,67 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String? alias;
-  Future<void> getProfile(String accesstoken) async {
-    final url = Uri.parse("http://10.66.8.149:8000/api/user/profile");
-    final response = await http
-        .get(url, headers: {'Authorization': 'Bearer ${accesstoken}'});
-    print('profile Response body: ${response.body}');
-    alias = json.decode(response.body)['data']['user']['alias'];
+  int? coin;
+
+  Future<void> fetchProfile() async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
+    try {
+      Map<String, dynamic> response = await getProfile(token!);
+      setState(() {
+        alias = response['data']['user']['alias'];
+        coin = response['data']['user']['collectPoints'];
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
+  }
+
+  String timeStamp = '--:--';
+  String systolicBloodPressure = '-';
+  String diastolicBloodPressure = '-';
+  String bmi = '-';
+  String bloodGlucose = '-';
+  String triglyceride = '-';
+
+  Future<void> fetchLatest() async {
+    try {
+      String? token = Provider.of<AuthProvider>(context, listen: false).token;
+      Map<String, dynamic> response = await getLatestRecord(token!);
+      setState(() {
+        systolicBloodPressure =
+            response['data']['record'][0]['systolicBloodPressure'].toString();
+        diastolicBloodPressure =
+            response['data']['record'][0]['diastolicBloodPressure'].toString();
+        bmi = response['data']['record'][0]['bmi'].toStringAsFixed(2);
+        bloodGlucose = response['data']['record'][0]['bloodGlucose'].toString();
+        triglyceride = response['data']['record'][0]['triglyceride'].toString();
+        timeStamp = response['data']['record'][0]['timestamp'];
+        DateTime inputDateTime = DateTime.parse(timeStamp);
+        timeStamp = DateFormat('dd MMM HH:mm', 'th').format(inputDateTime);
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    fetchProfile();
+    fetchLatest();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    String? token = Provider.of<AuthProvider>(context).token;
-    getProfile(token!);
-
     return Scaffold(
       backgroundColor: Color(hexColor('#FAFCFB')),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.only(top: 59),
+          padding: const EdgeInsets.only(top: 59),
           child: Column(
             children: [
               Container(
-                padding: EdgeInsets.only(left: 20, right: 20),
+                padding: const EdgeInsets.only(left: 20, right: 20),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -68,7 +97,7 @@ class _HomePageState extends State<HomePage> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => Profile()));
+                                  builder: (context) => const Profile()));
                         },
                         child: Image.asset('assets/images/userCircle.png')),
                     Row(
@@ -80,11 +109,11 @@ class _HomePageState extends State<HomePage> {
                                   context,
                                   PageTransition(
                                       type: PageTransitionType.rightToLeft,
-                                      child: Ranking()));
+                                      child: const Ranking()));
                             },
                             child:
                                 Image.asset('assets/images/solarRanking.png')),
-                        SizedBox(
+                        const SizedBox(
                           width: 16,
                         ),
                         InkWell(
@@ -93,7 +122,8 @@ class _HomePageState extends State<HomePage> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => Notificate()));
+                                      builder: (context) =>
+                                          const Notificate()));
                             },
                             child: Image.asset('assets/images/bellRing.png')),
                       ],
@@ -101,18 +131,22 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 25,
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 22, right: 6),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Stack(
+                  alignment: Alignment.centerRight,
                   children: [
+                    Image.asset(
+                      'assets/images/home.png',
+                      height: 178,
+                    ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
+                        const Text(
                           'ยินดีต้อนรับ',
                           style: TextStyle(
                             fontSize: 28,
@@ -122,8 +156,8 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         Text(
-                          alias??'',
-                          style: TextStyle(
+                          alias ?? '',
+                          style: const TextStyle(
                             fontSize: 32,
                             fontFamily: 'IBMPlexSansThai',
                             color: Colors.black,
@@ -136,7 +170,6 @@ class _HomePageState extends State<HomePage> {
                             InkWell(
                                 borderRadius: BorderRadius.circular(30),
                                 onTap: () {
-                                  //points
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -148,22 +181,20 @@ class _HomePageState extends State<HomePage> {
                               width: 10,
                             ),
                             Text(
-                              '100 คะแนน',
+                              coin == null
+                                  ? '- คะแนน'
+                                  : coin.toString() + " คะแนน",
                               style: TextStyle(
                                 fontSize: 20,
                                 fontFamily: 'IBMPlexSansThai',
                                 color: Color(hexColor('#42884B')),
-                                fontWeight: FontWeight.normal,
+                                fontWeight: FontWeight.bold,
                               ),
                             )
                           ],
                         )
                       ],
                     ),
-                    Image.asset(
-                      'assets/images/home.png',
-                      height: 178,
-                    )
                   ],
                 ),
               ),
@@ -187,7 +218,7 @@ class _HomePageState extends State<HomePage> {
                             fontSize: 20,
                             fontFamily: 'IBMPlexSansThai',
                             color: Colors.black,
-                            fontWeight: FontWeight.normal,
+                            fontWeight: FontWeight.bold,
                           ),
                         )
                       ],
@@ -250,7 +281,8 @@ class _HomePageState extends State<HomePage> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => TodayNote()));
+                                      builder: (context) =>
+                                          SelectedDate(DateTime.now(), true)));
                             },
                             style: ElevatedButton.styleFrom(
                                 padding: EdgeInsets.zero,
@@ -296,7 +328,11 @@ class _HomePageState extends State<HomePage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) =>
-                                          SearchingLearning()));
+                                          const SearchingLearning()));
+                              // Navigator.push(
+                              //     context,
+                              //     MaterialPageRoute(
+                              // builder: (context) => AllChallenge()));
                             },
                             style: ElevatedButton.styleFrom(
                                 padding: EdgeInsets.zero,
@@ -362,7 +398,7 @@ class _HomePageState extends State<HomePage> {
                             fontSize: 20,
                             fontFamily: 'IBMPlexSansThai',
                             color: Colors.black,
-                            fontWeight: FontWeight.normal,
+                            fontWeight: FontWeight.bold,
                           ),
                         )
                       ],
@@ -382,7 +418,7 @@ class _HomePageState extends State<HomePage> {
                                   builder: (context) => const PressureChart()));
                         },
                         child: Padding(
-                          padding: EdgeInsets.all(17),
+                          padding: const EdgeInsets.all(17),
                           child: Column(
                             children: [
                               Row(
@@ -405,7 +441,7 @@ class _HomePageState extends State<HomePage> {
                                   ]),
                                   Row(
                                     children: [
-                                      Text('09:45',
+                                      Text(timeStamp,
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontFamily: 'IBMPlexSansThai',
@@ -429,12 +465,16 @@ class _HomePageState extends State<HomePage> {
                               ),
                               Row(
                                 children: [
-                                  Text('110/75',
+                                  Text(
+                                      systolicBloodPressure == '-' ||
+                                              diastolicBloodPressure == '-'
+                                          ? '-/-'
+                                          : '$systolicBloodPressure/$diastolicBloodPressure',
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontFamily: 'IBMPlexSansThai',
                                         color: Colors.black,
-                                        fontWeight: FontWeight.normal,
+                                        fontWeight: FontWeight.bold,
                                       )),
                                   SizedBox(
                                     width: 5,
@@ -462,7 +502,10 @@ class _HomePageState extends State<HomePage> {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(30),
                         onTap: () {
-                          print('ค่าดัชนีมวลกาย');
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const BMIChart()));
                         },
                         child: Padding(
                           padding: EdgeInsets.all(17),
@@ -487,7 +530,7 @@ class _HomePageState extends State<HomePage> {
                                   ]),
                                   Row(
                                     children: [
-                                      Text('09:45',
+                                      Text(timeStamp,
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontFamily: 'IBMPlexSansThai',
@@ -512,9 +555,19 @@ class _HomePageState extends State<HomePage> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  Text('19.0',
+                                  Text(bmi,
                                       style: TextStyle(
                                         fontSize: 20,
+                                        fontFamily: 'IBMPlexSansThai',
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      )),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text('กก./ม.²',
+                                      style: TextStyle(
+                                        fontSize: 16,
                                         fontFamily: 'IBMPlexSansThai',
                                         color: Colors.black,
                                         fontWeight: FontWeight.normal,
@@ -535,7 +588,10 @@ class _HomePageState extends State<HomePage> {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(30),
                         onTap: () {
-                          print('ระดับน้ำตาล');
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const GlucoseChart()));
                         },
                         child: Padding(
                           padding: EdgeInsets.all(17),
@@ -546,7 +602,8 @@ class _HomePageState extends State<HomePage> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Row(children: [
-                                    Image.asset('assets/images/bloodSugar.png'),
+                                    Image.asset(
+                                        'assets/images/bloodGlucose.png'),
                                     SizedBox(
                                       width: 5,
                                     ),
@@ -560,7 +617,7 @@ class _HomePageState extends State<HomePage> {
                                   ]),
                                   Row(
                                     children: [
-                                      Text('14 ส.ค.',
+                                      Text(timeStamp,
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontFamily: 'IBMPlexSansThai',
@@ -584,17 +641,17 @@ class _HomePageState extends State<HomePage> {
                               ),
                               Row(
                                 children: [
-                                  Text('110/75',
+                                  Text(bloodGlucose,
                                       style: TextStyle(
                                         fontSize: 20,
                                         fontFamily: 'IBMPlexSansThai',
                                         color: Colors.black,
-                                        fontWeight: FontWeight.normal,
+                                        fontWeight: FontWeight.bold,
                                       )),
                                   SizedBox(
                                     width: 5,
                                   ),
-                                  Text('mmHg',
+                                  Text('mg/dL',
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontFamily: 'IBMPlexSansThai',
@@ -609,7 +666,93 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     SizedBox(
-                      height: 32,
+                      height: 20,
+                    ),
+                    Material(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(30),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(30),
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const LipidChart()));
+                        },
+                        child: Padding(
+                          padding: EdgeInsets.all(17),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(children: [
+                                    Image.asset(
+                                        'assets/images/cholesterolIcon.png'),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text('ไขมันในเลือด',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontFamily: 'IBMPlexSansThai',
+                                          color: Color(hexColor('#FF9900')),
+                                          fontWeight: FontWeight.normal,
+                                        ))
+                                  ]),
+                                  Row(
+                                    children: [
+                                      Text(timeStamp,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontFamily: 'IBMPlexSansThai',
+                                            color: Color(hexColor('#484554')),
+                                            fontWeight: FontWeight.normal,
+                                          )),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Icon(
+                                        Icons.arrow_forward_ios_rounded,
+                                        size: 16,
+                                        color: Color(hexColor('#7B7B7B')),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                              SizedBox(
+                                height: 15,
+                              ),
+                              Row(
+                                children: [
+                                  Text(triglyceride,
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontFamily: 'IBMPlexSansThai',
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                      )),
+                                  SizedBox(
+                                    width: 5,
+                                  ),
+                                  Text('mg/dL',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontFamily: 'IBMPlexSansThai',
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.normal,
+                                      )),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: 80,
                     ),
                   ]))
             ],

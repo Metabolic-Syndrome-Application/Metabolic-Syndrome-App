@@ -1,16 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/healthChart/detailPressureRecord.dart';
 import 'package:flutter_application_1/page/healthChart/pressureChart.dart';
-
-class AllPressureRecord extends StatelessWidget {
-  const AllPressureRecord({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(home: AllPressureRecordPage());
-  }
-}
+import 'package:flutter_application_1/response/api.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class AllPressureRecordPage extends StatefulWidget {
   const AllPressureRecordPage({super.key});
@@ -20,17 +15,34 @@ class AllPressureRecordPage extends StatefulWidget {
 }
 
 class _AllPressureRecordPageState extends State<AllPressureRecordPage> {
+  dynamic listOfPressure = '';
+  Future<void> fetchPressure() async {
+    try {
+      String? token = Provider.of<AuthProvider>(context, listen: false).token;
+      Map<String, dynamic> response = await getBloodPressure(token!);
+      setState(() {
+        listOfPressure = response['data']['record'];
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    setState(() {
+      fetchPressure();
+    });
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(hexColor('#FAFCFB')),
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(
-            left: 20,
-            right: 20,
-            top: 58,
-          ),
+          padding: const EdgeInsets.only(left: 20, right: 20, top: 58),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -58,11 +70,11 @@ class _AllPressureRecordPageState extends State<AllPressureRecordPage> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 24,
                 )
               ]),
-              SizedBox(
+              const SizedBox(
                 height: 25,
               ),
               Text(
@@ -74,127 +86,125 @@ class _AllPressureRecordPageState extends State<AllPressureRecordPage> {
                   fontWeight: FontWeight.normal,
                 ),
               ),
+              const SizedBox(
+                height: 10,
+              ),
               Container(
                 decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(30)),
-                child: Column(
-                  children: [
-                    InkWell(
-                      borderRadius: BorderRadius.circular(30),
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const DetailPressureRecordPage()));
-                      },
-                      child: Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 13, vertical: 14),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    borderRadius: BorderRadius.circular(30),
+                    color: Colors.white),
+                child: ListView.builder(
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(0),
+                    shrinkWrap: true,
+                    itemCount: listOfPressure.length,
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Column(
                           children: [
-                            Row(
-                              children: [
-                                Image.asset('assets/images/heartPressure.png'),
-                                SizedBox(
-                                  width: 5,
+                            index == 0
+                                ? const SizedBox(
+                                    height: 10,
+                                  )
+                                : const SizedBox(),
+                            InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            DetailPressureRecordPage(
+                                              systolicBloodPressure:
+                                                  listOfPressure[index]
+                                                      ['systolicBloodPressure'],
+                                              diastolicBloodPressure:
+                                                  listOfPressure[index][
+                                                      'diastolicBloodPressure'],
+                                              pulseRate: listOfPressure[index]
+                                                  ['pulseRate'],
+                                              timestamp: DateFormat(
+                                                      'dd MMM HH:mm', 'th')
+                                                  .format(DateTime.parse(
+                                                      listOfPressure[index]
+                                                          ['timestamp'])),
+                                            )));
+                              },
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Image.asset(
+                                            'assets/images/heartPressure.png'),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text(
+                                          '${listOfPressure[index]['systolicBloodPressure']}/${listOfPressure[index]['diastolicBloodPressure']}',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontFamily: 'IBMPlexSansThai',
+                                            color: Color(hexColor('#FB6262')),
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        Text(
+                                          DateFormat('dd MMM HH:mm', 'th')
+                                              .format(DateTime.parse(
+                                                  listOfPressure[index]
+                                                      ['timestamp'])),
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontFamily: 'IBMPlexSansThai',
+                                            color: Color(hexColor('#7B7B7B')),
+                                            fontWeight: FontWeight.normal,
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 5,
+                                        ),
+                                        const Icon(
+                                          Icons.arrow_forward_ios_rounded,
+                                          size: 14,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  '110/75',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: 'IBMPlexSansThai',
-                                    color: Color(hexColor('#FB6262')),
-                                    fontWeight: FontWeight.normal,
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
-                            Row(
-                              children: [
-                                Text(
-                                  '14 ส.ค. 09:45',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontFamily: 'IBMPlexSansThai',
-                                    color: Color(hexColor('#7B7B7B')),
-                                    fontWeight: FontWeight.normal,
+                            index != listOfPressure.length - 1
+                                ? Row(
+                                    children: [
+                                      Expanded(
+                                        child: Divider(
+                                          color: Color(hexColor('#DBDBDB')),
+                                          thickness: 1,
+                                          indent: 22,
+                                          endIndent: 22,
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : const SizedBox(
+                                    height: 10,
                                   ),
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios_rounded,
-                                  size: 14,
-                                ),
-                              ],
-                            ),
                           ],
                         ),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Divider(
-                            color: Color(hexColor('#DBDBDB')),
-                            thickness: 1,
-                            indent: 22,
-                            endIndent: 22,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 13, vertical: 14),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Image.asset('assets/images/heartPressure.png'),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text(
-                                '110/75',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'IBMPlexSansThai',
-                                  color: Color(hexColor('#FB6262')),
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Row(
-                            children: [
-                              Text(
-                                '14 ส.ค. 09:40',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'IBMPlexSansThai',
-                                  color: Color(hexColor('#7B7B7B')),
-                                  fontWeight: FontWeight.normal,
-                                ),
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Icon(
-                                Icons.arrow_forward_ios_rounded,
-                                size: 14,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                      );
+                    }),
+              ),
+              SizedBox(
+                height: 50,
               )
             ],
           ),

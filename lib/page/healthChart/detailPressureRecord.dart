@@ -2,17 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/healthChart/allPressureRecord.dart';
 
-class DetailPressureRecord extends StatelessWidget {
-  const DetailPressureRecord({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(home: DetailPressureRecordPage());
-  }
-}
-
 class DetailPressureRecordPage extends StatefulWidget {
-  const DetailPressureRecordPage({super.key});
+  final int systolicBloodPressure;
+  final int diastolicBloodPressure;
+  final int pulseRate;
+  final String timestamp;
+
+  const DetailPressureRecordPage(
+      {super.key,
+      required this.systolicBloodPressure,
+      required this.diastolicBloodPressure,
+      required this.pulseRate,
+      required this.timestamp});
 
   @override
   State<DetailPressureRecordPage> createState() =>
@@ -22,6 +23,7 @@ class DetailPressureRecordPage extends StatefulWidget {
 class _DetailPressureRecordPageState extends State<DetailPressureRecordPage> {
   @override
   Widget build(BuildContext context) {
+    print(widget.systolicBloodPressure);
     return Scaffold(
       backgroundColor: Color(hexColor('#FAFCFB')),
       body: SingleChildScrollView(
@@ -41,7 +43,8 @@ class _DetailPressureRecordPageState extends State<DetailPressureRecordPage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const AllPressureRecord()));
+                            builder: (context) =>
+                                const AllPressureRecordPage()));
                   },
                   child: Icon(
                     Icons.arrow_back_ios_new_rounded,
@@ -85,7 +88,7 @@ class _DetailPressureRecordPageState extends State<DetailPressureRecordPage> {
                           ),
                         ),
                         Text(
-                          '14 ส.ค. 09:45',
+                          widget.timestamp,
                           style: TextStyle(
                             fontSize: 16,
                             fontFamily: 'IBMPlexSansThai',
@@ -120,7 +123,7 @@ class _DetailPressureRecordPageState extends State<DetailPressureRecordPage> {
                               border: Border.all(
                                   color: Color(hexColor('#E9E9E9')))),
                           child: Text(
-                            '10 mmHg',
+                            '${widget.systolicBloodPressure} mmHg',
                             style: TextStyle(
                               fontSize: 14,
                               fontFamily: 'IBMPlexSansThai',
@@ -156,7 +159,7 @@ class _DetailPressureRecordPageState extends State<DetailPressureRecordPage> {
                               border: Border.all(
                                   color: Color(hexColor('#E9E9E9')))),
                           child: Text(
-                            '10 mmHg',
+                            '${widget.diastolicBloodPressure} mmHg',
                             style: TextStyle(
                               fontSize: 14,
                               fontFamily: 'IBMPlexSansThai',
@@ -192,7 +195,7 @@ class _DetailPressureRecordPageState extends State<DetailPressureRecordPage> {
                               border: Border.all(
                                   color: Color(hexColor('#E9E9E9')))),
                           child: Text(
-                            '10 ครั้ง/นาที',
+                            '${widget.pulseRate} ครั้ง/นาที',
                             style: TextStyle(
                               fontSize: 14,
                               fontFamily: 'IBMPlexSansThai',

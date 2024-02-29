@@ -27,54 +27,63 @@ class _TreatmentInformationPageState extends State<TreatmentInformationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(hexColor('#FAFCFB')),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.only(left: 20, right: 20, top: 50),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      InkWell(
-                        borderRadius: BorderRadius.circular(12),
-                        onTap: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => Profile()));
-                        },
-                        child: Icon(
-                          Icons.arrow_back_ios_new_rounded,
-                          color: Color(hexColor('#484554')),
-                          size: 24,
-                        ),
-                      ),
-                      Text(
-                        'ข้อมูลการรักษา',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontFamily: 'IBMPlexSansThai',
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 24,
-                      )
-                    ]),
-                SizedBox(
-                  height: 53,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.only(left: 20, right: 20, top: 50),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Profile()));
+                  },
+                  child: Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: Color(hexColor('#484554')),
+                    size: 24,
+                  ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'ข้อมูลการรักษาปัจจุบัน',
+                Text(
+                  'ข้อมูลการรักษา',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontFamily: 'IBMPlexSansThai',
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(
+                  width: 24,
+                )
+              ]),
+              SizedBox(
+                height: 53,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'ข้อมูลการรักษาปัจจุบัน',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'IBMPlexSansThai',
+                        color: Colors.black,
+                        fontWeight: FontWeight.normal,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Text(
+                        'เเพทย์ผู้รักษา',
                         style: TextStyle(
                           fontSize: 20,
                           fontFamily: 'IBMPlexSansThai',
@@ -82,81 +91,66 @@ class _TreatmentInformationPageState extends State<TreatmentInformationPage> {
                           fontWeight: FontWeight.normal,
                         ),
                       ),
-                      SizedBox(
-                        height: 20,
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      alignment: Alignment.centerLeft,
+                      height: 47,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                            width: 1, color: Color(hexColor('#E9E9E9'))),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Text(
-                          'เเพทย์ผู้รักษา',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontFamily: 'IBMPlexSansThai',
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),
+                      child: Text(
+                        'นายเเพทย์สมรักษ์ คำดี',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontFamily: 'IBMPlexSansThai',
+                          color: Colors.black,
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 15),
-                        alignment: Alignment.centerLeft,
-                        height: 47,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(
-                              width: 1, color: Color(hexColor('#E9E9E9'))),
-                        ),
-                        child: Text(
-                          'นายเเพทย์สมรักษ์ คำดี',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'IBMPlexSansThai',
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),
+                    ),
+                    SizedBox(
+                      height: 14,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(10),
+                      child: Text(
+                        'อาการของคนไข้',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontFamily: 'IBMPlexSansThai',
+                          color: Colors.black,
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
-                      SizedBox(
-                        height: 14,
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: 15),
+                      alignment: Alignment.centerLeft,
+                      height: 47,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(30),
+                        border: Border.all(
+                            width: 1, color: Color(hexColor('#E9E9E9'))),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Text(
-                          'อาการของคนไข้',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontFamily: 'IBMPlexSansThai',
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),
+                      child: Text(
+                        'ความดันโลหิตสูง',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontFamily: 'IBMPlexSansThai',
+                          color: Colors.black,
+                          fontWeight: FontWeight.normal,
                         ),
                       ),
-                      Container(
-                        padding: EdgeInsets.symmetric(horizontal: 15),
-                        alignment: Alignment.centerLeft,
-                        height: 47,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(30),
-                          border: Border.all(
-                              width: 1, color: Color(hexColor('#E9E9E9'))),
-                        ),
-                        child: Text(
-                          'ความดันโลหิตสูง',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontFamily: 'IBMPlexSansThai',
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),

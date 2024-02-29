@@ -1,28 +1,66 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/challenge/allChallenge.dart';
 import 'package:flutter_application_1/page/challenge/challenge.dart';
+import 'package:flutter_application_1/response/api.dart';
+import 'package:provider/provider.dart';
 
-class JoinChallenge extends StatelessWidget {
-  const JoinChallenge({super.key});
+class JoinChallenge extends StatefulWidget {
+  final String id;
+  const JoinChallenge({super.key, required this.id});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "JoinChallenge Page",
-      home: JoinChallengePage(),
-    );
+  State<JoinChallenge> createState() => _ChallengePageState();
+}
+
+class _ChallengePageState extends State<JoinChallenge> {
+  String name = '-';
+  int points = 0;
+  int participants = 0;
+  String description = '';
+  int numDays = 0;
+  Future<void> fetchChallengeById() async {
+    try {
+      String? token = Provider.of<AuthProvider>(context, listen: false).token;
+      Map<String, dynamic> response = await getChallengeById(token!, widget.id);
+      setState(() {
+        name = response['data']['daily']['name'];
+        points = response['data']['daily']['points'];
+        participants = response['data']['daily']['participants'];
+        description = response['data']['daily']['description'];
+        numDays = response['data']['daily']['numDays'];
+        print(response);
+      });
+    } catch (e) {
+      // print('Error fetching plan: $e');
+    }
   }
-}
 
-class JoinChallengePage extends StatefulWidget {
-  const JoinChallengePage({super.key});
+  Future<void> fetchUpdateProfile(
+    String challengeId,
+  ) async {
+    try {
+      print('pop');
+      String? token = Provider.of<AuthProvider>(context, listen: false).token;
+      print(challengeId);
+      Map<String, dynamic> response =
+          await postJoinChallenge(token, challengeId);
+      print(response);
+      setState(() {
+        print(response);
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
+  }
 
   @override
-  State<JoinChallengePage> createState() => _ChallengePageState();
-}
+  void initState() {
+    fetchChallengeById();
+    super.initState();
+  }
 
-class _ChallengePageState extends State<JoinChallengePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,13 +85,11 @@ class _ChallengePageState extends State<JoinChallengePage> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => AllChallenge()));
+                                  builder: (context) => const AllChallenge()));
                         },
-                        child: Container(
-                          child: Icon(
-                            Icons.arrow_back_ios_new_rounded,
-                            size: 24,
-                          ),
+                        child: Icon(
+                          Icons.arrow_back_ios_new_rounded,
+                          size: 24,
                         ),
                       ),
                       Container(
@@ -79,7 +115,7 @@ class _ChallengePageState extends State<JoinChallengePage> {
                         decoration: BoxDecoration(
                             color: Color(hexColor('#C9E1FD')),
                             borderRadius: BorderRadius.circular(30)),
-                        child: Text('ผู้ท้าดวล 245 คน',
+                        child: Text('ผู้ท้าดวล $participants คน',
                             style: TextStyle(
                               fontSize: 14,
                               fontFamily: 'IBMPlexSansThai',
@@ -103,7 +139,7 @@ class _ChallengePageState extends State<JoinChallengePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'สัปดาห์เเห่งการลดน้ำหนัก',
+                      name,
                       style: TextStyle(
                         fontSize: 24,
                         fontFamily: 'IBMPlexSansThai',
@@ -120,7 +156,7 @@ class _ChallengePageState extends State<JoinChallengePage> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "40 coins",
+                          "$points คะแนน",
                           style: TextStyle(
                             fontSize: 16,
                             fontFamily: 'IBMPlexSansThai',
@@ -139,7 +175,7 @@ class _ChallengePageState extends State<JoinChallengePage> {
                         ),
                         SizedBox(width: 10),
                         Text(
-                          "1 สัปดาห์",
+                          "$numDays วัน",
                           style: TextStyle(
                             fontSize: 16,
                             fontFamily: 'IBMPlexSansThai',
@@ -172,14 +208,18 @@ class _ChallengePageState extends State<JoinChallengePage> {
                       decoration: BoxDecoration(
                           color: Color(hexColor('#F2F2F2')),
                           borderRadius: BorderRadius.circular(20)),
-                      child: Text(
-                        'gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontFamily: 'IBMPlexSansThai',
-                          color: Colors.black,
-                          fontWeight: FontWeight.normal,
-                        ),
+                      child: Row(
+                        children: [
+                          Text(
+                            description,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'IBMPlexSansThai',
+                              color: Colors.black,
+                              fontWeight: FontWeight.normal,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     SizedBox(height: 44),
@@ -189,8 +229,16 @@ class _ChallengePageState extends State<JoinChallengePage> {
                         borderRadius: BorderRadius.circular(23.5),
                       ),
                       onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => Challenge()));
+                        print(widget.id);
+                        setState(() {
+                          fetchUpdateProfile(widget.id);
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ChallengePage(
+                                        id: widget.id,
+                                      )));
+                        });
                       },
                       child: Container(
                         height: 44,

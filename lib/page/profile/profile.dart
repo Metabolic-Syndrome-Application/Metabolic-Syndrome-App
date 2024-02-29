@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/home/home.dart';
@@ -8,7 +6,7 @@ import 'package:flutter_application_1/page/profile/changeProfile.dart';
 import 'package:flutter_application_1/page/profile/healthChart.dart';
 import 'package:flutter_application_1/page/profile/hospitalConnect.dart';
 import 'package:flutter_application_1/page/profile/treatmentInformation.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_application_1/response/api.dart';
 import 'package:provider/provider.dart';
 
 import '../../authProvider.dart';
@@ -35,29 +33,41 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   String imageProfile = 'assets/images/defaultProfile1.png';
   String? alias;
+  String? status;
   bool hospitalConnected = false;
 
-  Future<void> getProfile(String accesstoken) async {
-    final url = Uri.parse("http://10.66.8.149:8000/api/user/profile");
-    final response = await http
-        .get(url, headers: {'Authorization': 'Bearer ${accesstoken}'});
-    print('profile Response body: ${response.body}');
-    alias = json.decode(response.body)['data']['user']['alias'];
+  @override
+  void initState() {
+    super.initState();
+    fetchProfile();
   }
 
-  Future<void> getLogout(accesstoken) async {
-    final url = Uri.parse("http://10.66.8.149:8000/api/auth/logout");
-    final response = await http
-        .get(url, headers: {'Authorization': 'Bearer ${accesstoken}'});
-    print('logout status:${response.statusCode}');
-    print('logout message:${response.body}');
+  Future<void> fetchProfile() async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
+    try {
+      Map<String, dynamic> response = await getProfile(token!);
+      setState(() {
+        alias = response['data']['user']['alias'];
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
+  }
+
+  Future<void> fetchLogout() async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
+    try {
+      Map<String, dynamic> response = await getLogout(token!);
+      setState(() {
+        status = response['status'];
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    String? token = Provider.of<AuthProvider>(context).token;
-    getProfile(token!);
-
     return Scaffold(
         backgroundColor: Color(hexColor('#FAFCFB')),
         body: SingleChildScrollView(
@@ -71,8 +81,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       InkWell(
                         borderRadius: BorderRadius.circular(12),
                         onTap: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) => Home()));
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => HomePage()));
                         },
                         child: Icon(
                           Icons.arrow_back_ios_new_rounded,
@@ -86,7 +98,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           fontSize: 24,
                           fontFamily: 'IBMPlexSansThai',
                           color: Colors.black,
-                          fontWeight: FontWeight.normal,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                       SizedBox(
@@ -503,9 +515,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(23.5),
                   ),
-                  onPressed: () {
-                    //logout
-                    getLogout(token);
+                  onPressed: () async {
+                    await fetchLogout();
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => Login()));
                   },

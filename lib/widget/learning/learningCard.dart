@@ -15,7 +15,9 @@ class ArticleCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         onTap: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => MainLearning()));
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const MainLearning('hypertension')));
         },
         child: Container(
           padding: EdgeInsets.all(10),

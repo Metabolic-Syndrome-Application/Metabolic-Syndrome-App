@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/authProvider.dart';
+import 'package:flutter_application_1/response/api.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../../../extension/Color.dart';
@@ -25,9 +29,42 @@ class MonthChartWidget extends StatefulWidget {
 
 class _MonthChartWidgetState extends State<MonthChartWidget> {
   late TrackballBehavior trackballBehavior;
+  List<dynamic> bloodPressure = [];
+  List<PressureData> pressureDataList = [];
+
+  Future<void> fetchRandomQuiz() async {
+    try {
+      String? token = Provider.of<AuthProvider>(context, listen: false).token;
+      Map<String, dynamic> response = await getBloodPressure(token!);
+      setState(() {
+        bloodPressure = response['data']['record'];
+        DateTime endDate = DateTime.now(); // Today's date as the end date
+        DateTime startDate = endDate.subtract(Duration(
+            days: 30)); // Subtracting 7 days to get the start date (1 week ago)
+
+        var filteredData = bloodPressure.where((record) {
+          DateTime timestamp = DateTime.parse(record["timestamp"]);
+          return timestamp.isAfter(startDate.subtract(Duration(days: 1))) &&
+              timestamp.isBefore(endDate.add(Duration(days: 1)));
+        }).toList();
+
+        pressureDataList = filteredData.map((record) {
+          DateTime timestamp = DateTime.parse(record["timestamp"]);
+          int systolicPressure = record["systolicBloodPressure"];
+          int diastolicPressure = record["diastolicBloodPressure"];
+          int pulseRate = record["pulseRate"];
+          return PressureData(
+              timestamp, systolicPressure, diastolicPressure, pulseRate);
+        }).toList();
+      });
+    } catch (e) {
+      // Handle errors appropriately
+    }
+  }
 
   @override
   void initState() {
+    fetchRandomQuiz();
     trackballBehavior = TrackballBehavior(
       tooltipDisplayMode: TrackballDisplayMode.floatAllPoints,
       enable: true,
@@ -74,93 +111,85 @@ class _MonthChartWidgetState extends State<MonthChartWidget> {
               height: 300,
               child: SfCartesianChart(
                   borderColor: Colors.red,
-                  primaryXAxis: CategoryAxis(
+                  primaryXAxis: DateTimeAxis(
+                      dateFormat: DateFormat('d MMM', 'th'),
                       labelStyle: const TextStyle(
-                    fontSize: 10,
-                    fontFamily: 'IBMPlexSansThai',
-                    color: Colors.black,
-                    fontWeight: FontWeight.normal,
-                  )),
-                  // primaryYAxis: NumericAxis(plotBands: <PlotBand>[
-                  //   PlotBand(
-                  //       start: 0, end: 10, color: Color(hexColor('#FFE9C9'))),
-                  //   PlotBand(
-                  //       start: 30, end: 180, color: Color(hexColor('#FFBCBC'))),
-                  // ]),
+                        fontSize: 10,
+                        fontFamily: 'IBMPlexSansThai',
+                        color: Colors.black,
+                        fontWeight: FontWeight.normal,
+                      )),
+                  primaryYAxis: NumericAxis(plotBands: <PlotBand>[
+                    PlotBand(
+                        opacity: 0.5,
+                        start: 0,
+                        end: 120,
+                        color: Color(hexColor('#a5d1b0'))),
+                    PlotBand(
+                        opacity: 0.5,
+                        start: 120,
+                        end: 140,
+                        color: Color(hexColor('#fedc86'))),
+                    PlotBand(
+                        opacity: 0.5,
+                        start: 140,
+                        color: Color(hexColor('#FFBCBC'))),
+                  ]),
                   trackballBehavior: trackballBehavior,
-                  series: <LineSeries<PressureData, double>>[
-                    LineSeries<PressureData, double>(
-                        dataLabelSettings: const DataLabelSettings(),
-                        name: 'ความดันตัวบน',
-                        xAxisName: 'เวลา',
-                        yAxisName: 'mmHg',
-                        color: Color(hexColor('#FB6262')),
-                        dataSource: <PressureData>[
-                          PressureData(1, 0, 20, 30, 40),
-                          PressureData(2, 20, 20, 20, 20),
-                          PressureData(3, 20, 10, 30, 20),
-                          PressureData(4, 10, 20, 30, 10),
-                          PressureData(5, 0, 20, 30, 40),
-                          PressureData(6, 20, 20, 20, 20),
-                          PressureData(7, 20, 10, 30, 20),
-                          PressureData(8, 10, 20, 30, 10),
-                        ],
-                        xValueMapper: (PressureData data, _) => data.day,
-                        yValueMapper: (PressureData data, _) =>
-                            data.systolicPressure),
-                    LineSeries<PressureData, double>(
-                        name: 'ความดันตัวล่าง',
-                        xAxisName: 'เวลา',
-                        yAxisName: 'mmHg',
-                        color: Color(hexColor('#2F4EF1')),
-                        dataSource: <PressureData>[
-                          PressureData(1, 0, 20, 30, 40),
-                          PressureData(2, 20, 20, 20, 20),
-                          PressureData(3, 20, 10, 30, 20),
-                          PressureData(4, 10, 20, 30, 10),
-                          PressureData(5, 0, 20, 30, 40),
-                          PressureData(6, 20, 20, 20, 20),
-                          PressureData(7, 20, 10, 30, 20),
-                          PressureData(8, 10, 20, 30, 10),
-                        ],
-                        xValueMapper: (PressureData data, _) => data.day,
-                        yValueMapper: (PressureData data, _) =>
-                            data.diastolicPressure),
-                    LineSeries<PressureData, double>(
-                        name: 'ชีพจร',
-                        xAxisName: 'เวลา',
-                        yAxisName: 'ครั้ง/นาที',
-                        color: Color(hexColor('#42884B')),
-                        dataSource: <PressureData>[
-                          PressureData(1, 0, 20, 30, 40),
-                          PressureData(2, 20, 20, 20, 20),
-                          PressureData(3, 20, 10, 30, 20),
-                          PressureData(4, 10, 20, 30, 10),
-                          PressureData(5, 0, 20, 30, 40),
-                          PressureData(6, 20, 20, 20, 20),
-                          PressureData(7, 20, 10, 30, 20),
-                          PressureData(8, 10, 20, 30, 10),
-                        ],
-                        xValueMapper: (PressureData data, _) => data.day,
-                        yValueMapper: (PressureData data, _) => data.pulseRate),
-                    LineSeries<PressureData, double>(
-                        name: 'Pulse Pressure',
-                        xAxisName: 'เวลา',
-                        yAxisName: 'mmHg',
-                        color: Color(hexColor('#FFC556')),
-                        dataSource: <PressureData>[
-                          PressureData(1, 0, 20, 30, 40),
-                          PressureData(2, 20, 20, 20, 20),
-                          PressureData(3, 20, 10, 30, 20),
-                          PressureData(4, 10, 20, 30, 10),
-                          PressureData(5, 0, 20, 30, 40),
-                          PressureData(6, 20, 20, 20, 20),
-                          PressureData(7, 20, 10, 30, 20),
-                          PressureData(8, 10, 20, 30, 10),
-                        ],
-                        xValueMapper: (PressureData data, _) => data.day,
-                        yValueMapper: (PressureData data, _) =>
-                            data.pulsePressure),
+                  series: <LineSeries<PressureData, DateTime>>[
+                    LineSeries<PressureData, DateTime>(
+                      dataSource: pressureDataList,
+                      emptyPointSettings: EmptyPointSettings(
+                        mode: EmptyPointMode
+                            .gap, // This will create a gap for null values
+                      ),
+                      // markerSettings: MarkerSettings(
+                      //     isVisible: true, shape: DataMarkerType.diamond),
+                      dataLabelSettings:
+                          const DataLabelSettings(showZeroValue: true),
+                      name: 'ความดันตัวบน',
+                      xAxisName: 'เวลา',
+                      yAxisName: 'mmHg',
+                      color: Color(hexColor('#FB6262')),
+                      xValueMapper: (PressureData data, _) => data.timestamp,
+                      yValueMapper: (PressureData data, _) =>
+                          data.systolicPressure,
+                    ),
+                    LineSeries<PressureData, DateTime>(
+                      dataSource: pressureDataList,
+                      emptyPointSettings: EmptyPointSettings(
+                        mode: EmptyPointMode
+                            .gap, // This will create a gap for null values
+                      ),
+                      // markerSettings: MarkerSettings(
+                      //     isVisible: true, shape: DataMarkerType.triangle),
+                      dataLabelSettings:
+                          const DataLabelSettings(showZeroValue: true),
+                      name: 'ความดันตัวบน',
+                      xAxisName: 'เวลา',
+                      yAxisName: 'mmHg',
+                      color: Color(hexColor('#0502f1')),
+                      xValueMapper: (PressureData data, _) => data.timestamp,
+                      yValueMapper: (PressureData data, _) =>
+                          data.diastolicPressure,
+                    ),
+                    LineSeries<PressureData, DateTime>(
+                      dataSource: pressureDataList,
+                      emptyPointSettings: EmptyPointSettings(
+                        mode: EmptyPointMode
+                            .gap, // This will create a gap for null values
+                      ),
+                      // markerSettings: MarkerSettings(
+                      //     isVisible: true, shape: DataMarkerType.circle),
+                      dataLabelSettings:
+                          const DataLabelSettings(showZeroValue: true),
+                      name: 'ความดันตัวบน',
+                      xAxisName: 'เวลา',
+                      yAxisName: 'mmHg',
+                      color: Color(hexColor('#42884B')),
+                      xValueMapper: (PressureData data, _) => data.timestamp,
+                      yValueMapper: (PressureData data, _) => data.pulseRate,
+                    ),
                   ]))
         ],
       ),
@@ -169,11 +198,21 @@ class _MonthChartWidgetState extends State<MonthChartWidget> {
 }
 
 class PressureData {
-  PressureData(this.day, this.systolicPressure, this.diastolicPressure,
-      this.pulseRate, this.pulsePressure);
-  final double day;
-  final double systolicPressure;
-  final double diastolicPressure;
-  final double pulseRate;
-  final double pulsePressure;
+  final DateTime timestamp;
+  final int systolicPressure;
+  final int diastolicPressure;
+  final int pulseRate;
+
+  PressureData(this.timestamp, this.systolicPressure, this.diastolicPressure,
+      this.pulseRate);
 }
+
+// class PressureData {
+//   PressureData(this.day, this.systolicPressure, this.diastolicPressure,
+//       this.pulseRate, this.pulsePressure);
+//   final double day;
+//   final double systolicPressure;
+//   final double diastolicPressure;
+//   final double pulseRate;
+//   final double pulsePressure;
+// }

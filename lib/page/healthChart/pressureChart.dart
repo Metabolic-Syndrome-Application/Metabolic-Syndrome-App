@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/page/healthChart/allPressureRecord.dart';
+import 'package:flutter_application_1/page/nav.dart/nav.dart';
+import 'package:flutter_application_1/response/api.dart';
 import 'package:flutter_application_1/widget/chart/pressureChart.dart/dayChart.dart';
 import 'package:flutter_application_1/widget/chart/pressureChart.dart/sixMonthChart.dart';
 import 'package:flutter_application_1/widget/chart/pressureChart.dart/threeMonthChart.dart';
 import 'package:flutter_application_1/widget/chart/pressureChart.dart/weekChart.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../../extension/Color.dart';
 import '../../widget/chart/pressureChart.dart/monthChart.dart';
@@ -29,20 +34,54 @@ class PressureChartPage extends StatefulWidget {
 
 class _PressureChartPageState extends State<PressureChartPage> {
   String? period = 'day';
-  String _systolicPressure = '';
-  String _diastolicPressure = '';
-  String _pulseRate = '';
-  final _controllerSystolicPressure = TextEditingController();
-  final _controllerDiastolicPressure = TextEditingController();
-  final _controllerPulseRate = TextEditingController();
-  final bool _validateSystolicPressure = false;
-  final bool _validateDiastolicPressure = false;
-  final bool _validatePulseRate = false;
+  int _systolicPressure = 0;
+  int _diastolicPressure = 0;
+  int _pulseRate = 0;
+
+  String _timeStamp = '';
+
+  Future<void> fetchLatest() async {
+    try {
+      String? token = Provider.of<AuthProvider>(context, listen: false).token;
+      Map<String, dynamic> response = await getLatestRecord(token!);
+      setState(() {
+        _systolicPressure =
+            response['data']['record'][0]['systolicBloodPressure'];
+        _diastolicPressure =
+            response['data']['record'][0]['diastolicBloodPressure'];
+        _pulseRate = response['data']['record'][0]['pulseRate'];
+        _timeStamp = response['data']['record'][0]['timestamp'];
+        DateTime inputDateTime = DateTime.parse(_timeStamp);
+        _timeStamp = DateFormat('dd MMM HH:mm', 'th').format(inputDateTime);
+        print(_timeStamp);
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
+  }
+
+  late TextEditingController _controllerSystolicBloodPressure;
+  late TextEditingController _controllerDiastolicBloodPressure;
+  late TextEditingController _controllerPulseRate;
+
+  bool checkBloodPressure = false;
+
+  @override
+  void initState() {
+    fetchLatest();
+    _controllerSystolicBloodPressure = TextEditingController(
+        text: _systolicPressure == 0 ? null : _systolicPressure.toString());
+    _controllerDiastolicBloodPressure = TextEditingController(
+        text: _diastolicPressure == 0 ? null : _diastolicPressure.toString());
+    _controllerPulseRate = TextEditingController(
+        text: _pulseRate == 0 ? null : _pulseRate.toString());
+    super.initState();
+  }
 
   @override
   void dispose() {
-    _controllerSystolicPressure.dispose();
-    _controllerDiastolicPressure.dispose();
+    _controllerSystolicBloodPressure.dispose();
+    _controllerDiastolicBloodPressure.dispose();
     _controllerPulseRate.dispose();
     super.dispose();
   }
@@ -77,7 +116,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                         ),
                       ),
                       Text(
-                        '14 ส.ค. 09:45',
+                        _timeStamp,
                         style: TextStyle(
                           fontSize: 16,
                           fontFamily: 'IBMPlexSansThai',
@@ -106,24 +145,33 @@ class _PressureChartPageState extends State<PressureChartPage> {
                         height: 34,
                         width: 125,
                         child: TextFormField(
+                          controller: _controllerSystolicBloodPressure,
                           onChanged: (value) {
-                            _systolicPressure = value;
+                            setState(() {
+                              _systolicPressure =
+                                  (value == '') ? 0 : int.parse(value);
+                              if (_controllerSystolicBloodPressure.text == "" &&
+                                  _controllerDiastolicBloodPressure.text ==
+                                      "" &&
+                                  _controllerPulseRate.text == "") {
+                                checkBloodPressure = false;
+                              } else if (!(_controllerSystolicBloodPressure
+                                          .text ==
+                                      "" &&
+                                  _controllerDiastolicBloodPressure.text ==
+                                      "" &&
+                                  _controllerPulseRate.text == "")) {
+                                checkBloodPressure = false;
+                              }
+                            });
                           },
-                          textDirection: TextDirection.rtl,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
-                            errorBorder: OutlineInputBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(30)),
-                                borderSide: BorderSide(
-                                  color: Color(hexColor('#FB6262')),
-                                  width: 1,
-                                )),
-                            contentPadding: const EdgeInsets.only(left: 10),
+                            contentPadding: const EdgeInsets.only(left: 15),
                             fillColor: Colors.white,
                             suffixIcon: Container(
                               padding: const EdgeInsets.only(
-                                  top: 8, left: 3, right: 10),
+                                  top: 8, left: 15, right: 10),
                               child: Text(
                                 'mmHg',
                                 style: TextStyle(
@@ -134,14 +182,42 @@ class _PressureChartPageState extends State<PressureChartPage> {
                                 textAlign: TextAlign.center,
                               ),
                             ),
+                            hintText: _systolicPressure.toString(),
+                            hintStyle: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'IBMPlexSansThai',
+                              color: Color(hexColor('#999999')),
+                              fontWeight: FontWeight.normal,
+                            ),
                             border: OutlineInputBorder(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(24)),
+                                borderRadius: BorderRadius.circular(30.0),
                                 borderSide: BorderSide(
-                                  color: _validateSystolicPressure
-                                      ? Color(hexColor('#E9E9E9'))
-                                      : Color(hexColor('#FB6262')),
-                                  width: 1,
+                                  color: checkBloodPressure &&
+                                          _controllerSystolicBloodPressure
+                                                  .text ==
+                                              ""
+                                      ? Color(hexColor('#FB6262'))
+                                      : Color(hexColor('#DBDBDB')),
+                                )),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: BorderSide(
+                                  color: checkBloodPressure &&
+                                          _controllerSystolicBloodPressure
+                                                  .text ==
+                                              ""
+                                      ? Color(hexColor('#FB6262'))
+                                      : Color(hexColor('#DBDBDB')),
+                                )),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: BorderSide(
+                                  color: checkBloodPressure &&
+                                          _controllerSystolicBloodPressure
+                                                  .text ==
+                                              ""
+                                      ? Color(hexColor('#FB6262'))
+                                      : Color(hexColor('#DBDBDB')),
                                 )),
                           ),
                         ),
@@ -167,17 +243,29 @@ class _PressureChartPageState extends State<PressureChartPage> {
                         height: 34,
                         width: 125,
                         child: TextFormField(
+                          controller: _controllerDiastolicBloodPressure,
                           onChanged: (value) {
-                            _diastolicPressure = value;
+                            _diastolicPressure =
+                                (value == '') ? 0 : int.parse(value);
+                            if (_controllerSystolicBloodPressure.text == "" &&
+                                _controllerDiastolicBloodPressure.text == "" &&
+                                _controllerPulseRate.text == "") {
+                              checkBloodPressure = false;
+                            } else if (!(_controllerSystolicBloodPressure
+                                        .text ==
+                                    "" &&
+                                _controllerDiastolicBloodPressure.text == "" &&
+                                _controllerPulseRate.text == "")) {
+                              checkBloodPressure = false;
+                            }
                           },
-                          textDirection: TextDirection.rtl,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.only(left: 10),
+                            contentPadding: const EdgeInsets.only(left: 15),
                             fillColor: Colors.white,
                             suffixIcon: Container(
                               padding: const EdgeInsets.only(
-                                  top: 8, left: 3, right: 10),
+                                  top: 8, left: 15, right: 10),
                               child: Text(
                                 'mmHg',
                                 style: TextStyle(
@@ -188,12 +276,42 @@ class _PressureChartPageState extends State<PressureChartPage> {
                                 textAlign: TextAlign.center,
                               ),
                             ),
+                            hintText: _diastolicPressure.toString(),
+                            hintStyle: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'IBMPlexSansThai',
+                              color: Color(hexColor('#999999')),
+                              fontWeight: FontWeight.normal,
+                            ),
                             border: OutlineInputBorder(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(24)),
+                                borderRadius: BorderRadius.circular(30.0),
                                 borderSide: BorderSide(
-                                  color: Color(hexColor('#E9E9E9')),
-                                  width: 1,
+                                  color: checkBloodPressure &&
+                                          _controllerSystolicBloodPressure
+                                                  .text ==
+                                              ""
+                                      ? Color(hexColor('#FB6262'))
+                                      : Color(hexColor('#DBDBDB')),
+                                )),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: BorderSide(
+                                  color: checkBloodPressure &&
+                                          _controllerSystolicBloodPressure
+                                                  .text ==
+                                              ""
+                                      ? Color(hexColor('#FB6262'))
+                                      : Color(hexColor('#DBDBDB')),
+                                )),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: BorderSide(
+                                  color: checkBloodPressure &&
+                                          _controllerSystolicBloodPressure
+                                                  .text ==
+                                              ""
+                                      ? Color(hexColor('#FB6262'))
+                                      : Color(hexColor('#DBDBDB')),
                                 )),
                           ),
                         ),
@@ -217,17 +335,28 @@ class _PressureChartPageState extends State<PressureChartPage> {
                         height: 34,
                         width: 125,
                         child: TextFormField(
+                          controller: _controllerPulseRate,
                           onChanged: (value) {
-                            _pulseRate = value;
+                            _pulseRate = (value == '') ? 0 : int.parse(value);
+                            if (_controllerSystolicBloodPressure.text == "" &&
+                                _controllerDiastolicBloodPressure.text == "" &&
+                                _controllerPulseRate.text == "") {
+                              checkBloodPressure = false;
+                            } else if (!(_controllerSystolicBloodPressure
+                                        .text ==
+                                    "" &&
+                                _controllerDiastolicBloodPressure.text == "" &&
+                                _controllerPulseRate.text == "")) {
+                              checkBloodPressure = false;
+                            }
                           },
                           keyboardType: TextInputType.number,
-                          textDirection: TextDirection.rtl,
                           decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.only(left: 10),
+                            contentPadding: const EdgeInsets.only(left: 15),
                             fillColor: Colors.white,
                             suffixIcon: Container(
                               padding: const EdgeInsets.only(
-                                  top: 8, left: 3, right: 10),
+                                  top: 8, left: 15, right: 10),
                               child: Text(
                                 'ครั้ง/นาที',
                                 style: TextStyle(
@@ -238,12 +367,42 @@ class _PressureChartPageState extends State<PressureChartPage> {
                                 textAlign: TextAlign.center,
                               ),
                             ),
+                            hintText: _pulseRate.toString(),
+                            hintStyle: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'IBMPlexSansThai',
+                              color: Color(hexColor('#999999')),
+                              fontWeight: FontWeight.normal,
+                            ),
                             border: OutlineInputBorder(
-                                borderRadius:
-                                    const BorderRadius.all(Radius.circular(24)),
+                                borderRadius: BorderRadius.circular(30.0),
                                 borderSide: BorderSide(
-                                  color: Color(hexColor('#E9E9E9')),
-                                  width: 1,
+                                  color: checkBloodPressure &&
+                                          _controllerSystolicBloodPressure
+                                                  .text ==
+                                              ""
+                                      ? Color(hexColor('#FB6262'))
+                                      : Color(hexColor('#DBDBDB')),
+                                )),
+                            focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: BorderSide(
+                                  color: checkBloodPressure &&
+                                          _controllerSystolicBloodPressure
+                                                  .text ==
+                                              ""
+                                      ? Color(hexColor('#FB6262'))
+                                      : Color(hexColor('#DBDBDB')),
+                                )),
+                            enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: BorderSide(
+                                  color: checkBloodPressure &&
+                                          _controllerSystolicBloodPressure
+                                                  .text ==
+                                              ""
+                                      ? Color(hexColor('#FB6262'))
+                                      : Color(hexColor('#DBDBDB')),
                                 )),
                           ),
                         ),
@@ -276,9 +435,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                         color: Color(hexColor('#2F4EF1')),
                         borderRadius: BorderRadius.circular(30),
                         child: InkWell(
-                          onTap: () {
-                            
-                          },
+                          onTap: () {},
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 10),
                             decoration: BoxDecoration(
@@ -313,8 +470,9 @@ class _PressureChartPageState extends State<PressureChartPage> {
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 20, right: 20, top: 58),
-              child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Stack(alignment: Alignment.center, children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     InkWell(
                       borderRadius: BorderRadius.circular(12),
@@ -322,7 +480,9 @@ class _PressureChartPageState extends State<PressureChartPage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const HealthChart()));
+                                builder: (context) => const Navbar(
+                                      selectedIndex: 0,
+                                    )));
                       },
                       child: Icon(
                         Icons.arrow_back_ios_new_rounded,
@@ -333,52 +493,54 @@ class _PressureChartPageState extends State<PressureChartPage> {
                     const SizedBox(
                       width: 25,
                     ),
-                    const Text(
-                      'ความดันโลหิต',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontFamily: 'IBMPlexSansThai',
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Material(
-                      color: Color(hexColor('#2F4EF1')),
-                      borderRadius: BorderRadius.circular(30),
-                      child: InkWell(
-                        onTap: () {
-                          _addPressure();
-                        },
-                        child: Container(
-                          width: 76,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.add_circle_outline_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text("เพิ่ม",
-                                  style: TextStyle(
-                                      fontSize: 18,
-                                      fontFamily: 'IBMPlexSansThai',
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold),
-                                  textAlign: TextAlign.center),
-                            ],
-                          ),
-                        ),
-                      ),
-                    )
-                  ]),
+                  ],
+                ),
+                const Text(
+                  'ความดันโลหิต',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontFamily: 'IBMPlexSansThai',
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                // Material(
+                //   color: Color(hexColor('#2F4EF1')),
+                //   borderRadius: BorderRadius.circular(30),
+                //   child: InkWell(
+                //     onTap: () {
+                //       _addPressure();
+                //     },
+                //     child: Container(
+                //       width: 76,
+                //       alignment: Alignment.center,
+                //       decoration: BoxDecoration(
+                //         borderRadius: BorderRadius.circular(30),
+                //       ),
+                //       child: const Row(
+                //         mainAxisAlignment: MainAxisAlignment.center,
+                //         children: [
+                //           Icon(
+                //             Icons.add_circle_outline_rounded,
+                //             color: Colors.white,
+                //             size: 20,
+                //           ),
+                //           SizedBox(
+                //             width: 5,
+                //           ),
+                //           Text("เพิ่ม",
+                //               style: TextStyle(
+                //                   fontSize: 18,
+                //                   fontFamily: 'IBMPlexSansThai',
+                //                   color: Colors.white,
+                //                   fontWeight: FontWeight.bold),
+                //               textAlign: TextAlign.center),
+                //         ],
+                //       ),
+                //     ),
+                //   ),
+                // )
+              ]),
             ),
             const SizedBox(
               height: 25,
@@ -584,7 +746,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                             width: 5,
                           ),
                           Text(
-                            'ช่วงหัวใจบีบตัว',
+                            'ความดันตัวบน',
                             style: TextStyle(
                                 fontSize: 14,
                                 fontFamily: 'IBMPlexSansThai',
@@ -596,9 +758,9 @@ class _PressureChartPageState extends State<PressureChartPage> {
                       const SizedBox(
                         height: 16,
                       ),
-                      const Text(
-                        '110 mmHg',
-                        style: TextStyle(
+                      Text(
+                        "$_systolicPressure mmHg",
+                        style: const TextStyle(
                             fontSize: 20,
                             fontFamily: 'IBMPlexSansThai',
                             color: Colors.black,
@@ -619,7 +781,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                             width: 5,
                           ),
                           Text(
-                            'ช่วงหัวใจคลายตัว',
+                            'ความดันตัวล่าง',
                             style: TextStyle(
                                 fontSize: 14,
                                 fontFamily: 'IBMPlexSansThai',
@@ -631,9 +793,9 @@ class _PressureChartPageState extends State<PressureChartPage> {
                       const SizedBox(
                         height: 16,
                       ),
-                      const Text(
-                        '75 mmHg',
-                        style: TextStyle(
+                      Text(
+                        "$_diastolicPressure mmHg",
+                        style: const TextStyle(
                             fontSize: 20,
                             fontFamily: 'IBMPlexSansThai',
                             color: Colors.black,
@@ -666,9 +828,9 @@ class _PressureChartPageState extends State<PressureChartPage> {
                       const SizedBox(
                         height: 16,
                       ),
-                      const Text(
-                        '75 ครั้ง/นาที',
-                        style: TextStyle(
+                      Text(
+                        "$_pulseRate ครั้ง/นาที",
+                        style: const TextStyle(
                             fontSize: 20,
                             fontFamily: 'IBMPlexSansThai',
                             color: Colors.black,
@@ -786,7 +948,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
-                                        const AllPressureRecord()));
+                                        const AllPressureRecordPage()));
                           },
                           child: const Icon(
                             Icons.arrow_forward_ios_rounded,

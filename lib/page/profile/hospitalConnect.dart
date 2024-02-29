@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/page/loginRegister/otpRegister.dart';
 import 'package:flutter_application_1/page/profile/profile.dart';
 import 'package:flutter_application_1/page/profile/successConnect.dart';
 
@@ -23,6 +24,14 @@ class hospitalConnectPage extends StatefulWidget {
 }
 
 class _hospitalConnectPageState extends State<hospitalConnectPage> {
+  TextEditingController otp1Controller = TextEditingController();
+  TextEditingController otp2Controller = TextEditingController();
+  TextEditingController otp3Controller = TextEditingController();
+  TextEditingController otp4Controller = TextEditingController();
+
+  String otpController = "1234";
+  Color? validColor;
+  Duration myDuration = Duration(minutes: 3);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,7 +68,7 @@ class _hospitalConnectPageState extends State<hospitalConnectPage> {
                 )
               ]),
               SizedBox(
-                height: 20,
+                height: 80,
               ),
               Text(
                 'กรุณากรอกรหัสยืนยัน\nเพื่อเชื่อมต่อเข้ากับสถานพยาบาล',
@@ -75,7 +84,7 @@ class _hospitalConnectPageState extends State<hospitalConnectPage> {
                 height: 24,
               ),
               Image.asset(
-                'assets/images/otp.png',
+                'assets/images/otp1.png',
                 height: 148,
               ),
               SizedBox(
@@ -92,47 +101,40 @@ class _hospitalConnectPageState extends State<hospitalConnectPage> {
                 textAlign: TextAlign.center,
               ),
               SizedBox(
-                height: 12,
+                height: 30,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  InkWell(
-                    onTap: () {
-                      //
-                    },
-                    child: Row(
-                      children: [
-                        Icon(Icons.timer, color: Colors.black, size: 20),
-                        SizedBox(
-                          width: 5,
-                        ),
-                        Text('เหลือเวลาอีก ',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: 'IBMPlexSansThai',
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal,
-                            )),
-                        // Text(
-                        //   //'$minutes:$seconds',
-                        //   style: TextStyle(
-                        //       fontFamily: 'IBMPlexSansThai',
-                        //       fontWeight: FontWeight.normal,
-                        //       color: Color(hexColor('#2F4EF1')),
-                        //       fontSize: 14),
-                        // ),
-                        Text(' นาที',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: 'IBMPlexSansThai',
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal,
-                            )),
-                      ],
-                    ),
+                  Otp(
+                    otpController: otp1Controller,
+                    validColor: validColor,
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Otp(
+                    otpController: otp2Controller,
+                    validColor: validColor,
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Otp(
+                    otpController: otp3Controller,
+                    validColor: validColor,
+                  ),
+                  SizedBox(
+                    width: 20,
+                  ),
+                  Otp(
+                    otpController: otp4Controller,
+                    validColor: validColor,
                   ),
                 ],
+              ),
+              SizedBox(
+                height: 80,
               ),
               MaterialButton(
                   height: 44,

@@ -7,6 +7,8 @@ import 'package:flutter_application_1/response/api.dart';
 import 'package:provider/provider.dart';
 
 class ConcludeRiskResult extends StatefulWidget {
+  final String exerciseFrequency;
+  final String exercisePeriod;
   final String diabetes;
   final String hyperlipidemia;
   final String hypertension;
@@ -16,17 +18,45 @@ class ConcludeRiskResult extends StatefulWidget {
       required this.hyperlipidemia,
       required this.hypertension,
       required this.obesity,
-      super.key});
+      super.key,
+      required this.exerciseFrequency,
+      required this.exercisePeriod});
 
   @override
   State<ConcludeRiskResult> createState() => _ConcludeRiskResultState();
 }
 
 class _ConcludeRiskResultState extends State<ConcludeRiskResult> {
+  String details = '';
+  String symptoms = '';
+  String medications = '';
+  String behaviors = '';
+  String warning = '';
+
+  Future<void> fetchKnowledge(String disease) async {
+    try {
+      String? token = Provider.of<AuthProvider>(context, listen: false).token;
+      Map<String, dynamic> response = await getKnowledge(token!, disease);
+      setState(() {
+        details = response['data']['details'];
+        behaviors = response['data']['behaviors'];
+        print(response);
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
+  }
+
   @override
   void initState() {
-    super.initState();
     fetchDisease();
+    widget.exerciseFrequency == 'น้อยกว่า 3 วัน' ||
+            widget.exerciseFrequency == 'ไม่ออกกำลังกาย' ||
+            widget.exercisePeriod == 'น้อยกว่า 15 นาที'
+        ? warning =
+            'ควรออกกำลังให้สม่ำเสมอ\nโดยอย่าน้อยควรออกกำลังกายสัปดาห์ละ 3 และขั้นต่ำไม่ควรน้อยกว่า 15 นาทีต่อครั้ง'
+        : warning = '';
+    super.initState();
   }
 
   var riskResult = {};
@@ -34,10 +64,6 @@ class _ConcludeRiskResultState extends State<ConcludeRiskResult> {
   int checkMedium = 0;
   int checkLow = 0;
 
-  // String diabetesResult = "";
-  // String hyperlipidemiaResult = "";
-  // String hypertensionResult = "";
-  // String obesityResult = "";
   Map<String, dynamic> highList = {};
   Map<String, dynamic> mediumList = {};
   Map<String, dynamic> lowList = {};
@@ -75,7 +101,8 @@ class _ConcludeRiskResultState extends State<ConcludeRiskResult> {
           showList = lowList;
         }
 
-        showList.forEach((key, value) {
+        showList.forEach((key, value) async {
+          await fetchKnowledge(key);
           _pagesView.add(
             SingleChildScrollView(
               child: Column(
@@ -95,20 +122,24 @@ class _ConcludeRiskResultState extends State<ConcludeRiskResult> {
                   const SizedBox(
                     height: 20,
                   ),
-                  Text(
-                    key == "diabetes"
-                        ? "คุณมีความเสี่ยงที่จะเป็นโรคเบาหวาน"
-                        : key == "hyperlipidemia"
-                            ? "คุณมีความเสี่ยงที่จะมีภาวะไขมันในเลือดสูง"
-                            : key ==
-                                    "hypertension" // Did you mean key == "hypertension" here?
-                                ? "คุณมีความเสี่ยงที่จะเป็นโรคความดันเลือดสูง"
-                                : "คุณมีความเสี่ยงที่จะเป็นโรคอ้วน",
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontFamily: 'IBMPlexSansThai',
-                      color: Colors.black,
-                      fontWeight: FontWeight.normal,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      key == "diabetes"
+                          ? "คุณมีความเสี่ยงที่จะเป็นโรคเบาหวาน"
+                          : key == "hyperlipidemia"
+                              ? "คุณมีความเสี่ยงที่จะมีภาวะไขมันในเลือดสูง"
+                              : key ==
+                                      "hypertension" // Did you mean key == "hypertension" here?
+                                  ? "คุณมีความเสี่ยงที่จะเป็นโรคความดันเลือดสูง"
+                                  : "คุณมีความเสี่ยงที่จะเป็นโรคอ้วน",
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontFamily: 'IBMPlexSansThai',
+                        color: Colors.black,
+                        fontWeight: FontWeight.normal,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                   const SizedBox(
@@ -118,7 +149,7 @@ class _ConcludeRiskResultState extends State<ConcludeRiskResult> {
                     padding: const EdgeInsets.symmetric(horizontal: 30),
                     child: Column(
                       children: [
-                        Row(
+                        const Row(
                           children: [
                             Text(
                               "คำเเนะนำสำหรับคุณ",
@@ -131,25 +162,31 @@ class _ConcludeRiskResultState extends State<ConcludeRiskResult> {
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
-                        ),
-                        Text(
-                          'detailshhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontFamily: 'IBMPlexSansThai',
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 57,
                         ),
                         Row(
                           children: [
+                            Expanded(
+                              child: Text(
+                                details,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'IBMPlexSansThai',
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 57,
+                        ),
+                        const Row(
+                          children: [
                             Text(
-                              "โรคที่เกี่ยวข้อง",
+                              "การปรับเปลี่ยนพฤติกรรม",
                               style: TextStyle(
                                 fontSize: 20,
                                 fontFamily: 'IBMPlexSansThai',
@@ -159,21 +196,31 @@ class _ConcludeRiskResultState extends State<ConcludeRiskResult> {
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
-                        ),
-                        Container(
-                          height: 100,
-                          decoration:
-                              BoxDecoration(color: Color(hexColor('#D9D9D9'))),
-                        ),
-                        SizedBox(
-                          height: 57,
                         ),
                         Row(
                           children: [
+                            Expanded(
+                              child: Text(
+                                behaviors,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontFamily: 'IBMPlexSansThai',
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 57,
+                        ),
+                        const Row(
+                          children: [
                             Text(
-                              "โรคที่เกี่ยวข้อง",
+                              "เพิ่มเติม",
                               style: TextStyle(
                                 fontSize: 20,
                                 fontFamily: 'IBMPlexSansThai',
@@ -183,15 +230,27 @@ class _ConcludeRiskResultState extends State<ConcludeRiskResult> {
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20,
                         ),
-                        Container(
-                          height: 100,
-                          decoration:
-                              BoxDecoration(color: Color(hexColor('#D9D9D9'))),
-                        ),
-                        SizedBox(
+                        warning == ''
+                            ? const SizedBox()
+                            : Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      warning,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontFamily: 'IBMPlexSansThai',
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                        const SizedBox(
                           height: 150,
                         ),
                       ],
@@ -233,12 +292,12 @@ class _ConcludeRiskResultState extends State<ConcludeRiskResult> {
       body: Center(
         child: Column(
           children: [
-            Column(
+            const Column(
               children: [
-                const SizedBox(
+                SizedBox(
                   height: 59,
                 ),
-                const Text(
+                Text(
                   "สรุปผลลัพธ์ความเสี่ยง",
                   style: TextStyle(
                     fontSize: 22,
@@ -247,7 +306,7 @@ class _ConcludeRiskResultState extends State<ConcludeRiskResult> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(
+                SizedBox(
                   height: 15,
                 ),
               ],
@@ -440,7 +499,7 @@ class _ConcludeRiskResultState extends State<ConcludeRiskResult> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => HomePage()));
+                                      builder: (context) => const HomePage()));
                             },
                             child: Container(
                               height: 47,

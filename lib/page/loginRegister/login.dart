@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
-import 'package:flutter_application_1/page/home/home.dart';
 import 'package:flutter_application_1/page/loginRegister/createProfile.dart';
 import 'package:flutter_application_1/page/loginRegister/forgetPassword.dart';
 import 'package:flutter_application_1/page/loginRegister/register.dart';
@@ -345,8 +344,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            const Navbar(selectedIndex: 0)));
+                                        builder: (context) => const Navbar()));
                               } else if (diseaseRisk == "metabolicMedium" ||
                                   diseaseRisk == "metabolicHigh") {
                                 Navigator.push(
@@ -357,9 +355,7 @@ class _LoginPageState extends State<LoginPage> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => const Navbar(
-                                              selectedIndex: 0,
-                                            )));
+                                        builder: (context) => const Navbar()));
                               }
                             } else {
                               Navigator.push(

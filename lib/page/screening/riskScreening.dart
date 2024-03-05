@@ -48,9 +48,10 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
   Color _inactiveColor = Color(hexColor('#DBDBDB'));
 
   TextStyle _headerStyle =
-      TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold);
+      const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold);
 
-  TextStyle _stepStyle = TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold);
+  TextStyle _stepStyle =
+      const TextStyle(fontSize: 12.0, fontWeight: FontWeight.bold);
 
   late Size _safeAreaSize;
 
@@ -78,7 +79,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
       _headerStyle,
       _stepStyle,
       decoration: BoxDecoration(color: Color(hexColor('#FAFCFB'))),
-      padding: EdgeInsets.only(top: 53.0),
+      padding: const EdgeInsets.only(top: 53.0),
     );
   }
 
@@ -206,7 +207,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                   ),
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 15,
                               ),
                               RichText(
@@ -221,7 +222,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                   ),
                                 ),
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 22,
                               ),
                               Row(
@@ -258,22 +259,22 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                         },
                                         child: Column(
                                           children: [
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 21,
                                             ),
-                                            Container(
+                                            SizedBox(
                                               width: 50,
                                               height: 50,
                                               child: Image.asset(
                                                   'assets/images/sleep.png'),
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 12,
                                             ),
-                                            Text(
+                                            const Text(
                                               'นอนกรนและเหนื่อย\nเพลียหลังตื่นนอน',
                                               style: TextStyle(
-                                                fontSize: 14,
+                                                fontSize: 12,
                                                 fontFamily: 'IBMPlexSansThai',
                                                 color: Colors.black,
                                                 fontWeight: FontWeight.normal,
@@ -283,7 +284,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                           ],
                                         )),
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 31,
                                   ),
                                   Container(
@@ -318,22 +319,22 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                         },
                                         child: Column(
                                           children: [
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 15,
                                             ),
-                                            Container(
+                                            SizedBox(
                                               width: 50,
                                               height: 50,
                                               child: Image.asset(
                                                   'assets/images/alcohol.png'),
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 12,
                                             ),
-                                            Text(
+                                            const Text(
                                               'ดื่มแอลกอฮอล์เกิน\nกว่าวันละ 2 แก้วเป็น\nประจำ',
                                               style: TextStyle(
-                                                fontSize: 14,
+                                                fontSize: 12,
                                                 fontFamily: 'IBMPlexSansThai',
                                                 color: Colors.black,
                                                 fontWeight: FontWeight.normal,
@@ -345,7 +346,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                   ),
                                 ],
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 31,
                               ),
                               Row(
@@ -382,22 +383,22 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                         },
                                         child: Column(
                                           children: [
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 21,
                                             ),
-                                            Container(
+                                            SizedBox(
                                               width: 50,
                                               height: 50,
                                               child: Image.asset(
                                                   'assets/images/smoking.png'),
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 12,
                                             ),
-                                            Text(
+                                            const Text(
                                               'สูบบุหรี่',
                                               style: TextStyle(
-                                                fontSize: 14,
+                                                fontSize: 12,
                                                 fontFamily: 'IBMPlexSansThai',
                                                 color: Colors.black,
                                                 fontWeight: FontWeight.normal,
@@ -442,22 +443,22 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                         },
                                         child: Column(
                                           children: [
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 21,
                                             ),
-                                            Container(
+                                            SizedBox(
                                               width: 50,
                                               height: 50,
                                               child: Image.asset(
                                                   'assets/images/medicalReport.png'),
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 18,
                                             ),
-                                            Text(
+                                            const Text(
                                               'ไม่เคยตรวจสุขภาพ',
                                               style: TextStyle(
-                                                fontSize: 14,
+                                                fontSize: 12,
                                                 fontFamily: 'IBMPlexSansThai',
                                                 color: Colors.black,
                                                 fontWeight: FontWeight.normal,
@@ -673,13 +674,14 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                     children: [
                                       Container(
                                           height: 36,
-                                          margin: EdgeInsets.only(left: 16),
+                                          margin:
+                                              const EdgeInsets.only(left: 16),
                                           child: Image.asset(
                                               'assets/images/hypertensionIcon.png')),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 15,
                                       ),
-                                      Text("โรคความดันเลือดสูง",
+                                      const Text("โรคความดันเลือดสูง",
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontFamily: 'IBMPlexSansThai',
@@ -691,7 +693,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                 ),
                               ),
                               Container(
-                                margin: EdgeInsets.only(
+                                margin: const EdgeInsets.only(
                                     left: 22, right: 22, bottom: 20),
                                 height: 56,
                                 child: MaterialButton(
@@ -714,13 +716,14 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                     children: [
                                       Container(
                                           height: 36,
-                                          margin: EdgeInsets.only(left: 16),
+                                          margin:
+                                              const EdgeInsets.only(left: 16),
                                           child: Image.asset(
                                               'assets/images/heartAttackIcon.png')),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 15,
                                       ),
-                                      Text("โรคหัวใจ",
+                                      const Text("โรคหัวใจ",
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontFamily: 'IBMPlexSansThai',
@@ -732,7 +735,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                 ),
                               ),
                               Container(
-                                margin: EdgeInsets.only(
+                                margin: const EdgeInsets.only(
                                     left: 22, right: 22, bottom: 20),
                                 height: 56,
                                 child: MaterialButton(
@@ -754,13 +757,14 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                     children: [
                                       Container(
                                           height: 36,
-                                          margin: EdgeInsets.only(left: 16),
+                                          margin:
+                                              const EdgeInsets.only(left: 16),
                                           child: Image.asset(
                                               'assets/images/kidneyIcon.png')),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 15,
                                       ),
-                                      Text("โรคไต",
+                                      const Text("โรคไต",
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontFamily: 'IBMPlexSansThai',
@@ -804,13 +808,14 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                     children: [
                                       Container(
                                           height: 36,
-                                          margin: EdgeInsets.only(left: 16),
+                                          margin:
+                                              const EdgeInsets.only(left: 16),
                                           child: Image.asset(
                                               'assets/images/addIcon.png')),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 15,
                                       ),
-                                      Text("อื่นๆ",
+                                      const Text("อื่นๆ",
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontFamily: 'IBMPlexSansThai',
@@ -823,7 +828,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                               ),
                               another
                                   ? Container(
-                                      margin: EdgeInsets.only(
+                                      margin: const EdgeInsets.only(
                                           left: 22, right: 22, bottom: 90),
                                       height: 56,
                                       child: TextFormField(
@@ -843,11 +848,12 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                             fontWeight: FontWeight.normal,
                                           ),
                                           contentPadding:
-                                              EdgeInsets.only(left: 35),
+                                              const EdgeInsets.only(left: 35),
                                           fillColor: Color(hexColor('#C9E1FD')),
                                           border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(24)),
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(24)),
                                               borderSide: BorderSide(
                                                 color:
                                                     Color(hexColor('#C9E1FD')),
@@ -1026,13 +1032,14 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                     children: [
                                       Container(
                                           height: 36,
-                                          margin: EdgeInsets.only(left: 16),
+                                          margin:
+                                              const EdgeInsets.only(left: 16),
                                           child: Image.asset(
                                               'assets/images/diabetesIcon.png')),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 15,
                                       ),
-                                      Text("โรคเบาหวาน",
+                                      const Text("โรคเบาหวาน",
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontFamily: 'IBMPlexSansThai',
@@ -1044,7 +1051,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                 ),
                               ),
                               Container(
-                                margin: EdgeInsets.only(
+                                margin: const EdgeInsets.only(
                                     left: 22, right: 22, bottom: 20),
                                 height: 56,
                                 child: MaterialButton(
@@ -1068,13 +1075,14 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                     children: [
                                       Container(
                                           height: 36,
-                                          margin: EdgeInsets.only(left: 16),
+                                          margin:
+                                              const EdgeInsets.only(left: 16),
                                           child: Image.asset(
                                               'assets/images/hypertensionIcon.png')),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 15,
                                       ),
-                                      Text("โรคความดันเลือดสูง",
+                                      const Text("โรคความดันเลือดสูง",
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontFamily: 'IBMPlexSansThai',
@@ -1110,13 +1118,14 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                     children: [
                                       Container(
                                           height: 36,
-                                          margin: EdgeInsets.only(left: 16),
+                                          margin:
+                                              const EdgeInsets.only(left: 16),
                                           child: Image.asset(
                                               'assets/images/heartAttackIcon.png')),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 15,
                                       ),
-                                      Text("โรคหัวใจ",
+                                      const Text("โรคหัวใจ",
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontFamily: 'IBMPlexSansThai',
@@ -1152,13 +1161,14 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                     children: [
                                       Container(
                                           height: 36,
-                                          margin: EdgeInsets.only(left: 16),
+                                          margin:
+                                              const EdgeInsets.only(left: 16),
                                           child: Image.asset(
                                               'assets/images/kidneyIcon.png')),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 15,
                                       ),
-                                      Text("โรคไต",
+                                      const Text("โรคไต",
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontFamily: 'IBMPlexSansThai',
@@ -1170,7 +1180,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                 ),
                               ),
                               Container(
-                                margin: EdgeInsets.only(
+                                margin: const EdgeInsets.only(
                                     left: 22, right: 22, bottom: 20),
                                 height: 56,
                                 child: MaterialButton(
@@ -1204,13 +1214,14 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                     children: [
                                       Container(
                                           height: 36,
-                                          margin: EdgeInsets.only(left: 16),
+                                          margin:
+                                              const EdgeInsets.only(left: 16),
                                           child: Image.asset(
                                               'assets/images/addIcon.png')),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 15,
                                       ),
-                                      Text("อื่นๆ",
+                                      const Text("อื่นๆ",
                                           style: TextStyle(
                                               fontSize: 18,
                                               fontFamily: 'IBMPlexSansThai',
@@ -1223,7 +1234,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                               ),
                               anotherParent
                                   ? Container(
-                                      margin: EdgeInsets.only(
+                                      margin: const EdgeInsets.only(
                                           left: 22, right: 22, bottom: 90),
                                       height: 56,
                                       child: TextFormField(
@@ -1243,11 +1254,12 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                             fontWeight: FontWeight.normal,
                                           ),
                                           contentPadding:
-                                              EdgeInsets.only(left: 35),
+                                              const EdgeInsets.only(left: 35),
                                           fillColor: Color(hexColor('#C9E1FD')),
                                           border: OutlineInputBorder(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(24)),
+                                              borderRadius:
+                                                  const BorderRadius.all(
+                                                      Radius.circular(24)),
                                               borderSide: BorderSide(
                                                 color:
                                                     Color(hexColor('#C9E1FD')),
@@ -1256,8 +1268,8 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                         ),
                                       ),
                                     )
-                                  : SizedBox(height: 80),
-                              SizedBox(height: 20)
+                                  : const SizedBox(height: 80),
+                              const SizedBox(height: 20)
                             ],
                           ),
                         ),
@@ -1268,9 +1280,9 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                           child: Center(
                             child: Column(
                               children: [
-                                SizedBox(height: 44),
+                                const SizedBox(height: 44),
                                 RichText(
-                                  text: TextSpan(
+                                  text: const TextSpan(
                                     text: 'คุณออกกำลังกายกี่ครั้งต่อสัปดาห์',
                                     style: TextStyle(
                                       fontSize: 22,
@@ -1280,11 +1292,11 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 27,
                                 ),
                                 Container(
-                                  margin: EdgeInsets.only(
+                                  margin: const EdgeInsets.only(
                                       left: 26, right: 26, bottom: 26),
                                   height: 50,
                                   child: MaterialButton(
@@ -1302,7 +1314,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                         exerciseFrequency = "น้อยกว่า 3 วัน";
                                       });
                                     },
-                                    child: Row(
+                                    child: const Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
@@ -1318,7 +1330,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                   ),
                                 ),
                                 Container(
-                                  margin: EdgeInsets.only(
+                                  margin: const EdgeInsets.only(
                                       left: 26, right: 26, bottom: 26),
                                   height: 50,
                                   child: MaterialButton(
@@ -1336,7 +1348,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                         exerciseFrequency = "3 - 5 วัน";
                                       });
                                     },
-                                    child: Row(
+                                    child: const Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
@@ -1352,7 +1364,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                   ),
                                 ),
                                 Container(
-                                  margin: EdgeInsets.only(
+                                  margin: const EdgeInsets.only(
                                       left: 26, right: 26, bottom: 26),
                                   height: 50,
                                   child: MaterialButton(
@@ -1370,7 +1382,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                         exerciseFrequency = "6 - 7 วัน";
                                       });
                                     },
-                                    child: Row(
+                                    child: const Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
@@ -1386,7 +1398,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                   ),
                                 ),
                                 Container(
-                                  margin: EdgeInsets.only(
+                                  margin: const EdgeInsets.only(
                                       left: 26, right: 26, bottom: 26),
                                   height: 50,
                                   child: MaterialButton(
@@ -1404,7 +1416,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                         exerciseFrequency = "ไม่ออกกำลังกาย";
                                       });
                                     },
-                                    child: Row(
+                                    child: const Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
@@ -1419,11 +1431,11 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(
+                                const SizedBox(
                                   height: 41,
                                 ),
                                 RichText(
-                                  text: TextSpan(
+                                  text: const TextSpan(
                                     text: 'คุณออกกำลังกายครั้งละกี่นาที',
                                     style: TextStyle(
                                       fontSize: 22,
@@ -1455,7 +1467,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                         exercisePeriod = "น้อยกว่า 15 นาที";
                                       });
                                     },
-                                    child: Row(
+                                    child: const Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
@@ -1471,7 +1483,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                   ),
                                 ),
                                 Container(
-                                  margin: EdgeInsets.only(
+                                  margin: const EdgeInsets.only(
                                       left: 26, right: 26, bottom: 26),
                                   height: 50,
                                   child: MaterialButton(
@@ -1489,7 +1501,7 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                         exercisePeriod = "15 - 30 นาที";
                                       });
                                     },
-                                    child: Row(
+                                    child: const Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
@@ -1504,6 +1516,10 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                     ),
                                   ),
                                 ),
+                                // ignore: prefer_const_constructors
+                                SizedBox(
+                                  height: 150,
+                                )
                               ],
                             ),
                           ),
@@ -1600,8 +1616,11 @@ class _RiskScreeningPageState extends State<RiskScreeningPage> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) =>
-                                            RiskResultPage()));
+                                        builder: (context) => RiskResultPage(
+                                              exerciseFrequency:
+                                                  exerciseFrequency!,
+                                              exercisePeriod: exercisePeriod!,
+                                            )));
                               }
                             },
                             child: Container(

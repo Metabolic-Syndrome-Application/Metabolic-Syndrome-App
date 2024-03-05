@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
@@ -8,6 +9,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+@RoutePage()
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -18,20 +20,6 @@ class CalendarPage extends StatefulWidget {
 
 class _CalendarPageState extends State<CalendarPage> {
   Map<String, String> contentsList = {};
-  Future<void> fetchAllMood() async {
-    try {
-      String? token = Provider.of<AuthProvider>(context, listen: false).token;
-      Map<String, dynamic> response = await getAllMood(token!);
-      setState(() {
-        var allMood = response['data'];
-        for (var record in allMood) {
-          contentsList[record["date"]] = record["mood"];
-        }
-      });
-    } catch (e) {
-      // print('Error fetching profile: $e');
-    }
-  }
 
   DateTime currentDateTime = DateTime.now();
 
@@ -51,6 +39,25 @@ class _CalendarPageState extends State<CalendarPage> {
 
   dynamic listOfPlan = '';
 
+  String id = '';
+  String name = '';
+  String type = '';
+
+  Future<void> fetchAllMood() async {
+    try {
+      String? token = Provider.of<AuthProvider>(context, listen: false).token;
+      Map<String, dynamic> response = await getAllMood(token!);
+      setState(() {
+        var allMood = response['data'];
+        for (var record in allMood) {
+          contentsList[record["date"]] = record["mood"];
+        }
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
+  }
+
   void _onSelectionChanged(DateRangePickerSelectionChangedArgs args) {
     setState(() {
       if (args.value is DateTime) {
@@ -62,17 +69,6 @@ class _CalendarPageState extends State<CalendarPage> {
         context,
         MaterialPageRoute(
             builder: (context) => SelectedDate(args.value, hasPlan)));
-  }
-
-  @override
-  void initState() {
-    setState(() {
-      fetchAllMood();
-      fetchLatestMood();
-      fetchAllPlan();
-    });
-
-    super.initState();
   }
 
   Future<void> getEmoji(
@@ -108,18 +104,53 @@ class _CalendarPageState extends State<CalendarPage> {
     }
   }
 
-  Future<void> fetchAllPlan() async {
+  // Future<void> fetchAllPlan() async {
+  //   try {
+  //     String? token = Provider.of<AuthProvider>(context, listen: false).token;
+  //     Map<String, dynamic> response = await getAllPlan(token!);
+  //     setState(() {
+  //       listOfPlan = response['data']['plan'];
+  //     });
+  //   } catch (e) {
+  //     // print('Error fetching profile: $e');
+  //   }
+  // }
+
+  Future<void> fetchProfile() async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
     try {
-      String? token = Provider.of<AuthProvider>(context, listen: false).token;
-      Map<String, dynamic> response = await getAllPlan(token!);
+      Map<String, dynamic> response = await getProfile(token!);
       setState(() {
-        listOfPlan = response['data']['plan'];
-        // print(listOfPlan[0]['name']);
-        // print(listOfPlan);
+        listOfPlan = response['data']['user']['planID'];
       });
     } catch (e) {
       // print('Error fetching profile: $e');
     }
+  }
+
+  Future<void> fetchAndPrintPlan(String planId) async {
+    try {
+      String? token = Provider.of<AuthProvider>(context, listen: false).token;
+      Map<String, dynamic> response = await getPlanById(token!, planId);
+      setState(() {});
+      id = response['data']['plan']['id'];
+      name = response['data']['plan']['name'];
+      type = response['data']['plan']['type'];
+    } catch (e) {
+      // print('Error fetching plan: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    setState(() {
+      fetchProfile();
+      fetchAllMood();
+      fetchLatestMood();
+      // fetchAllPlan();
+    });
+
+    super.initState();
   }
 
   @override
@@ -553,18 +584,19 @@ class _CalendarPageState extends State<CalendarPage> {
                         ),
                       ],
                     ),
-                    ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: listOfPlan.length,
-                        itemBuilder: (context, index) {
-                          return ProgramCard(
-                            planId: listOfPlan[index]['id'],
-                            planName: listOfPlan[index]['name'],
-                            planType: listOfPlan[index]['type'],
-                          );
-                        }),
-                    SizedBox(
-                      height: 170,
+                    listOfPlan == null
+                        ? const SizedBox()
+                        : ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: listOfPlan.length,
+                            itemBuilder: (context, index) {
+                              return ProgramCard(
+                                planId: listOfPlan[index],
+                              );
+                            }),
+                    const SizedBox(
+                      height: 50,
                     ),
                   ],
                 ),

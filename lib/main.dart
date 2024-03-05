@@ -1,3 +1,5 @@
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/page/loginRegister/login.dart';
@@ -10,22 +12,37 @@ import 'extension/Color.dart';
 
 void main() async {
   await dotenv.load(fileName: '.env');
+  // WidgetsFlutterBinding.ensureInitialized();
+  // await Firebase.initializeApp();
+  // await FirebaseAppCheck.instance.activate(
+  //   // You can also use a `ReCaptchaEnterpriseProvider` provider instance as an
+  //   // argument for `webProvider`
+  //   webProvider: ReCaptchaV3Provider('recaptcha-v3-site-key'),
+  //   // Default provider for Android is the Play Integrity provider. You can use the "AndroidProvider" enum to choose
+  //   // your preferred provider. Choose from:
+  //   // 1. Debug provider
+  //   // 2. Safety Net provider
+  //   // 3. Play Integrity provider
+  //   androidProvider: AndroidProvider.debug,
+  //   // Default provider for iOS/macOS is the Device Check provider. You can use the "AppleProvider" enum to choose
+  //   // your preferred provider. Choose from:
+  //   // 1. Debug provider
+  //   // 2. Device Check provider
+  //   // 3. App Attest provider
+  //   // 4. App Attest provider with fallback to Device Check provider (App Attest provider is only available on iOS 14.0+, macOS 14.0+)
+  //   appleProvider: AppleProvider.appAttest,
+  // );
 
   initializeDateFormatting().then((_) => runApp(ChangeNotifierProvider(
-      create: (context) => AuthProvider(), child: MyApp())));
-
-  // runApp(ChangeNotifierProvider(
-  //     create: (context) => AuthProvider(), child: MyApp()));
+      create: (context) => AuthProvider(), child: const MyApp())));
 }
 
-//สร้าง Widget
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
-      //navigatorKey: navigatorKey,
       localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -49,44 +66,11 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  // int _currentIndex = 0;
-  // final List _children = [
-  //   const Home(),
-  //   const Calendar(),
-  //   const TodayNote(),
-  //   const AllChallenge(),
-  //   const Profile()
-  // ];
-
-  // void onTabTapped(int index) {
-  //   setState(() {
-  //     _currentIndex = index;
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Color(hexColor('#FAFCFB')),
       body: const LoginPage(),
-      // body: _children[_currentIndex],
-      // bottomNavigationBar: BottomNavigationBar(
-      //   onTap: onTabTapped,
-      //   currentIndex: _currentIndex,
-      //   items: [
-      //     new BottomNavigationBarItem(
-      //         backgroundColor: Color(hexColor('#1438F3')),
-      //         icon: Icon(Icons.home),
-      //         label: 'หน้าหลัก'),
-      //     new BottomNavigationBarItem(icon: Icon(Icons.mail), label: 'ปฏิทิน'),
-      //     new BottomNavigationBarItem(
-      //         icon: Icon(Icons.person), label: 'บันทึก'),
-      //     new BottomNavigationBarItem(
-      //         icon: Icon(Icons.battery_alert_outlined), label: 'ท้าดวล'),
-      //     new BottomNavigationBarItem(
-      //         icon: Icon(Icons.person), label: 'โปรไฟล์'),
-      //   ],
-      // ),
     );
   }
 }

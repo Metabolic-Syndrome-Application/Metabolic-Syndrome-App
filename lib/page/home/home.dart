@@ -33,6 +33,7 @@ class _HomePageState extends State<HomePage> {
     try {
       Map<String, dynamic> response = await getProfile(token!);
       setState(() {
+        print(response);
         alias = response['data']['user']['alias'];
         coin = response['data']['user']['collectPoints'];
       });
@@ -93,11 +94,11 @@ class _HomePageState extends State<HomePage> {
                     InkWell(
                         borderRadius: BorderRadius.circular(30),
                         onTap: () {
-                          //profile
+                          // profile
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const Profile()));
+                                  builder: (context) => const ProfilePage()));
                         },
                         child: Image.asset('assets/images/userCircle.png')),
                     Row(
@@ -173,11 +174,12 @@ class _HomePageState extends State<HomePage> {
                                   Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => Ranking()));
+                                          builder: (context) =>
+                                              const Ranking()));
                                 },
                                 child:
                                     Image.asset('assets/images/piggyBank.png')),
-                            SizedBox(
+                            const SizedBox(
                               width: 10,
                             ),
                             Text(
@@ -198,7 +200,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              SizedBox(height: 18),
+              const SizedBox(height: 18),
               Padding(
                 padding: const EdgeInsets.only(left: 20, right: 20),
                 child: Column(
@@ -209,10 +211,10 @@ class _HomePageState extends State<HomePage> {
                         Image.asset(
                           'assets/images/information.png',
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 5,
                         ),
-                        Text(
+                        const Text(
                           'แผนสุขภาพ',
                           style: TextStyle(
                             fontSize: 20,
@@ -223,7 +225,7 @@ class _HomePageState extends State<HomePage> {
                         )
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     Row(
@@ -252,17 +254,18 @@ class _HomePageState extends State<HomePage> {
                                     ]),
                                 borderRadius: BorderRadius.circular(30)),
                             child: Container(
-                                padding: EdgeInsets.only(top: 10, bottom: 10),
+                                padding:
+                                    const EdgeInsets.only(top: 10, bottom: 10),
                                 width: 100,
                                 alignment: Alignment.center,
                                 child: Column(
                                   children: [
                                     Image.asset(
                                         'assets/images/stethoscope.png'),
-                                    SizedBox(
+                                    const SizedBox(
                                       height: 4,
                                     ),
-                                    Text(
+                                    const Text(
                                       'ประเมิน\nสุขภาพ',
                                       style: TextStyle(
                                         fontSize: 16,
@@ -299,17 +302,18 @@ class _HomePageState extends State<HomePage> {
                                       ]),
                                   borderRadius: BorderRadius.circular(30)),
                               child: Container(
-                                  padding: EdgeInsets.only(top: 10, bottom: 10),
+                                  padding: const EdgeInsets.only(
+                                      top: 10, bottom: 10),
                                   width: 100,
                                   alignment: Alignment.center,
                                   child: Column(
                                     children: [
                                       Image.asset(
                                           'assets/images/stretching.png'),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 4,
                                       ),
-                                      Text(
+                                      const Text(
                                         'โปรเเกรม\nสุขภาพ',
                                         style: TextStyle(
                                           fontSize: 16,
@@ -349,17 +353,18 @@ class _HomePageState extends State<HomePage> {
                                       ]),
                                   borderRadius: BorderRadius.circular(30)),
                               child: Container(
-                                  padding: EdgeInsets.only(top: 10, bottom: 10),
+                                  padding: const EdgeInsets.only(
+                                      top: 10, bottom: 10),
                                   width: 100,
                                   alignment: Alignment.center,
                                   child: Column(
                                     children: [
                                       Image.asset(
                                           'assets/images/heartbeat.png'),
-                                      SizedBox(
+                                      const SizedBox(
                                         height: 4,
                                       ),
-                                      Text(
+                                      const Text(
                                         'ความรู้\n',
                                         style: TextStyle(
                                           fontSize: 16,
@@ -377,7 +382,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 25,
               ),
               Padding(
@@ -389,10 +394,10 @@ class _HomePageState extends State<HomePage> {
                         Image.asset(
                           'assets/images/chartLine.png',
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 5,
                         ),
-                        Text(
+                        const Text(
                           'กราฟข้อมูลสุขภาพ',
                           style: TextStyle(
                             fontSize: 20,
@@ -403,7 +408,7 @@ class _HomePageState extends State<HomePage> {
                         )
                       ],
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 32,
                     ),
                     Material(
@@ -428,7 +433,7 @@ class _HomePageState extends State<HomePage> {
                                   Row(children: [
                                     Image.asset(
                                         'assets/images/heartPressure.png'),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 5,
                                     ),
                                     Text('ความดัน',
@@ -448,7 +453,7 @@ class _HomePageState extends State<HomePage> {
                                             color: Color(hexColor('#484554')),
                                             fontWeight: FontWeight.normal,
                                           )),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 5,
                                       ),
                                       Icon(
@@ -460,7 +465,7 @@ class _HomePageState extends State<HomePage> {
                                   )
                                 ],
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 15,
                               ),
                               Row(
@@ -470,16 +475,16 @@ class _HomePageState extends State<HomePage> {
                                               diastolicBloodPressure == '-'
                                           ? '-/-'
                                           : '$systolicBloodPressure/$diastolicBloodPressure',
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 20,
                                         fontFamily: 'IBMPlexSansThai',
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold,
                                       )),
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 5,
                                   ),
-                                  Text('mmHg',
+                                  const Text('mmHg',
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontFamily: 'IBMPlexSansThai',
@@ -493,7 +498,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Material(
@@ -508,7 +513,7 @@ class _HomePageState extends State<HomePage> {
                                   builder: (context) => const BMIChart()));
                         },
                         child: Padding(
-                          padding: EdgeInsets.all(17),
+                          padding: const EdgeInsets.all(17),
                           child: Column(
                             children: [
                               Row(
@@ -517,7 +522,7 @@ class _HomePageState extends State<HomePage> {
                                 children: [
                                   Row(children: [
                                     Image.asset('assets/images/runHuman.png'),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 5,
                                     ),
                                     Text('ค่าดัชนีมวลกาย',
@@ -537,7 +542,7 @@ class _HomePageState extends State<HomePage> {
                                             color: Color(hexColor('#484554')),
                                             fontWeight: FontWeight.normal,
                                           )),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 5,
                                       ),
                                       Icon(
@@ -549,23 +554,23 @@ class _HomePageState extends State<HomePage> {
                                   )
                                 ],
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 15,
                               ),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
                                   Text(bmi,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 20,
                                         fontFamily: 'IBMPlexSansThai',
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold,
                                       )),
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 5,
                                   ),
-                                  Text('กก./ม.²',
+                                  const Text('กก./ม.²',
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontFamily: 'IBMPlexSansThai',
@@ -579,7 +584,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Material(
@@ -594,7 +599,7 @@ class _HomePageState extends State<HomePage> {
                                   builder: (context) => const GlucoseChart()));
                         },
                         child: Padding(
-                          padding: EdgeInsets.all(17),
+                          padding: const EdgeInsets.all(17),
                           child: Column(
                             children: [
                               Row(
@@ -604,7 +609,7 @@ class _HomePageState extends State<HomePage> {
                                   Row(children: [
                                     Image.asset(
                                         'assets/images/bloodGlucose.png'),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 5,
                                     ),
                                     Text('ระดับน้ำตาล',
@@ -624,7 +629,7 @@ class _HomePageState extends State<HomePage> {
                                             color: Color(hexColor('#484554')),
                                             fontWeight: FontWeight.normal,
                                           )),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 5,
                                       ),
                                       Icon(
@@ -636,22 +641,22 @@ class _HomePageState extends State<HomePage> {
                                   )
                                 ],
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 15,
                               ),
                               Row(
                                 children: [
                                   Text(bloodGlucose,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 20,
                                         fontFamily: 'IBMPlexSansThai',
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold,
                                       )),
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 5,
                                   ),
-                                  Text('mg/dL',
+                                  const Text('mg/dL',
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontFamily: 'IBMPlexSansThai',
@@ -665,7 +670,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     Material(
@@ -680,7 +685,7 @@ class _HomePageState extends State<HomePage> {
                                   builder: (context) => const LipidChart()));
                         },
                         child: Padding(
-                          padding: EdgeInsets.all(17),
+                          padding: const EdgeInsets.all(17),
                           child: Column(
                             children: [
                               Row(
@@ -690,7 +695,7 @@ class _HomePageState extends State<HomePage> {
                                   Row(children: [
                                     Image.asset(
                                         'assets/images/cholesterolIcon.png'),
-                                    SizedBox(
+                                    const SizedBox(
                                       width: 5,
                                     ),
                                     Text('ไขมันในเลือด',
@@ -710,7 +715,7 @@ class _HomePageState extends State<HomePage> {
                                             color: Color(hexColor('#484554')),
                                             fontWeight: FontWeight.normal,
                                           )),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 5,
                                       ),
                                       Icon(
@@ -722,22 +727,22 @@ class _HomePageState extends State<HomePage> {
                                   )
                                 ],
                               ),
-                              SizedBox(
+                              const SizedBox(
                                 height: 15,
                               ),
                               Row(
                                 children: [
                                   Text(triglyceride,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 20,
                                         fontFamily: 'IBMPlexSansThai',
                                         color: Colors.black,
                                         fontWeight: FontWeight.bold,
                                       )),
-                                  SizedBox(
+                                  const SizedBox(
                                     width: 5,
                                   ),
-                                  Text('mg/dL',
+                                  const Text('mg/dL',
                                       style: TextStyle(
                                         fontSize: 16,
                                         fontFamily: 'IBMPlexSansThai',
@@ -751,7 +756,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 80,
                     ),
                   ]))

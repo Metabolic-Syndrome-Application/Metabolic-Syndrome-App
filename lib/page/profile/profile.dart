@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/home/home.dart';
@@ -11,6 +12,7 @@ import 'package:provider/provider.dart';
 
 import '../../authProvider.dart';
 
+@RoutePage()
 class Profile extends StatelessWidget {
   const Profile({super.key});
 
@@ -36,18 +38,15 @@ class _ProfilePageState extends State<ProfilePage> {
   String? status;
   bool hospitalConnected = false;
 
-  @override
-  void initState() {
-    super.initState();
-    fetchProfile();
-  }
-
   Future<void> fetchProfile() async {
     String? token = Provider.of<AuthProvider>(context, listen: false).token;
     try {
       Map<String, dynamic> response = await getProfile(token!);
       setState(() {
         alias = response['data']['user']['alias'];
+        if (response['data']['user']['hn'] != null) {
+          hospitalConnected = true;
+        }
       });
     } catch (e) {
       // print('Error fetching profile: $e');
@@ -64,6 +63,12 @@ class _ProfilePageState extends State<ProfilePage> {
     } catch (e) {
       // print('Error fetching profile: $e');
     }
+  }
+
+  @override
+  void initState() {
+    fetchProfile();
+    super.initState();
   }
 
   @override
@@ -163,10 +168,13 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 SizedBox(
-                  height: 40,
+                  height: 16,
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.white),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -340,7 +348,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) =>
-                                            hospitalConnect()));
+                                            const HospitalConnect()));
                               },
                               child: Container(
                                 child: Row(
@@ -515,10 +523,10 @@ class _ProfilePageState extends State<ProfilePage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(23.5),
                   ),
-                  onPressed: () async {
-                    await fetchLogout();
+                  onPressed: () {
+                    fetchLogout();
                     Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Login()));
+                        MaterialPageRoute(builder: (context) => const Login()));
                   },
                   child: Container(
                     height: 47,

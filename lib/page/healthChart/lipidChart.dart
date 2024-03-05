@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/page/healthChart/allLipidRecord.dart';
-import 'package:flutter_application_1/page/healthChart/allPressureRecord.dart';
+import 'package:flutter_application_1/page/home/home.dart';
+import 'package:flutter_application_1/page/nav.dart/nav.dart';
 import 'package:flutter_application_1/response/api.dart';
 import 'package:flutter_application_1/widget/chart/lipidChart.dart/dayChart.dart';
 import 'package:flutter_application_1/widget/chart/lipidChart.dart/sixMonthChart.dart';
@@ -11,7 +12,6 @@ import 'package:provider/provider.dart';
 
 import '../../extension/Color.dart';
 import '../../widget/chart/lipidChart.dart/monthChart.dart';
-import '../profile/healthChart.dart';
 
 class LipidChart extends StatefulWidget {
   const LipidChart({super.key});
@@ -336,7 +336,7 @@ class _LipidChartState extends State<LipidChart> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const HealthChart()));
+                                builder: (context) => const HomePage()));
                       },
                       child: Icon(
                         Icons.arrow_back_ios_new_rounded,

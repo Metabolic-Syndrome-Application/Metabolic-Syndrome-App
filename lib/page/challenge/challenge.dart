@@ -42,6 +42,7 @@ class _ChallengePageState extends State<ChallengePage> {
         name = myChallenge['name'];
         points = myChallenge['points'];
         numDays = myChallenge['numDays'];
+        print(myChallenge);
         fetchDailyList();
       });
     } catch (e) {
@@ -176,7 +177,9 @@ class _ChallengePageState extends State<ChallengePage> {
 
   @override
   void initState() {
-    fetchMydaily();
+    setState(() {
+      fetchMydaily();
+    });
     // fetchDailyList();
     super.initState();
   }
@@ -420,7 +423,7 @@ class _ChallengePageState extends State<ChallengePage> {
                       Container(
                         padding: const EdgeInsets.only(top: 6, bottom: 6),
                         height: 123,
-                        child: Image.asset('assets/images/login.png'),
+                        child: Image.asset('assets/images/hula-hoop.png'),
                       ),
                       const SizedBox(
                         width: 24,

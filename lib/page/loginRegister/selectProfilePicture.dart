@@ -1,10 +1,14 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/loginRegister/createProfile.dart';
+import 'package:flutter_application_1/response/api.dart';
 import 'package:flutter_application_1/utils.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter_application_1/resources/add_data.dart';
+import 'package:provider/provider.dart';
 
 class SelectProfilePicturePage extends StatefulWidget {
   final ImageProvider<Object>? profileImage;
@@ -37,6 +41,19 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
   String? _lastname;
   int? _yearOfBirth;
   String? _gender;
+  String? _id;
+
+  Future<void> fetchProfile() async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
+    try {
+      Map<String, dynamic> response = await getProfile(token!);
+      setState(() {
+        _id = response['data']['user']['id'];
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
+  }
 
   void cameraImage() async {
     Uint8List cameraImg = await pickImage(ImageSource.camera);
@@ -52,6 +69,17 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
       _image = img;
       _selectImage = MemoryImage(_image!);
     });
+  }
+
+  void saveProfile() async {
+    String id = _id!;
+    String resp = await StoreData().saveData(id: id, file: _image!);
+  }
+
+  @override
+  void initState() {
+    fetchProfile();
+    super.initState();
   }
 
   @override
@@ -333,6 +361,7 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
                     borderRadius: BorderRadius.circular(23.5),
                   ),
                   onPressed: () {
+                    // saveProfile();
                     Navigator.push(
                         context,
                         MaterialPageRoute(

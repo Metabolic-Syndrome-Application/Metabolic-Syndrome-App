@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "270276933005",
-    "project_id": "metabolic-app-1f577",
-    "storage_bucket": "metabolic-app-1f577.appspot.com"
+    "project_number": "816515833904",
+    "project_id": "fir-260dd",
+    "storage_bucket": "fir-260dd.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:270276933005:android:7f72bac6461354eac779c4",
+        "mobilesdk_app_id": "1:816515833904:android:3eff4f5ccee960c5d04df5",
         "android_client_info": {
           "package_name": "com.example.flutter_application_1"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBfVggdNV2n-dZ_NydB6foapg55E1ulv4o"
+          "current_key": "AIzaSyCJAw64yXjhUhVzoaiZC7tgnvCWjNnMy9c"
         }
       ],
       "services": {

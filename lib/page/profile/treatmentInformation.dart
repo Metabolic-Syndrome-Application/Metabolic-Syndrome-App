@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/page/profile/profile.dart';
+import 'package:flutter_application_1/response/api.dart';
+import 'package:provider/provider.dart';
 
 import '../../extension/Color.dart';
 
@@ -23,6 +26,32 @@ class TreatmentInformationPage extends StatefulWidget {
 }
 
 class _TreatmentInformationPageState extends State<TreatmentInformationPage> {
+  String doctorPrefix = '';
+  String doctorFirstname = '';
+  String doctorLastname = '';
+  String disease = '';
+  Future<void> fetchProfile() async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
+    try {
+      Map<String, dynamic> response = await getProfile(token!);
+      setState(() {
+        doctorPrefix = response['data']['user']['mainDoctor']['prefix'];
+        doctorFirstname = response['data']['user']['mainDoctor']['firstName'];
+        doctorLastname = response['data']['user']['mainDoctor']['lastName'];
+        disease = response['data']['user']['disease'];
+        print(doctorPrefix);
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchProfile();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,7 +132,7 @@ class _TreatmentInformationPageState extends State<TreatmentInformationPage> {
                             width: 1, color: Color(hexColor('#E9E9E9'))),
                       ),
                       child: Text(
-                        'นายเเพทย์สมรักษ์ คำดี',
+                        '$doctorPrefix $doctorFirstname $doctorLastname',
                         style: TextStyle(
                           fontSize: 14,
                           fontFamily: 'IBMPlexSansThai',
@@ -138,7 +167,7 @@ class _TreatmentInformationPageState extends State<TreatmentInformationPage> {
                             width: 1, color: Color(hexColor('#E9E9E9'))),
                       ),
                       child: Text(
-                        'ความดันโลหิตสูง',
+                        '$disease',
                         style: TextStyle(
                           fontSize: 14,
                           fontFamily: 'IBMPlexSansThai',

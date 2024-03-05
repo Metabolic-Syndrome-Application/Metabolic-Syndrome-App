@@ -34,6 +34,26 @@ Future<Map<String, dynamic>> postRegister(
   return json.decode(response.body);
 }
 
+Future<Map<String, dynamic>> postConnect(
+  String accessToken,
+  String otp,
+) async {
+  final url = Uri.parse("http://$hostIP:8000/api/connect/submit-otp");
+  final response = await http.post(url,
+      headers: {'Authorization': 'Bearer $accessToken'},
+      body: json.encode({
+        "otp": otp,
+      }));
+  print(otp);
+  print(response.body);
+  if (response.statusCode == 200) {
+    // print(response.body);
+    return json.decode(response.body);
+  } else {
+    throw Exception('Failed to connect hospital');
+  }
+}
+
 Future<Map<String, dynamic>> getProfile(String accessToken) async {
   final url = Uri.parse("http://$hostIP:8000/api/user/profile");
 
@@ -200,6 +220,7 @@ Future<Map<String, dynamic>> getBloodPressure(String accesstoken) async {
     headers: {'Authorization': 'Bearer $accesstoken'},
   );
   if (response.statusCode == 200) {
+    // print(json.decode(response.body));
     return json.decode(response.body);
   } else {
     throw Exception('Failed to get blood pressure');
@@ -357,11 +378,9 @@ Future<Map<String, dynamic>> getPlan(String accesstoken, String date) async {
     url,
     headers: {'Authorization': 'Bearer $accesstoken'},
   );
-  if (response.statusCode == 200) {
-    return json.decode(response.body);
-  } else {
-    throw Exception('Failed to get plan');
-  }
+  print('API ${json.decode(response.body)}');
+
+  return json.decode(response.body);
 }
 
 Future<Map<String, dynamic>> getAllPlan(String accesstoken) async {
@@ -466,11 +485,11 @@ Future<Map<String, dynamic>> getMyDaily(String accesstoken) async {
     url,
     headers: {'Authorization': 'Bearer $accesstoken'},
   );
-  if (response.statusCode == 200) {
+  // if (response.statusCode == 200) {
     return json.decode(response.body);
-  } else {
-    throw Exception('Failed to get plan');
-  }
+  // } else {
+  //   throw Exception('Failed to get plan');
+  // }
 }
 
 Future<Map<String, dynamic>> getDailyList(String accesstoken) async {
@@ -511,11 +530,11 @@ Future<Map<String, dynamic>> postJoinChallenge(
         "challengeID": challenge,
       }));
 
-  if (response.statusCode == 200) {
-    return json.decode(response.body);
-  } else {
-    throw Exception('Failed to Update Profile');
-  }
+  // if (response.statusCode == 200) {
+  return json.decode(response.body);
+  // } else {
+  //   throw Exception('Failed to Update Profile');
+  // }
 }
 
 Future<Map<String, dynamic>> postUpdateChallenge(
@@ -549,21 +568,3 @@ Future<Map<String, dynamic>> getKnowledge(
     throw Exception('Failed to get top 5');
   }
 }
-
-
-
-// Future<Map<String, dynamic>> getAllKnowledge(String accessToken) async {
-//   final url = Uri.parse("http://$hostIP:8000/api/rank/top5");
-
-//   final response = await http.get(
-//     url,
-//     headers: {'Authorization': 'Bearer $accessToken'},
-//   );
-
-//   if (response.statusCode == 200) {
-//     // print(response.body);
-//     return json.decode(response.body);
-//   } else {
-//     throw Exception('Failed to get top 5');
-//   }
-// }

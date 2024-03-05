@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/healthChart/allGlucoseRecord.dart';
+import 'package:flutter_application_1/page/home/home.dart';
+import 'package:flutter_application_1/page/nav.dart/nav.dart';
 import 'package:flutter_application_1/page/profile/healthChart.dart';
 import 'package:flutter_application_1/response/api.dart';
 import 'package:flutter_application_1/widget/chart/glucoseChart/dayChart.dart';
@@ -328,10 +330,10 @@ class _GlucoseChartState extends State<GlucoseChart> {
                     InkWell(
                       borderRadius: BorderRadius.circular(12),
                       onTap: () {
-                        Navigator.push(
+                       Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const HealthChart()));
+                                builder: (context) => const HomePage()));
                       },
                       child: Icon(
                         Icons.arrow_back_ios_new_rounded,

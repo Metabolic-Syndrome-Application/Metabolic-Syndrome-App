@@ -31,7 +31,6 @@ class ChangeProfile extends StatefulWidget {
 }
 
 class _ChangeProfileState extends State<ChangeProfile> {
-  final List<int> items = [];
   int? selectedYear;
   String? selectedGender;
 
@@ -41,6 +40,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
   String? lastname;
   int? yearOfBirth;
   String? gender;
+  String? hn;
 
   String? aliasHint;
   String? firstnameHint;
@@ -51,7 +51,6 @@ class _ChangeProfileState extends State<ChangeProfile> {
   Future<void> fetchUpdateProfile(String? alias, String? firstname,
       String? lastname, int? yearOfBirth, String? gender, String? photo) async {
     String? token = Provider.of<AuthProvider>(context, listen: false).token;
-    print('pop');
     await updateProfile(
         token!, alias, firstname, lastname, yearOfBirth, gender, photo);
     setState(() {
@@ -69,6 +68,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
         lastnameHint = response['data']['user']['lastName'];
         yearOfBirthHint = response['data']['user']['yearOfBirth'];
         genderHint = response['data']['user']['gender'];
+        hn = response['data']['user']['hn'];
       });
     } catch (e) {
       // print('Error fetching profile: $e');
@@ -121,8 +121,10 @@ class _ChangeProfileState extends State<ChangeProfile> {
                     InkWell(
                       borderRadius: BorderRadius.circular(12),
                       onTap: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => Profile()));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const Profile()));
                       },
                       child: Icon(
                         Icons.arrow_back_ios_new_rounded,
@@ -130,7 +132,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
                         size: 24,
                       ),
                     ),
-                    Text(
+                    const Text(
                       'แก้ไขโปรไฟล์',
                       style: TextStyle(
                         fontSize: 24,
@@ -139,7 +141,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 24,
                     ),
                   ]),
@@ -152,7 +154,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
                   children: [
                     Column(
                       children: [
-                        SizedBox(
+                        const SizedBox(
                           height: 19,
                         ),
                         Stack(
@@ -175,7 +177,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
                             Container(
                                 height: 120,
                                 width: 105,
-                                padding: EdgeInsets.only(right: 13),
+                                padding: const EdgeInsets.only(right: 13),
                                 alignment: Alignment.bottomRight,
                                 child: InkWell(
                                     onTap: () {
@@ -205,13 +207,13 @@ class _ChangeProfileState extends State<ChangeProfile> {
                                         'assets/images/healthInfo.png'))),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 22,
                         ),
                         Container(
-                          padding: EdgeInsets.only(left: 8, bottom: 8),
+                          padding: const EdgeInsets.only(left: 8, bottom: 8),
                           alignment: Alignment.centerLeft,
-                          child: Text(
+                          child: const Text(
                             'นามแฝง',
                             style: TextStyle(
                               fontSize: 16,
@@ -235,7 +237,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
                               textAlignVertical: TextAlignVertical.center,
                               decoration: InputDecoration(
                                 contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 15),
+                                    const EdgeInsets.symmetric(horizontal: 15),
                                 hintText: aliasHint ?? '',
                                 hintStyle: TextStyle(
                                   fontSize: 16,
@@ -260,7 +262,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
                                     )),
                               ),
                             )),
-                        SizedBox(
+                        const SizedBox(
                           height: 14,
                         ),
                         Row(
@@ -269,10 +271,10 @@ class _ChangeProfileState extends State<ChangeProfile> {
                               child: Column(
                                 children: [
                                   Container(
-                                    padding:
-                                        EdgeInsets.only(left: 8, bottom: 8),
+                                    padding: const EdgeInsets.only(
+                                        left: 8, bottom: 8),
                                     alignment: Alignment.centerLeft,
-                                    child: Text(
+                                    child: const Text(
                                       'ชื่อ',
                                       style: TextStyle(
                                         fontSize: 16,
@@ -286,6 +288,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
                                       height: 47,
                                       alignment: Alignment.center,
                                       child: TextField(
+                                        readOnly: hn == null ? false : true,
                                         controller: _controllerFirstname,
                                         onChanged: (value) {
                                           setState(() {
@@ -339,10 +342,10 @@ class _ChangeProfileState extends State<ChangeProfile> {
                               child: Column(
                                 children: [
                                   Container(
-                                    padding:
-                                        EdgeInsets.only(left: 8, bottom: 8),
+                                    padding: const EdgeInsets.only(
+                                        left: 8, bottom: 8),
                                     alignment: Alignment.centerLeft,
-                                    child: Text(
+                                    child: const Text(
                                       'นามสกุล',
                                       style: TextStyle(
                                         fontSize: 16,
@@ -356,6 +359,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
                                       height: 47,
                                       alignment: Alignment.center,
                                       child: TextField(
+                                        readOnly: hn == null ? false : true,
                                         controller: _controllerLastname,
                                         onChanged: (value) {
                                           setState(() {
@@ -366,10 +370,11 @@ class _ChangeProfileState extends State<ChangeProfile> {
                                         textAlignVertical:
                                             TextAlignVertical.center,
                                         decoration: InputDecoration(
-                                          contentPadding: EdgeInsets.symmetric(
-                                              horizontal: 15),
+                                          contentPadding:
+                                              const EdgeInsets.symmetric(
+                                                  horizontal: 15),
                                           hintText: lastnameHint,
-                                          hintStyle: TextStyle(
+                                          hintStyle: const TextStyle(
                                             fontSize: 16,
                                             fontFamily: 'IBMPlexSansThai',
                                             color: Colors.grey,
@@ -403,13 +408,13 @@ class _ChangeProfileState extends State<ChangeProfile> {
                             ),
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 14,
                         ),
                         Container(
-                          padding: EdgeInsets.only(left: 8, bottom: 8),
+                          padding: const EdgeInsets.only(left: 8, bottom: 8),
                           alignment: Alignment.centerLeft,
-                          child: Text(
+                          child: const Text(
                             'ปีเกิด',
                             style: TextStyle(
                               fontSize: 16,
@@ -422,15 +427,15 @@ class _ChangeProfileState extends State<ChangeProfile> {
                         DropdownButtonHideUnderline(
                           child: DropdownButton2<int>(
                             isExpanded: true,
-                            hint: const Row(
+                            hint: Row(
                               children: [
-                                SizedBox(
+                                const SizedBox(
                                   width: 4,
                                 ),
                                 Expanded(
                                   child: Text(
-                                    'เลือกปีเกิด', //-----------------default
-                                    style: TextStyle(
+                                    "${widget.yearOfBirth ?? selectedYear ?? yearOfBirthHint}", //-----------------default
+                                    style: const TextStyle(
                                       fontSize: 16,
                                       fontFamily: 'IBMPlexSansThai',
                                       color: Colors.grey,
@@ -523,13 +528,13 @@ class _ChangeProfileState extends State<ChangeProfile> {
                             ),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 14,
                         ),
                         Container(
-                          padding: EdgeInsets.only(left: 8, bottom: 8),
+                          padding: const EdgeInsets.only(left: 8, bottom: 8),
                           alignment: Alignment.centerLeft,
-                          child: Text(
+                          child: const Text(
                             'เพศ',
                             style: TextStyle(
                               fontSize: 16,
@@ -549,7 +554,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    'เลือกเพศของคุณ',
+                                    "เลือกเพศ",
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontFamily: 'IBMPlexSansThai',
@@ -636,7 +641,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
                             ),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 33,
                         ),
                       ],
@@ -671,7 +676,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
                           height: 47,
                           width: 350,
                           alignment: Alignment.center,
-                          child: Text("บันทึก",
+                          child: const Text("บันทึก",
                               style: TextStyle(
                                   fontSize: 20,
                                   fontFamily: 'IBMPlexSansThai',

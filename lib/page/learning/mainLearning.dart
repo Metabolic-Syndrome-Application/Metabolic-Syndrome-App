@@ -1,46 +1,36 @@
 import 'package:buttons_tabbar/buttons_tabbar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/page/learning/searchLearning.dart';
-import 'package:flutter_application_1/response/api.dart';
 import 'package:flutter_application_1/widget/learning/allArticle.dart';
-import 'package:flutter_application_1/widget/learning/behavierArticle.dart';
-import 'package:flutter_application_1/widget/learning/foodArticle.dart';
-import 'package:flutter_application_1/widget/learning/medicineArticle.dart';
-import 'package:provider/provider.dart';
 
 import '../../extension/Color.dart';
 
 class MainLearning extends StatefulWidget {
-  final String disease;
-  const MainLearning(this.disease, {super.key});
+  // final String disease;
+  final String photo;
+  final String name;
+  final String details;
+  final String symptoms;
+  final String medications;
+  final String behaviors;
+  const MainLearning({
+    super.key,
+    required this.photo,
+    required this.name,
+    required this.details,
+    required this.symptoms,
+    required this.medications,
+    required this.behaviors,
+  });
 
   @override
   State<MainLearning> createState() => _MainLearningState();
 }
 
 class _MainLearningState extends State<MainLearning> {
-  String name = '';
-  String detail = '';
-  String symtomps = '';
-  String medications = '';
-  String behaviors = '';
-
-  Future<void> fetchKnowledge(String disease) async {
-    try {
-      String? token = Provider.of<AuthProvider>(context, listen: false).token;
-      Map<String, dynamic> response = await getKnowledge(token!, disease);
-      setState(() {
-        print(response);
-      });
-    } catch (e) {
-      // print('Error fetching profile: $e');
-    }
-  }
-
   @override
   void initState() {
-    fetchKnowledge(widget.disease);
+    // fetchKnowledge(widget.disease);
     super.initState();
   }
 
@@ -52,7 +42,7 @@ class _MainLearningState extends State<MainLearning> {
         length: 4,
         child: Column(
           children: <Widget>[
-            SizedBox(
+            const SizedBox(
               height: 58,
             ),
             Padding(
@@ -66,7 +56,8 @@ class _MainLearningState extends State<MainLearning> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => SearchingLearning()));
+                                builder: (context) =>
+                                    const SearchingLearning()));
                       },
                       child: Icon(
                         Icons.arrow_back_ios_new_rounded,
@@ -75,32 +66,32 @@ class _MainLearningState extends State<MainLearning> {
                       ),
                     ),
                     Text(
-                      'โรคอ้วน',
-                      style: TextStyle(
+                      widget.name,
+                      style: const TextStyle(
                         fontSize: 24,
                         fontFamily: 'IBMPlexSansThai',
                         color: Colors.black,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       width: 24,
                     )
                   ]),
             ),
-            SizedBox(
+            const SizedBox(
               height: 35,
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: ButtonsTabBar(
                 height: 32,
-                buttonMargin: EdgeInsets.symmetric(horizontal: 5),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                buttonMargin: const EdgeInsets.symmetric(horizontal: 5),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
                 borderColor: Color(hexColor('#2F4EF1')),
                 backgroundColor: Color(hexColor('#2F4EF1')),
                 unselectedBackgroundColor: Colors.white,
-                labelStyle: TextStyle(
+                labelStyle: const TextStyle(
                   fontSize: 16,
                   fontFamily: 'IBMPlexSansThai',
                   color: Colors.white,
@@ -137,10 +128,28 @@ class _MainLearningState extends State<MainLearning> {
             Expanded(
               child: TabBarView(
                 children: <Widget>[
-                  AllArticle(),
-                  FoodArticle(),
-                  MedicineArticle(),
-                  BehavierArticle(),
+                  AllArticle(
+                    photo: widget.photo,
+                    name: widget.name,
+                    details: widget.details,
+                    symptoms: widget.symptoms,
+                    medications: widget.medications,
+                    behaviors: widget.behaviors,
+                  ),
+                  AllArticle(
+                    photo: widget.photo,
+                    name: widget.name,
+                    details: widget.details,
+                    symptoms: widget.symptoms,
+                  ),
+                  AllArticle(
+                    photo: widget.photo,
+                    medications: widget.medications,
+                  ),
+                  AllArticle(
+                    photo: widget.photo,
+                    behaviors: widget.behaviors,
+                  ),
                 ],
               ),
             ),

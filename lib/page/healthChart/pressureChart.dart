@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/page/healthChart/allPressureRecord.dart';
-import 'package:flutter_application_1/page/nav.dart/nav.dart';
+import 'package:flutter_application_1/page/home/home.dart';
 import 'package:flutter_application_1/response/api.dart';
 import 'package:flutter_application_1/widget/chart/pressureChart.dart/dayChart.dart';
 import 'package:flutter_application_1/widget/chart/pressureChart.dart/sixMonthChart.dart';
@@ -12,27 +12,15 @@ import 'package:provider/provider.dart';
 
 import '../../extension/Color.dart';
 import '../../widget/chart/pressureChart.dart/monthChart.dart';
-import '../profile/healthChart.dart';
 
-class PressureChart extends StatelessWidget {
+class PressureChart extends StatefulWidget {
   const PressureChart({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: PressureChartPage(),
-    );
-  }
+  State<PressureChart> createState() => _PressureChartState();
 }
 
-class PressureChartPage extends StatefulWidget {
-  const PressureChartPage({super.key});
-
-  @override
-  State<PressureChartPage> createState() => _PressureChartPageState();
-}
-
-class _PressureChartPageState extends State<PressureChartPage> {
+class _PressureChartState extends State<PressureChart> {
   String? period = 'day';
   int _systolicPressure = 0;
   int _diastolicPressure = 0;
@@ -480,9 +468,7 @@ class _PressureChartPageState extends State<PressureChartPage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const Navbar(
-                                      selectedIndex: 0,
-                                    )));
+                                builder: (context) => const HomePage()));
                       },
                       child: Icon(
                         Icons.arrow_back_ios_new_rounded,

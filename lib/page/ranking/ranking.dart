@@ -74,8 +74,8 @@ class _RankingState extends State<Ranking> {
     for (int x = 0; x <= 4; x++) {
       if (x <= listOfRank.length - 1) {
         rank.add(Container(
-          margin: EdgeInsets.only(bottom: 13),
-          padding: EdgeInsets.only(left: 20, right: 20),
+          margin: const EdgeInsets.only(bottom: 13),
+          padding: const EdgeInsets.only(left: 20, right: 20),
           height: 70,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30), color: Colors.white),
@@ -86,28 +86,30 @@ class _RankingState extends State<Ranking> {
                 children: [
                   Text(
                     '0${x + 1}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 24,
                       fontFamily: 'IBMPlexSansThai',
                       color: Colors.black,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
-                  CircleAvatar(
+                  const CircleAvatar(
                     radius: 20,
                     backgroundImage: AssetImage('assets/images/person.png'),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 7,
                   ),
                   Text(
-                    listOfRank[x]['name'] == ''
-                        ? firstname
-                        : listOfRank[x]['name'],
-                    style: TextStyle(
+                    listOfRank[x]['name']
+                    // == ''
+                    //     ? firstname
+                    //     : listOfRank[x]['name']
+                    ,
+                    style: const TextStyle(
                       fontSize: 16,
                       fontFamily: 'IBMPlexSansThai',
                       color: Colors.black,
@@ -119,7 +121,7 @@ class _RankingState extends State<Ranking> {
               Row(
                 children: [
                   Image.asset('assets/images/coin.png', height: 24),
-                  SizedBox(
+                  const SizedBox(
                     width: 5,
                   ),
                   Text(
@@ -138,8 +140,8 @@ class _RankingState extends State<Ranking> {
         ));
       } else {
         rank.add(Container(
-          margin: EdgeInsets.only(bottom: 13),
-          padding: EdgeInsets.only(left: 20, right: 20),
+          margin: const EdgeInsets.only(bottom: 13),
+          padding: const EdgeInsets.only(left: 20, right: 20),
           height: 70,
           decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(30), color: Colors.white),
@@ -150,24 +152,24 @@ class _RankingState extends State<Ranking> {
                 children: [
                   Text(
                     '0${x + 1}',
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 24,
                       fontFamily: 'IBMPlexSansThai',
                       color: Colors.black,
                       fontWeight: FontWeight.normal,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
-                  CircleAvatar(
+                  const CircleAvatar(
                     radius: 20,
                     backgroundImage: AssetImage('assets/images/person.png'),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 7,
                   ),
-                  Text(
+                  const Text(
                     '-',
                     style: TextStyle(
                       fontSize: 16,
@@ -181,7 +183,7 @@ class _RankingState extends State<Ranking> {
               Row(
                 children: [
                   Image.asset('assets/images/coin.png', height: 24),
-                  SizedBox(
+                  const SizedBox(
                     width: 5,
                   ),
                   Text(
@@ -201,8 +203,8 @@ class _RankingState extends State<Ranking> {
       }
     }
     rank.add(Container(
-      margin: EdgeInsets.only(bottom: 13),
-      padding: EdgeInsets.only(left: 20, right: 20),
+      margin: const EdgeInsets.only(bottom: 13),
+      padding: const EdgeInsets.only(left: 20, right: 20),
       height: 70,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
@@ -218,7 +220,7 @@ class _RankingState extends State<Ranking> {
                   myRank.toString().length == 1
                       ? '0$myRank'
                       : myRank.toString(),
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 24,
                     fontFamily: 'IBMPlexSansThai',
                     color: Colors.black,
@@ -226,19 +228,19 @@ class _RankingState extends State<Ranking> {
                   ),
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 20,
                 backgroundImage: AssetImage('assets/images/person.png'),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 7,
               ),
               Text(
                 name == '' ? firstname : name,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontFamily: 'IBMPlexSansThai',
                   color: Colors.black,
@@ -250,7 +252,7 @@ class _RankingState extends State<Ranking> {
           Row(
             children: [
               Image.asset('assets/images/coin.png', height: 24),
-              SizedBox(
+              const SizedBox(
                 width: 5,
               ),
               Text(
@@ -272,7 +274,7 @@ class _RankingState extends State<Ranking> {
       backgroundColor: Color(hexColor('#FAFCFB')),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.only(top: 58, left: 20, right: 20),
+          padding: const EdgeInsets.only(top: 58, left: 20, right: 20),
           child: Column(
             children: [
               Row(
@@ -285,7 +287,7 @@ class _RankingState extends State<Ranking> {
                           context,
                           PageTransition(
                               type: PageTransitionType.leftToRight,
-                              child: HomePage()));
+                              child: const HomePage()));
                     },
                     child: Icon(
                       Icons.arrow_back_ios_new_rounded,
@@ -293,7 +295,7 @@ class _RankingState extends State<Ranking> {
                       size: 24,
                     ),
                   ),
-                  Text(
+                  const Text(
                     'กระดานคนเก่ง',
                     style: TextStyle(
                       fontSize: 24,
@@ -302,64 +304,77 @@ class _RankingState extends State<Ranking> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(
+                  const SizedBox(
                     width: 24,
                   )
                 ],
               ),
-              SizedBox(height: 34),
-              Container(
-                  padding: EdgeInsets.only(left: 20),
-                  height: 138,
-                  decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                          colors: [
-                            Color.fromARGB(255, 255, 205, 131),
-                            Color.fromARGB(117, 255, 205, 131),
-                          ]),
-                      borderRadius: BorderRadius.circular(30)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'เก่งที่สุด !',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontFamily: 'IBMPlexSansThai',
-                              color: Colors.black,
-                              fontWeight: FontWeight.bold,
+              const SizedBox(height: 34),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                                begin: Alignment.centerLeft,
+                                end: Alignment.centerRight,
+                                colors: [
+                                  Color.fromARGB(255, 255, 205, 131),
+                                  Color.fromARGB(117, 255, 205, 131),
+                                ]),
+                            borderRadius: BorderRadius.circular(30)),
+                        child: Stack(
+                          alignment: Alignment.centerLeft,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Image.asset('assets/images/trophy.png'),
+                              ],
                             ),
-                          ),
-                          Text(
-                            'วันนี้ก็มาพยายามต่อด้วยกันนะ',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'IBMPlexSansThai',
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal,
+                            const Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'เก่งที่สุด !',
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontFamily: 'IBMPlexSansThai',
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Text(
+                                  'วันนี้ก็มาพยายามต่อด้วยกันนะ',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontFamily: 'IBMPlexSansThai',
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.normal,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                      Image.asset('assets/images/trophy.png')
-                    ],
-                  )),
-              SizedBox(
+                          ],
+                        )),
+                  ),
+                ],
+              ),
+              const SizedBox(
                 height: 36,
               ),
               Row(
                 children: [
                   Image.asset('assets/images/leaderboard.png'),
-                  SizedBox(
+                  const SizedBox(
                     width: 5,
                   ),
-                  Text(
+                  const Text(
                     'อันดับ',
                     style: TextStyle(
                       fontSize: 20,
@@ -370,7 +385,7 @@ class _RankingState extends State<Ranking> {
                   ),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 18,
               ),
               Container(
@@ -381,16 +396,16 @@ class _RankingState extends State<Ranking> {
                   children: rank,
                 ),
               ),
-              SizedBox(
+              const SizedBox(
                 height: 45,
               ),
               Row(
                 children: [
                   Image.asset('assets/images/coins.png'),
-                  SizedBox(
+                  const SizedBox(
                     width: 5,
                   ),
-                  Text(
+                  const Text(
                     'คะเเนนของฉัน',
                     style: TextStyle(
                       fontSize: 20,
@@ -401,7 +416,7 @@ class _RankingState extends State<Ranking> {
                   ),
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 16,
               ),
               Row(
@@ -414,7 +429,7 @@ class _RankingState extends State<Ranking> {
                         //points
                       },
                       child: Image.asset('assets/images/piggyBank.png')),
-                  SizedBox(
+                  const SizedBox(
                     width: 10,
                   ),
                   Text(
@@ -428,7 +443,7 @@ class _RankingState extends State<Ranking> {
                   )
                 ],
               ),
-              SizedBox(
+              const SizedBox(
                 height: 21,
               ),
               // Container(
@@ -461,7 +476,7 @@ class _RankingState extends State<Ranking> {
               //     ],
               //   ),
               // ),
-              SizedBox(
+              const SizedBox(
                 height: 220,
               )
             ],

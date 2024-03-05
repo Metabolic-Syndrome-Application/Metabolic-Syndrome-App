@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_application_1/response/api.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+@RoutePage()
 class SelectedDate extends StatelessWidget {
   final DateTime selectedDate;
   final bool hasPlan;
@@ -31,8 +33,7 @@ class SelectedDatePage extends StatefulWidget {
 
 class _SelectedDatePageState extends State<SelectedDatePage> {
   String selectedfilter = "ทั้งหมด";
-
-  final List<String> items = [];
+  List<String> items = [];
 
   int initial = 1;
   late final CustomSegmentedController<int> controller;
@@ -40,7 +41,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
   int pageChanged = 1;
   DateFormat f = DateFormat('dd/MM/yyyy');
   DateFormat formatForCheck = DateFormat('yyyy-MM-dd 00:00:00.000');
-  PageController _pageController = PageController();
+  final PageController _pageController = PageController();
 
   bool isChecked1 = false;
   bool isChecked2 = false;
@@ -131,7 +132,6 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
     showDialog(
         context: context,
         barrierDismissible: false,
-        //context: _scaffoldKey.currentContext,
         builder: (context) {
           return AlertDialog(
             titlePadding: const EdgeInsets.only(top: 0),
@@ -435,43 +435,46 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
   List<Item> listOfPlan = [];
 
   Future<void> fetchPlan(DateTime selectDate) async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
     try {
-      String? token = Provider.of<AuthProvider>(context, listen: false).token;
       final DateFormat formatter = DateFormat('yyyy-MM-dd');
       Map<String, dynamic> response =
           await getPlan(token!, formatter.format(selectDate).toString());
-
-      listOfPlan.clear();
-      items.clear();
-      items.add('ทั้งหมด');
-      for (var item in response['data']['list']) {
-        listOfPlan.add(Item(
-          name: item['name'],
-          check: item['check'],
-          type: item['type'],
-        ));
-        if (!items.contains(item['type'] == "food"
-            ? "อาหาร"
-            : item['type'] == "exercise"
-                ? "ออกกำลังกาย"
-                : item['type'] == "rest"
-                    ? "พักผ่อน"
-                    : item['type'] == "health"
-                        ? "สุขภาพ"
-                        : null)) {
-          if (item['type'] == "food") {
-            items.add("อาหาร");
-          } else if (item['type'] == "exercise") {
-            items.add("ออกกำลังกาย");
-          } else if (item['type'] == "rest") {
-            items.add("พักผ่อน");
-          } else if (item['type'] == "health") {
-            items.add("สุขภาพ");
+      setState(() {
+        dynamic resp = response;
+        print(resp);
+        items.add('ทั้งหมด');
+        for (var item in resp['data']['list']) {
+          listOfPlan.add(Item(
+            name: item['name'],
+            check: item['check'],
+            type: item['type'],
+          ));
+          if (!items.contains(item['type'] == "food"
+              ? "อาหาร"
+              : item['type'] == "exercise"
+                  ? "ออกกำลังกาย"
+                  : item['type'] == "rest"
+                      ? "พักผ่อน"
+                      : item['type'] == "health"
+                          ? "สุขภาพ"
+                          : null)) {
+            if (item['type'] == "food") {
+              items.add("อาหาร");
+            } else if (item['type'] == "exercise") {
+              items.add("ออกกำลังกาย");
+            } else if (item['type'] == "rest") {
+              items.add("พักผ่อน");
+            } else if (item['type'] == "health") {
+              items.add("สุขภาพ");
+            }
           }
         }
-      }
+      });
+      // listOfPlan.clear();
+      // items.clear();
     } catch (e) {
-      // print('Error fetching profile: $e');
+      print('Error fetching profile: $e');
     }
   }
 
@@ -507,6 +510,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
 
   @override
   void initState() {
+    fetchPlan(widget.selectedDate);
     checkEnable(widget.selectedDate);
     fetchLatest();
     fetchBloodPressure(widget.selectedDate);
@@ -514,7 +518,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
     fetchWaistline(widget.selectedDate);
     fetchBloodGlucose(widget.selectedDate);
     fetchBloodLipid(widget.selectedDate);
-    fetchPlan(widget.selectedDate);
+
     controller = CustomSegmentedController();
     _controllerHeight = TextEditingController(
         text: height == 0 ? null : height.round().toString());
@@ -611,10 +615,90 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                             InkWell(
                               borderRadius: BorderRadius.circular(12),
                               onTap: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => CalendarPage()));
+                                setState(() {
+                                  initial = 1;
+                                  if ((_controllerSystolicBloodPressure.text ==
+                                              "" ||
+                                          _controllerDiastolicBloodPressure
+                                                  .text ==
+                                              "" ||
+                                          _controllerPulseRate.text == "") &&
+                                      !(_controllerSystolicBloodPressure
+                                                  .text ==
+                                              "" &&
+                                          _controllerDiastolicBloodPressure
+                                                  .text ==
+                                              "" &&
+                                          _controllerPulseRate.text == "")) {
+                                    checkBloodPressure = true;
+                                  }
+
+                                  if ((_controllerCholesterol.text == "" ||
+                                          _controllerHdl.text == "" ||
+                                          _controllerLdl.text == "" ||
+                                          _controllerTriglyceride.text == "") &&
+                                      !(_controllerCholesterol.text == "" &&
+                                          _controllerHdl.text == "" &&
+                                          _controllerLdl.text == "" &&
+                                          _controllerTriglyceride.text == "")) {
+                                    checkBloodLipids = true;
+                                  }
+                                  if (_controllerSystolicBloodPressure.text ==
+                                          '' &&
+                                      _controllerDiastolicBloodPressure.text ==
+                                          '' &&
+                                      _controllerPulseRate.text == '' &&
+                                      _controllerHeight.text == '' &&
+                                      _controllerWeight.text == '' &&
+                                      _controllerWaistline.text == '' &&
+                                      _controllerBloodGlucose.text == '' &&
+                                      _controllerCholesterol.text == '' &&
+                                      _controllerHdl.text == '' &&
+                                      _controllerLdl.text == '' &&
+                                      _controllerTriglyceride.text == '') {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const CalendarPage()));
+                                  } else {
+                                    if (checkBloodPressure == false &&
+                                        checkBloodLipids == false) {
+                                      fetchRecord();
+                                      fetchLatest();
+                                      _controllerSystolicBloodPressure.text =
+                                          "";
+                                      _controllerDiastolicBloodPressure.text =
+                                          "";
+                                      _controllerPulseRate.text = "";
+                                      _controllerHeight.text = "";
+                                      _controllerWeight.text = "";
+                                      _controllerWaistline.text = "";
+                                      _controllerBloodGlucose.text = "";
+                                      _controllerCholesterol.text = "";
+                                      _controllerHdl.text = "";
+                                      _controllerLdl.text = "";
+                                      _controllerTriglyceride.text = "";
+                                      systolicBloodPressure = 0;
+                                      diastolicBloodPressure = 0;
+                                      pulseRate = 0;
+                                      height = 0;
+                                      weight = 0;
+                                      waistline = 0;
+                                      bloodGlucose = 0;
+                                      cholesterol = 0;
+                                      hdl = 0;
+                                      ldl = 0;
+                                      triglyceride = 0;
+
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const CalendarPage()));
+                                    }
+                                  }
+                                });
                               },
                               child: Icon(
                                 Icons.arrow_back_ios_new_rounded,
@@ -622,16 +706,16 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                 size: 24,
                               ),
                             ),
-                            Text(
+                            const Text(
                               "บันทึก",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 24,
                                 fontFamily: 'IBMPlexSansThai',
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               width: 24,
                             )
                           ]),
@@ -785,7 +869,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                       child: SingleChildScrollView(
                         child: Column(
                           children: [
-                            SizedBox(
+                            const SizedBox(
                               height: 30,
                             ),
                             Row(
@@ -796,7 +880,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                     selectedDate == today
                                         ? 'วันนี้'
                                         : 'วันที่ $selectedDate',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 20,
                                       fontFamily: 'IBMPlexSansThai',
                                       color: Colors.black,
@@ -932,11 +1016,11 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                 ? SingleChildScrollView(
                                     child: Column(
                                       children: [
-                                        SizedBox(height: 44),
+                                        const SizedBox(height: 44),
                                         Image.asset(
                                             'assets/images/sceening.png'),
-                                        SizedBox(height: 55),
-                                        Text(
+                                        const SizedBox(height: 55),
+                                        const Text(
                                           'วันนี้ไม่มีแผนสุขภาพ',
                                           style: TextStyle(
                                             fontSize: 24,
@@ -994,7 +1078,6 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                       ),
                     ),
                   ),
-                  //ค่าสุขภาพ
                   Scaffold(
                     backgroundColor: Color(hexColor('#FAFCFB')),
                     body: SingleChildScrollView(
@@ -1002,13 +1085,13 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Column(
                           children: [
-                            SizedBox(
+                            const SizedBox(
                               height: 20,
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Row(
+                                const Row(
                                   children: [
                                     Icon(Icons.pending_actions),
                                     SizedBox(
@@ -1038,11 +1121,11 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                     : const SizedBox()
                               ],
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 20,
                             ),
                             Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 20),
                               decoration: BoxDecoration(
                                   color: Colors.white,
@@ -1070,7 +1153,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                     children: [
                                       Row(
                                         children: [
-                                          Text(
+                                          const Text(
                                             'ความดันโลหิต',
                                             style: TextStyle(
                                               fontSize: 16,
@@ -1079,7 +1162,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          SizedBox(
+                                          const SizedBox(
                                             width: 10,
                                           ),
                                           systolicBloodPressure >= 120 ||
@@ -1116,14 +1199,14 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                       // )
                                     ],
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
+                                      const Text(
                                         'ช่วงหัวใจบีบตัว (ตัวบน)',
                                         style: TextStyle(
                                           fontSize: 16,
@@ -1167,10 +1250,10 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                           keyboardType: TextInputType.number,
                                           decoration: InputDecoration(
                                             contentPadding:
-                                                EdgeInsets.only(left: 15),
+                                                const EdgeInsets.only(left: 15),
                                             fillColor: Colors.white,
                                             suffixIcon: Container(
-                                              padding: EdgeInsets.only(
+                                              padding: const EdgeInsets.only(
                                                   top: 8, left: 15, right: 10),
                                               child: Text(
                                                 'mmHg',
@@ -1250,14 +1333,14 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                       ),
                                     ],
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 10,
                                   ),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
+                                      const Text(
                                         'ช่วงหัวใจคลายตัว (ตัวล่าง)',
                                         style: TextStyle(
                                           fontSize: 16,
@@ -1301,10 +1384,10 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                           keyboardType: TextInputType.number,
                                           decoration: InputDecoration(
                                             contentPadding:
-                                                EdgeInsets.only(left: 15),
+                                                const EdgeInsets.only(left: 15),
                                             fillColor: Colors.white,
                                             suffixIcon: Container(
-                                              padding: EdgeInsets.only(
+                                              padding: const EdgeInsets.only(
                                                   top: 8, left: 15, right: 10),
                                               child: Text(
                                                 'mmHg',
@@ -1384,12 +1467,12 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 10),
+                                  const SizedBox(height: 10),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
+                                      const Text(
                                         'อัตราการเต้นของหัวใจ',
                                         style: TextStyle(
                                           fontSize: 16,
@@ -1433,10 +1516,10 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                               signed: false, decimal: true),
                                           decoration: InputDecoration(
                                             contentPadding:
-                                                EdgeInsets.only(left: 15),
+                                                const EdgeInsets.only(left: 15),
                                             fillColor: Colors.white,
                                             suffixIcon: Container(
-                                              padding: EdgeInsets.only(
+                                              padding: const EdgeInsets.only(
                                                   top: 8, left: 15, right: 10),
                                               child: Text(
                                                 'ครั้ง/นาที',
@@ -1517,11 +1600,11 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                 ],
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 20,
                             ),
                             Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 20),
                               decoration: BoxDecoration(
                                 color: Colors.white,
@@ -1531,7 +1614,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Row(
+                                  const Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
@@ -1555,7 +1638,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                       // )
                                     ],
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   selectedDate == today
@@ -1566,7 +1649,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                Text(
+                                                const Text(
                                                   'ส่วนสูง',
                                                   style: TextStyle(
                                                     fontSize: 16,
@@ -1598,12 +1681,13 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                                     },
                                                     decoration: InputDecoration(
                                                       contentPadding:
-                                                          EdgeInsets.only(
+                                                          const EdgeInsets.only(
                                                               left: 15),
                                                       fillColor: Colors.white,
                                                       suffixIcon: Container(
                                                         padding:
-                                                            EdgeInsets.only(
+                                                            const EdgeInsets
+                                                                .only(
                                                                 top: 8,
                                                                 left: 15,
                                                                 right: 10),
@@ -1675,7 +1759,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                                 ),
                                               ],
                                             ),
-                                            SizedBox(
+                                            const SizedBox(
                                               height: 10,
                                             ),
                                             Row(
@@ -1683,7 +1767,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                Text(
+                                                const Text(
                                                   'น้ำหนัก',
                                                   style: TextStyle(
                                                     fontSize: 16,
@@ -1715,12 +1799,13 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                                     },
                                                     decoration: InputDecoration(
                                                       contentPadding:
-                                                          EdgeInsets.only(
+                                                          const EdgeInsets.only(
                                                               left: 15),
                                                       fillColor: Colors.white,
                                                       suffixIcon: Container(
                                                         padding:
-                                                            EdgeInsets.only(
+                                                            const EdgeInsets
+                                                                .only(
                                                                 top: 8,
                                                                 left: 15,
                                                                 right: 10),
@@ -1792,7 +1877,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                                 ),
                                               ],
                                             ),
-                                            SizedBox(height: 10),
+                                            const SizedBox(height: 10),
                                           ],
                                         )
                                       : Column(
@@ -1802,7 +1887,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                Text(
+                                                const Text(
                                                   'BMI',
                                                   style: TextStyle(
                                                     fontSize: 16,
@@ -1824,12 +1909,13 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                                         _controllerWeight,
                                                     decoration: InputDecoration(
                                                       contentPadding:
-                                                          EdgeInsets.only(
+                                                          const EdgeInsets.only(
                                                               left: 15),
                                                       fillColor: Colors.white,
                                                       suffixIcon: Container(
                                                         padding:
-                                                            EdgeInsets.only(
+                                                            const EdgeInsets
+                                                                .only(
                                                                 top: 8,
                                                                 left: 15,
                                                                 right: 10),
@@ -1904,14 +1990,14 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                                 ),
                                               ],
                                             ),
-                                            SizedBox(height: 10),
+                                            const SizedBox(height: 10),
                                           ],
                                         ),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
+                                      const Text(
                                         'รอบเอว',
                                         style: TextStyle(
                                           fontSize: 16,
@@ -1938,10 +2024,10 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                           },
                                           decoration: InputDecoration(
                                             contentPadding:
-                                                EdgeInsets.only(left: 15),
+                                                const EdgeInsets.only(left: 15),
                                             fillColor: Colors.white,
                                             suffixIcon: Container(
-                                              padding: EdgeInsets.only(
+                                              padding: const EdgeInsets.only(
                                                   top: 8, left: 15, right: 10),
                                               child: Text(
                                                 'นิ้ว',
@@ -2004,11 +2090,11 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                 ],
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 20,
                             ),
                             Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 20),
                               decoration: BoxDecoration(
                                   color: Colors.white,
@@ -2023,7 +2109,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                     children: [
                                       Row(
                                         children: [
-                                          Text(
+                                          const Text(
                                             'น้ำตาลในเลือด',
                                             style: TextStyle(
                                               fontSize: 16,
@@ -2032,7 +2118,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          SizedBox(
+                                          const SizedBox(
                                             width: 10,
                                           ),
                                           bloodGlucose >= 120 //แก้
@@ -2067,14 +2153,14 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                       // )
                                     ],
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
+                                      const Text(
                                         'ระดับน้ำตาล',
                                         style: TextStyle(
                                           fontSize: 16,
@@ -2101,10 +2187,10 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                           keyboardType: TextInputType.number,
                                           decoration: InputDecoration(
                                             contentPadding:
-                                                EdgeInsets.only(left: 15),
+                                                const EdgeInsets.only(left: 15),
                                             fillColor: Colors.white,
                                             suffixIcon: Container(
-                                              padding: EdgeInsets.only(
+                                              padding: const EdgeInsets.only(
                                                   top: 8, left: 15, right: 10),
                                               child: Text(
                                                 'mg/dL',
@@ -2168,11 +2254,11 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                 ],
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 20,
                             ),
                             Container(
-                              padding: EdgeInsets.symmetric(
+                              padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 20),
                               decoration: BoxDecoration(
                                   color: Colors.white,
@@ -2199,7 +2285,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                     children: [
                                       Row(
                                         children: [
-                                          Text(
+                                          const Text(
                                             'ไขมันในเลือด',
                                             style: TextStyle(
                                               fontSize: 16,
@@ -2208,7 +2294,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          SizedBox(
+                                          const SizedBox(
                                             width: 10,
                                           ),
                                           (cholesterol >= 50 ||
@@ -2236,14 +2322,14 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                       ),
                                     ],
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 20,
                                   ),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
+                                      const Text(
                                         'คอเลสเตอรอล',
                                         style: TextStyle(
                                           fontSize: 16,
@@ -2288,10 +2374,10 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                           },
                                           decoration: InputDecoration(
                                             contentPadding:
-                                                EdgeInsets.only(left: 15),
+                                                const EdgeInsets.only(left: 15),
                                             fillColor: Colors.white,
                                             suffixIcon: Container(
-                                              padding: EdgeInsets.only(
+                                              padding: const EdgeInsets.only(
                                                   top: 8, left: 15, right: 10),
                                               child: Text(
                                                 'mg/dL',
@@ -2369,14 +2455,14 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                       ),
                                     ],
                                   ),
-                                  SizedBox(
+                                  const SizedBox(
                                     height: 10,
                                   ),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
+                                      const Text(
                                         'ไขมันดี (HDL)',
                                         style: TextStyle(
                                           fontSize: 16,
@@ -2421,10 +2507,10 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                           },
                                           decoration: InputDecoration(
                                             contentPadding:
-                                                EdgeInsets.only(left: 15),
+                                                const EdgeInsets.only(left: 15),
                                             fillColor: Colors.white,
                                             suffixIcon: Container(
-                                              padding: EdgeInsets.only(
+                                              padding: const EdgeInsets.only(
                                                   top: 8, left: 15, right: 10),
                                               child: Text(
                                                 'mg/dL',
@@ -2496,12 +2582,12 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 10),
+                                  const SizedBox(height: 10),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
+                                      const Text(
                                         'ไขมันอันตราย (LDL)',
                                         style: TextStyle(
                                           fontSize: 16,
@@ -2546,10 +2632,10 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                           keyboardType: TextInputType.number,
                                           decoration: InputDecoration(
                                             contentPadding:
-                                                EdgeInsets.only(left: 15),
+                                                const EdgeInsets.only(left: 15),
                                             fillColor: Colors.white,
                                             suffixIcon: Container(
-                                              padding: EdgeInsets.only(
+                                              padding: const EdgeInsets.only(
                                                   top: 8, left: 15, right: 10),
                                               child: Text(
                                                 'mg/dL',
@@ -2621,12 +2707,12 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                       ),
                                     ],
                                   ),
-                                  SizedBox(height: 10),
+                                  const SizedBox(height: 10),
                                   Row(
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
+                                      const Text(
                                         'ไตรกลีเซอไรด์',
                                         style: TextStyle(
                                           fontSize: 16,
@@ -2674,10 +2760,10 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                           keyboardType: TextInputType.number,
                                           decoration: InputDecoration(
                                             contentPadding:
-                                                EdgeInsets.only(left: 15),
+                                                const EdgeInsets.only(left: 15),
                                             fillColor: Colors.white,
                                             suffixIcon: Container(
-                                              padding: EdgeInsets.only(
+                                              padding: const EdgeInsets.only(
                                                   top: 8, left: 15, right: 10),
                                               child: Text(
                                                 'mg/dL',
@@ -2759,7 +2845,7 @@ class _SelectedDatePageState extends State<SelectedDatePage> {
                                 ],
                               ),
                             ),
-                            SizedBox(
+                            const SizedBox(
                               height: 100,
                             )
                           ],

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:custom_sliding_segmented_control/custom_sliding_segmented_control.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
@@ -221,14 +222,44 @@ class _ScreeningPageState extends State<ScreeningPage> {
                                       const SizedBox(
                                         height: 40,
                                       ),
-                                      DropdownButton<String>(
-                                          icon: const Icon(Icons
-                                              .keyboard_arrow_down_outlined),
-                                          iconSize: 30,
-                                          itemHeight: 60,
-                                          dropdownColor: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
+                                      DropdownButton2<String>(
+                                          alignment: Alignment.centerLeft,
+                                          dropdownStyleData: DropdownStyleData(
+                                            maxHeight: 200,
+                                            decoration: BoxDecoration(
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.grey
+                                                      .withOpacity(.3),
+                                                  blurRadius: 4.0,
+                                                  spreadRadius: .1,
+                                                  offset: const Offset(
+                                                    2.0,
+                                                    4.0,
+                                                  ),
+                                                ),
+                                              ],
+                                              borderRadius:
+                                                  BorderRadius.circular(0),
+                                              color: Colors.white,
+                                            ),
+                                            scrollbarTheme: ScrollbarThemeData(
+                                              radius: const Radius.circular(3),
+                                              thickness: MaterialStateProperty
+                                                  .all<double>(6),
+                                              thumbVisibility:
+                                                  MaterialStateProperty.all<
+                                                      bool>(true),
+                                            ),
+                                          ),
+                                          // menuMaxHeight: 500,
+                                          // icon: const Icon(Icons
+                                          //     .keyboard_arrow_down_outlined),
+                                          // iconSize: 30,
+                                          // itemHeight: 60,
+                                          // dropdownColor: Colors.white,
+                                          // borderRadius:
+                                          // BorderRadius.circular(20),
                                           hint: const Text(
                                             'โปรดเลือกอาชีพ   ',
                                             style: TextStyle(
@@ -245,10 +276,18 @@ class _ScreeningPageState extends State<ScreeningPage> {
                                             });
                                           },
                                           items: <String>[
-                                            'Apple',
-                                            'Mango',
-                                            'Banana',
-                                            'Peach'
+                                            'แพทย์',
+                                            'วิศวกร',
+                                            'ค้าขาย',
+                                            'นักศึกษา/นักศึกษา',
+                                            'ครู/อาจารย์',
+                                            'เชฟ',
+                                            'นักเขียน',
+                                            'โปรแกรมเมอร์',
+                                            'สถาปนิก',
+                                            'นักเครื่องดนตรี',
+                                            'ช่าง',
+                                            'ผู้ประกอบการ' 'อื่นๆ'
                                           ].map<DropdownMenuItem<String>>(
                                               (String value) {
                                             return DropdownMenuItem<String>(
@@ -789,6 +828,9 @@ class _ScreeningPageState extends State<ScreeningPage> {
                                   ],
                                 ),
                               ),
+                              SizedBox(
+                                height: 40,
+                              )
                             ],
                           ),
                         ),
@@ -1615,6 +1657,9 @@ class _ScreeningPageState extends State<ScreeningPage> {
                                   ),
                                 ),
                               ),
+                              SizedBox(
+                                height: 150,
+                              )
                             ],
                           ),
                         ),
@@ -1776,7 +1821,7 @@ class _ScreeningPageState extends State<ScreeningPage> {
                                     hdl != 0) {
                                   await fetchMetabolic(
                                       token!,
-                                      dropdownValue!,
+                                      dropdownValue ?? '',
                                       height,
                                       weight,
                                       bmi,

@@ -7,8 +7,12 @@ import 'package:provider/provider.dart';
 import '../../extension/Color.dart';
 
 class RiskResultPage extends StatefulWidget {
+  final String exerciseFrequency;
+  final String exercisePeriod;
   const RiskResultPage({
     super.key,
+    required this.exerciseFrequency,
+    required this.exercisePeriod,
   });
 
   @override
@@ -820,10 +824,16 @@ class _RiskResultPageState extends State<RiskResultPage> {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => ConcludeRiskResult(
-                                          diabetes: diabetesResult,
-                                          hyperlipidemia: hyperlipidemiaResult,
-                                          hypertension: hypertensionResult,
-                                          obesity: obesityResult)));
+                                            diabetes: diabetesResult,
+                                            hyperlipidemia:
+                                                hyperlipidemiaResult,
+                                            hypertension: hypertensionResult,
+                                            obesity: obesityResult,
+                                            exerciseFrequency:
+                                                widget.exerciseFrequency,
+                                            exercisePeriod:
+                                                widget.exercisePeriod,
+                                          )));
                             },
                             child: Container(
                               height: 47,

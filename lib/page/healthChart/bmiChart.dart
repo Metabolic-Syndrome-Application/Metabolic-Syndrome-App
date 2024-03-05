@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/page/healthChart/allBMIRecord.dart';
+import 'package:flutter_application_1/page/home/home.dart';
+import 'package:flutter_application_1/page/nav.dart/nav.dart';
 import 'package:flutter_application_1/response/api.dart';
 import 'package:flutter_application_1/widget/chart/bmiChart.dart/dayChart.dart';
 import 'package:flutter_application_1/widget/chart/bmiChart.dart/sixMonthChart.dart';
@@ -347,7 +349,7 @@ class _BMIChartPageState extends State<BMIChartPage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const HealthChart()));
+                                builder: (context) => const HomePage()));
                       },
                       child: Icon(
                         Icons.arrow_back_ios_new_rounded,

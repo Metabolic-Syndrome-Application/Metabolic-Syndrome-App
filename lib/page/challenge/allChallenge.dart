@@ -1,3 +1,4 @@
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
@@ -6,6 +7,8 @@ import 'package:flutter_application_1/widget/challenge/challenge.dart';
 import 'package:flutter_application_1/widget/challenge/question.dart';
 import 'package:flutter_application_1/widget/challenge/yourChallenge.dart';
 import 'package:provider/provider.dart';
+
+@RoutePage()
 
 class AllChallenge extends StatelessWidget {
   const AllChallenge({super.key});
@@ -252,76 +255,67 @@ class _AllChallengePageState extends State<AllChallengePage> {
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(30)),
                                 alignment: Alignment.centerLeft,
-                                padding: EdgeInsets.only(left: 7, right: 7),
+                                padding:
+                                    const EdgeInsets.only(left: 7, right: 7),
                                 child: Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
-                                      Container(
+                                      SizedBox(
                                           height: 110,
                                           child: Image.asset(
                                               'assets/images/your_challenge_image_default.png')),
-                                      SizedBox(
+                                      const SizedBox(
                                         width: 7,
                                       ),
-                                      Container(
-                                        child: Expanded(
-                                          child: Padding(
-                                            padding: EdgeInsets.only(
-                                                top: 18,
-                                                bottom: 18,
-                                                left: 10,
-                                                right: 10),
-                                            child: Text(
-                                                'ยังไม่มีภารกิจให้เข้าร่วมในเวลานี้',
-                                                style: TextStyle(
-                                                  fontSize: 20,
-                                                  fontFamily: 'IBMPlexSansThai',
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.normal,
-                                                )),
-                                          ),
+                                      const Expanded(
+                                        child: Padding(
+                                          padding: EdgeInsets.only(
+                                              top: 18,
+                                              bottom: 18,
+                                              left: 10,
+                                              right: 10),
+                                          child: Text(
+                                              'ยังไม่มีภารกิจให้เข้าร่วมในเวลานี้',
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                fontFamily: 'IBMPlexSansThai',
+                                                color: Colors.black,
+                                                fontWeight: FontWeight.normal,
+                                              )),
                                         ),
                                       ),
                                     ]))))
                     : ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: listOfChallenge.length,
                         itemBuilder: (context, index) {
-                          print("check null $listOfChallenge");
-                          // Check if the current item is null or not a Map.
                           if (listOfChallenge[index] == null ||
-                              !(listOfChallenge[index] is Map)) {
-                            print(
-                                "Invalid item at index $index: ${listOfChallenge[index]}");
-                            return SizedBox
-                                .shrink(); // Return an empty widget for invalid items.
+                              listOfChallenge[index] is! Map) {
+                            return const SizedBox.shrink();
                           }
 
-                          // Safely access the map with null checks.
                           final item = listOfChallenge[index] as Map;
                           final id = item['id'];
                           final name = item['name'];
                           final points = item['points'];
                           final numDays = item['numDays'];
 
-                          // Ensure all required fields are present and not null.
                           if (id == null ||
                               name == null ||
                               points == null ||
                               numDays == null) {
-                            print("Missing data at index $index: $item");
-                            return SizedBox
-                                .shrink(); // Return an empty widget for items with missing data.
+                            return const SizedBox.shrink();
                           }
 
-                          // Proceed to build the ChallengeCard with validated data.
                           return ChallengeCard(
                             id: id,
                             name: name,
                             points: points,
                             numDays: numDays,
+                            enable: myChallenge == null ? true : false,
                           );
                         },
                       )

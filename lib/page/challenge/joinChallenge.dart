@@ -15,11 +15,26 @@ class JoinChallenge extends StatefulWidget {
 }
 
 class _ChallengePageState extends State<JoinChallenge> {
+  dynamic planID;
   String name = '-';
   int points = 0;
   int participants = 0;
   String description = '';
   int numDays = 0;
+
+  Future<void> fetchProfile() async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
+    try {
+      Map<String, dynamic> response = await getProfile(token!);
+      setState(() {
+        planID = response['data']['user']['planID'];
+        print(planID);
+      });
+    } catch (e) {
+      // print('Error fetching profile: $e');
+    }
+  }
+
   Future<void> fetchChallengeById() async {
     try {
       String? token = Provider.of<AuthProvider>(context, listen: false).token;
@@ -58,6 +73,7 @@ class _ChallengePageState extends State<JoinChallenge> {
   @override
   void initState() {
     fetchChallengeById();
+    fetchProfile();
     super.initState();
   }
 
@@ -95,7 +111,7 @@ class _ChallengePageState extends State<JoinChallenge> {
                       Container(
                         padding: EdgeInsets.only(top: 6, bottom: 6),
                         height: 123,
-                        child: Image.asset('assets/images/login.png'),
+                        child: Image.asset('assets/images/hula-hoop.png'),
                       ),
                       SizedBox(
                         width: 24,
@@ -144,7 +160,7 @@ class _ChallengePageState extends State<JoinChallenge> {
                         fontSize: 24,
                         fontFamily: 'IBMPlexSansThai',
                         color: Colors.black,
-                        fontWeight: FontWeight.normal,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     Row(
@@ -195,7 +211,7 @@ class _ChallengePageState extends State<JoinChallenge> {
                         fontSize: 18,
                         fontFamily: 'IBMPlexSansThai',
                         color: Colors.black,
-                        fontWeight: FontWeight.normal,
+                        fontWeight: FontWeight.bold,
                       ),
                       textAlign: TextAlign.left,
                     ),
@@ -210,40 +226,45 @@ class _ChallengePageState extends State<JoinChallenge> {
                           borderRadius: BorderRadius.circular(20)),
                       child: Row(
                         children: [
-                          Text(
-                            description,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontFamily: 'IBMPlexSansThai',
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal,
+                          Expanded(
+                            child: Text(
+                              description,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontFamily: 'IBMPlexSansThai',
+                                color: Colors.black,
+                                fontWeight: FontWeight.normal,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    SizedBox(height: 44),
+                    const SizedBox(height: 44),
                     MaterialButton(
-                      color: Color(hexColor('#2F4EF1')),
+                      enableFeedback: true,
+                      color: Color(
+                          hexColor(planID == null ? '#D9D9D9' : '#2F4EF1')),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(23.5),
                       ),
-                      onPressed: () {
-                        print(widget.id);
-                        setState(() {
-                          fetchUpdateProfile(widget.id);
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ChallengePage(
-                                        id: widget.id,
-                                      )));
-                        });
-                      },
+                      onPressed: planID == null
+                          ? null
+                          : () {
+                              setState(() {
+                                fetchUpdateProfile(widget.id);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ChallengePage(
+                                              id: widget.id,
+                                            )));
+                              });
+                            },
                       child: Container(
                         height: 44,
                         alignment: Alignment.center,
-                        child: Text('เข้าร่วม',
+                        child: const  Text('เข้าร่วม',
                             style: TextStyle(
                                 fontSize: 20,
                                 fontFamily: 'IBMPlexSansThai',

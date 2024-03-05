@@ -1,29 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/page/loginRegister/otpRegister.dart';
 import 'package:flutter_application_1/page/profile/profile.dart';
 import 'package:flutter_application_1/page/profile/successConnect.dart';
+import 'package:flutter_application_1/response/api.dart';
+import 'package:provider/provider.dart';
 
 import '../../extension/Color.dart';
 
-class hospitalConnect extends StatelessWidget {
-  const hospitalConnect({super.key});
+class HospitalConnect extends StatelessWidget {
+  const HospitalConnect({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: hospitalConnectPage(),
+      home: HospitalConnectPage(),
     );
   }
 }
 
-class hospitalConnectPage extends StatefulWidget {
-  const hospitalConnectPage({super.key});
+class HospitalConnectPage extends StatefulWidget {
+  const HospitalConnectPage({super.key});
 
   @override
-  State<hospitalConnectPage> createState() => _hospitalConnectPageState();
+  State<HospitalConnectPage> createState() => _HospitalConnectPageState();
 }
 
-class _hospitalConnectPageState extends State<hospitalConnectPage> {
+class _HospitalConnectPageState extends State<HospitalConnectPage> {
   TextEditingController otp1Controller = TextEditingController();
   TextEditingController otp2Controller = TextEditingController();
   TextEditingController otp3Controller = TextEditingController();
@@ -32,6 +35,26 @@ class _hospitalConnectPageState extends State<hospitalConnectPage> {
   String otpController = "1234";
   Color? validColor;
   Duration myDuration = Duration(minutes: 3);
+  String success = '';
+  bool matching = false;
+  bool full = false;
+  String validation = '';
+
+  Future<void> fetchConnectHostpital(String otp) async {
+    try {
+      String? token = Provider.of<AuthProvider>(context, listen: false).token;
+      Map<String, dynamic> response = await postConnect(token!, otp);
+      // print(otp);
+      setState(() {
+        // print(response);
+        success = response['message'];
+        // print();
+      });
+    } catch (e) {
+      print('Error fetching plan: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -134,7 +157,18 @@ class _hospitalConnectPageState extends State<hospitalConnectPage> {
                 ],
               ),
               SizedBox(
-                height: 80,
+                height: 30,
+              ),
+              Text(
+                validation,
+                style: TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'IBMPlexSansThai',
+                    color: Color(hexColor('#FB6262')),
+                    fontWeight: FontWeight.normal),
+              ),
+              SizedBox(
+                height: 30,
               ),
               MaterialButton(
                   height: 44,
@@ -144,7 +178,7 @@ class _hospitalConnectPageState extends State<hospitalConnectPage> {
                   ),
                   child: Container(
                     alignment: Alignment.center,
-                    child: Text("ยืนยัน",
+                    child: const Text("ยืนยัน",
                         style: TextStyle(
                             fontSize: 20,
                             fontFamily: 'IBMPlexSansThai',
@@ -153,33 +187,41 @@ class _hospitalConnectPageState extends State<hospitalConnectPage> {
                         textAlign: TextAlign.center),
                   ),
                   onPressed: () async {
-                    //   if (await widget.myauth.verifyOTP(
-                    //           otp: otp1Controller.text +
-                    //               otp2Controller.text +
-                    //               otp3Controller.text +
-                    //               otp4Controller.text +
-                    //               otp5Controller.text +
-                    //               otp6Controller.text) ==
-                    //       true) {
-                    //     setState(() {
-                    //       validColor = Colors.green;
-                    //     });
-
-                    //     // ScaffoldMessenger.of(context)
-                    //     //     .showSnackBar(const SnackBar(
-                    //     //   content: Text("OTP is verified"),
-                    //     // ));
-
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const SuccessConnect()));
-                    // } else {
-                    //   ScaffoldMessenger.of(context)
-                    //       .showSnackBar(const SnackBar(
-                    //     content: Text("Invalid OTP"),
-                    //   ));
-                    //   }
+                    if (otp1Controller.text.isNotEmpty &&
+                        otp2Controller.text.isNotEmpty &&
+                        otp3Controller.text.isNotEmpty &&
+                        otp4Controller.text.isNotEmpty) {
+                      await fetchConnectHostpital(otp1Controller.text +
+                          otp2Controller.text +
+                          otp3Controller.text +
+                          otp4Controller.text);
+                      // print(success);
+                      if (success == 'OTP matching') {
+                        validColor = Color(hexColor('#42884B'));
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SuccessConnect()));
+                      } else {
+                        setState(() {
+                          validation = '*รหัสยืนยันไม่ตรงกัน';
+                        });
+                      }
+                    } else {
+                      if (otp1Controller.text.isNotEmpty ||
+                          otp2Controller.text.isNotEmpty ||
+                          otp3Controller.text.isNotEmpty ||
+                          otp4Controller.text.isNotEmpty) {
+                        setState(() {
+                          validation = '*กรุณากรอกรหัสยืนยันให้ครบก่อนยืนยัน';
+                        });
+                      } else {
+                        setState(() {
+                          validation = '*กรุณากรอกรหัสก่อนยืนยัน';
+                        });
+                      }
+                      validColor = Color(hexColor('#FB6262'));
+                    }
                   })
             ],
           ),

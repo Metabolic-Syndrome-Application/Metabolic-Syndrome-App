@@ -7,14 +7,129 @@ import 'package:flutter_application_1/page/home/home.dart';
 import 'package:flutter_application_1/page/profile/profile.dart';
 
 class Navbar extends StatefulWidget {
-  final int selectedIndex;
-  const Navbar({super.key, required this.selectedIndex});
+  const Navbar({
+    super.key,
+  });
 
   @override
   State<Navbar> createState() => _NavbarState();
 }
 
 class _NavbarState extends State<Navbar> {
+//   @override
+//   Widget build(BuildContext context) {
+//     AppRouter appRouter = AppRouter();
+//     return MaterialApp.router(
+//       routerConfig: appRouter.config(),
+//     );
+//   }
+//   // late PageController _myPage;
+//   // var selectedPage;
+
+//   // @override
+//   // void initState() {
+//   //   super.initState();
+//   //   _myPage = PageController(initialPage: 0);
+//   //   selectedPage = 0;
+//   // }
+
+//   // @override
+//   // Widget build(BuildContext context) {
+//   //   return Scaffold(
+//   //       body: PageView(
+//   //         physics: NeverScrollableScrollPhysics(),
+//   //         controller: _myPage,
+//   //         children: <Widget>[
+//   //           HomePage(),
+//   //           CalendarPage(),
+//   //           SelectedDate(DateTime.now(), true),
+//   //           AllChallenge(),
+//   //           Profile(),
+//   //           Center(
+//   //             child: Text("Another Page"),
+//   //           ),
+//   //           Center(
+//   //               child: Column(
+//   //             mainAxisAlignment: MainAxisAlignment.center,
+//   //             children: <Widget>[
+//   //               Text("Page 1"),
+//   //               MaterialButton(
+//   //                 onPressed: () {
+//   //                   _myPage.jumpToPage(0);
+//   //                   setState(() {
+//   //                     selectedPage = 0;
+//   //                   });
+//   //                 },
+//   //                 child: Text("Go to another page"),
+//   //               )
+//   //             ],
+//   //           )),
+//   //           Center(child: Text("Page 2")),
+//   //           Center(child: Text("Page 3")),
+//   //         ],
+//   //       ),
+//   //       bottomNavigationBar: BottomAppBar(
+//   //         child: Row(
+//   //           mainAxisAlignment: MainAxisAlignment.spaceAround,
+//   //           children: <Widget>[
+//   //             IconButton(
+//   //               icon: Icon(Icons.home),
+//   //               color: selectedPage == 0 ? Colors.blue : Colors.grey,
+//   //               onPressed: () {
+//   //                 _myPage.jumpToPage(0);
+//   //                 setState(() {
+//   //                   selectedPage = 0;
+//   //                 });
+//   //               },
+//   //             ),
+//   //             IconButton(
+//   //               icon: Icon(Icons.star),
+//   //               color: selectedPage == 1 ? Colors.blue : Colors.grey,
+//   //               onPressed: () {
+//   //                 _myPage.jumpToPage(1);
+//   //                 setState(() {
+//   //                   selectedPage = 1;
+//   //                 });
+//   //               },
+//   //             ),
+//   //             IconButton(
+//   //               icon: Icon(
+//   //                 Icons.settings,
+//   //               ),
+//   //               color: selectedPage == 2 ? Colors.blue : Colors.grey,
+//   //               onPressed: () {
+//   //                 _myPage.jumpToPage(2);
+//   //                 setState(() {
+//   //                   selectedPage = 2;
+//   //                 });
+//   //               },
+//   //             ),
+//   //             IconButton(
+//   //               icon: Icon(Icons.star),
+//   //               color: selectedPage == 3 ? Colors.blue : Colors.grey,
+//   //               onPressed: () {
+//   //                 _myPage.jumpToPage(3);
+//   //                 setState(() {
+//   //                   selectedPage = 3;
+//   //                 });
+//   //               },
+//   //             ),
+//   //             IconButton(
+//   //               icon: Icon(
+//   //                 Icons.settings,
+//   //               ),
+//   //               color: selectedPage == 4 ? Colors.blue : Colors.grey,
+//   //               onPressed: () {
+//   //                 _myPage.jumpToPage(4);
+//   //                 setState(() {
+//   //                   selectedPage = 4;
+//   //                 });
+//   //               },
+//   //             ),
+//   //           ],
+//   //         ),
+//   //       ));
+// }
   int _selectedIndex = 0;
   static final List<Widget> _widgetOptions = <Widget>[
     const HomePage(),
@@ -32,7 +147,7 @@ class _NavbarState extends State<Navbar> {
 
   @override
   void initState() {
-    _selectedIndex = widget.selectedIndex;
+    // _selectedIndex = widget.selectedIndex;
     super.initState();
   }
 
@@ -88,7 +203,7 @@ class _NavbarState extends State<Navbar> {
         ],
         currentIndex: _selectedIndex,
         selectedItemColor: Color(hexColor('#1438F3')),
-        unselectedItemColor:  Color(hexColor('#000000')),
+        unselectedItemColor: Color(hexColor('#000000')),
         onTap: _onItemTapped,
       ),
     );

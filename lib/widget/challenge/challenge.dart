@@ -7,11 +7,13 @@ class ChallengeCard extends StatefulWidget {
   final String name;
   final int points;
   final int numDays;
+  final bool enable;
   const ChallengeCard({
     required this.id,
     required this.name,
     required this.points,
     required this.numDays,
+    required this.enable,
     super.key,
   });
 
@@ -123,7 +125,7 @@ class _ChallengeCardState extends State<ChallengeCard> {
                             borderRadius: BorderRadius.circular(30),
                           ),
                           child: Text(
-                            'เข้าร่วม',
+                            widget.enable ? 'เข้าร่วม' : 'รายละเอียด',
                             style: TextStyle(
                               fontSize: 16,
                               fontFamily: 'IBMPlexSansThai',

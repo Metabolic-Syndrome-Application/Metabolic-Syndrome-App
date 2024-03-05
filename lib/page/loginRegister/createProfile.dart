@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 
 class CreateProfilePage extends StatefulWidget {
   final ImageProvider<Object>? profileImage;
+
   final String? alias;
   final String? firstname;
   final String? lastname;
@@ -48,12 +49,11 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
       String? lastname, int? yearOfBirth, String? gender, String? photo) async {
     try {
       String? token = Provider.of<AuthProvider>(context, listen: false).token;
-      print(token);
       await updateProfile(
           token!, alias, firstname, lastname, yearOfBirth, gender, photo);
       setState(() {});
     } catch (e) {
-      print('Error fetching profile: $e');
+      // print('Error fetching profile: $e');
     }
   }
 
@@ -145,15 +145,25 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      const Text('Name of requestor: }'),
-                      Text(
-                        'Description:' * 400,
+                      const Text(
+                        'นโยบายส่วนบุคคลสำหรับแอปพลิเคชัน Metabolic Syndrome\n',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontFamily: 'IBMPlexSansThai',
+                          color: Colors.black,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        textAlign: TextAlign.start,
                       ),
                       const Text(
-                        'Help_Description',
-                      ),
-                      const Text(
-                        'Type of help needed:Help_TypeNeeded',
+                        '1. ข้อมูลส่วนบุคคล : เราเก็บข้อมูลส่วนบุคคลที่ผู้ใช้บันทึกลงในแอปพลิเคชัน Metabolic Syndrome ได้โดยตรง เช่น ชื่อ, อีเมล, และข้อมูลสุขภาพ เช่น น้ำหนัก, ส่วนสูง, ค่าความดันโลหิต, ค่าน้ำตาลในเลือด, ค่าไขมันในเลือด เป็นต้น\n2. วัตถุประสงค์ของการใช้ข้อมูล: เราใช้ข้อมูลส่วนบุคคลเพื่อใช้วิเคราะห์ผลประเมิน และให้บริการแอปพลิเคชัน Metabolic Syndrome ให้กับผู้ใช้ รวมถึงการให้คำแนะนำเกี่ยวกับโปรแกรมสุขภาพและการปรับพฤติกรรมต่างๆ\n3. การเก็บรักษาข้อมูล: เราจะเก็บรักษาข้อมูลส่วนบุคคลของผู้ใช้ตามที่กำหนดในนโยบายนี้และตามกฎหมายที่เกี่ยวข้อง\n4. ความปลอดภัย: เรามุ่งมั่นในการรักษาความปลอดภัยของข้อมูลส่วนบุคคล และจะดำเนินการป้องกันข้อมูลอย่างเหมาะสมเพื่อป้องกันการเข้าถึงข้อมูลโดยไม่ได้รับอนุญาต\n5. การแชร์ข้อมูล: เราจะไม่แชร์ข้อมูลส่วนบุคคลของผู้ใช้กับบุคคลที่สามใด ๆ โดยไม่ได้รับอนุญาตจากผู้ใช้ยกเว้นกรณีที่จำเป็นตามกฎหมายหรือตามคำสั่งของหน่วยงานที่เกี่ยวข้อง\n6.การปรับปรุงนโยบายส่วนบุคคล: เราอาจทำการปรับปรุงนโยบายส่วนบุคคลนี้เมื่อมีการเปลี่ยนแปลงในสภาพแวดล้อมหรือกฎหมายที่เกี่ยวข้อง และจะแจ้งให้ทราบผ่านทางแอปพลิเคชันหรือเว็บไซต์ของเรา',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontFamily: 'IBMPlexSansThai',
+                          color: Colors.black,
+                          fontWeight: FontWeight.normal,
+                        ),
+                        textAlign: TextAlign.start,
                       ),
                       const SizedBox(
                         height: 10,

@@ -2,10 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/challenge/challenge.dart';
 
-// void main() {
-//   runApp(YourChallengeCard());
-// }
-
 class YourChallengeCard extends StatelessWidget {
   final String id;
   final String name;

@@ -125,8 +125,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _usedEmail = false;
 
   bool _conditionPassword(String value) {
-    RegExp regex =
-        RegExp(r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[_]).{8,}$');
+    RegExp regex = RegExp(r'^\d{8}$');
     //r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$'
     if (!regex.hasMatch(value)) {
       return false;
@@ -332,7 +331,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 )),
                             errorText: !_conditionPassword(_password) &&
                                     _password != ''
-                                ? '*** รหัสผ่านขั้นต่ำ 8 ตัวอักษร\nโดยประกอบด้วยตัวอักษรภาษาอังกฤษ ตัวพิมพ์เล็ก, ตัวพิมพ์ใหญ่, ตัวเลข, เครื่องหมาย "_" อย่างน้อย 1 ตัว'
+                                ? '*** รหัสผ่านขั้นต่ำ 8 ตัวอักษร'
                                 : _validatePassword && _password == ''
                                     ? "กรุณากรอกรหัสผ่าน"
                                     : null,

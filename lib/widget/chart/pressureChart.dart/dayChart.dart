@@ -11,7 +11,7 @@ class DayChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DayChartWidget();
+    return const DayChartWidget();
   }
 }
 
@@ -34,20 +34,23 @@ class _DayChartWidgetState extends State<DayChartWidget> {
       Map<String, dynamic> response = await getBloodPressure(token!);
       setState(() {
         bloodPressure = response['data']['record'];
+
         DateTime isNow = DateTime.now();
         var filteredData = bloodPressure
             .where((record) =>
                 record["timestamp"].startsWith(dateFormat.format(isNow)))
             .toList();
-        print("waistline $filteredData");
+        print("here $filteredData");
         pressureDataList = filteredData.map((record) {
           DateTime timestamp = DateTime.parse(record["timestamp"]);
           int systolicPressure = record["systolicBloodPressure"];
           int diastolicPressure = record["diastolicBloodPressure"];
           int pulseRate = record["pulseRate"];
+          print(timestamp);
           return PressureData(
               timestamp, systolicPressure, diastolicPressure, pulseRate);
         }).toList();
+        print("check ${pressureDataList.length}");
       });
     } catch (e) {
       // print('Error fetching plan: $e');
@@ -76,6 +79,7 @@ class _DayChartWidgetState extends State<DayChartWidget> {
         ),
       ),
     );
+    setState(() {});
 
     super.initState();
   }
@@ -87,7 +91,7 @@ class _DayChartWidgetState extends State<DayChartWidget> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'วันนี้',
             style: TextStyle(
               fontSize: 16,
@@ -96,7 +100,7 @@ class _DayChartWidgetState extends State<DayChartWidget> {
               fontWeight: FontWeight.normal,
             ),
           ),
-          SizedBox(
+          const SizedBox(
             height: 5,
           ),
           SizedBox(
@@ -111,33 +115,31 @@ class _DayChartWidgetState extends State<DayChartWidget> {
                         color: Colors.black,
                         fontWeight: FontWeight.normal,
                       )),
-                  primaryYAxis: NumericAxis(
-                      
-                      plotBands: <PlotBand>[
-                        PlotBand(
-                            opacity: 0.5,
-                            start: 0,
-                            end: 120,
-                            color: Color(hexColor('#a5d1b0'))),
-                        PlotBand(
-                            opacity: 0.5,
-                            start: 120,
-                            end: 140,
-                            color: Color(hexColor('#fedc86'))),
-                        PlotBand(
-                            opacity: 0.5,
-                            start: 140,
-                            color: Color(hexColor('#FFBCBC'))),
-                      ]),
+                  primaryYAxis: NumericAxis(plotBands: <PlotBand>[
+                    PlotBand(
+                        opacity: 0.5,
+                        start: 0,
+                        end: 120,
+                        color: Color(hexColor('#a5d1b0'))),
+                    PlotBand(
+                        opacity: 0.5,
+                        start: 120,
+                        end: 140,
+                        color: Color(hexColor('#fedc86'))),
+                    PlotBand(
+                        opacity: 0.5,
+                        start: 140,
+                        color: Color(hexColor('#FFBCBC'))),
+                  ]),
                   trackballBehavior: trackballBehavior,
                   series: <LineSeries<PressureData, DateTime>>[
                     LineSeries<PressureData, DateTime>(
                       dataSource: pressureDataList,
-                      emptyPointSettings: EmptyPointSettings(
-                        mode: EmptyPointMode
-                            .gap, // This will create a gap for null values
-                      ),
-                      markerSettings: MarkerSettings(
+                      // emptyPointSettings: const EmptyPointSettings(
+                      //   mode: EmptyPointMode
+                      //       .gap, // This will create a gap for null values
+                      // ),
+                      markerSettings: const MarkerSettings(
                           isVisible: true, shape: DataMarkerType.diamond),
                       dataLabelSettings:
                           const DataLabelSettings(showZeroValue: true),
@@ -151,11 +153,11 @@ class _DayChartWidgetState extends State<DayChartWidget> {
                     ),
                     LineSeries<PressureData, DateTime>(
                       dataSource: pressureDataList,
-                      emptyPointSettings: EmptyPointSettings(
-                        mode: EmptyPointMode
-                            .gap, // This will create a gap for null values
-                      ),
-                      markerSettings: MarkerSettings(
+                      // emptyPointSettings: const EmptyPointSettings(
+                      //   mode: EmptyPointMode
+                      //       .gap, // This will create a gap for null values
+                      // ),
+                      markerSettings: const MarkerSettings(
                           isVisible: true, shape: DataMarkerType.triangle),
                       dataLabelSettings:
                           const DataLabelSettings(showZeroValue: true),
@@ -169,11 +171,11 @@ class _DayChartWidgetState extends State<DayChartWidget> {
                     ),
                     LineSeries<PressureData, DateTime>(
                       dataSource: pressureDataList,
-                      emptyPointSettings: EmptyPointSettings(
-                        mode: EmptyPointMode
-                            .gap, // This will create a gap for null values
-                      ),
-                      markerSettings: MarkerSettings(
+                      // emptyPointSettings: const EmptyPointSettings(
+                      //   mode: EmptyPointMode
+                      //       .gap, // This will create a gap for null values
+                      // ),
+                      markerSettings: const MarkerSettings(
                           isVisible: true, shape: DataMarkerType.circle),
                       dataLabelSettings:
                           const DataLabelSettings(showZeroValue: true),

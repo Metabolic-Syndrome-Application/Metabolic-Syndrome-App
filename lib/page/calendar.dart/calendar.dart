@@ -9,8 +9,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
-@RoutePage()
 
+@RoutePage()
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
 
@@ -42,6 +42,7 @@ class _CalendarPageState extends State<CalendarPage> {
   String id = '';
   String name = '';
   String type = '';
+  String photo = '';
 
   Future<void> fetchAllMood() async {
     try {
@@ -122,6 +123,7 @@ class _CalendarPageState extends State<CalendarPage> {
       Map<String, dynamic> response = await getProfile(token!);
       setState(() {
         listOfPlan = response['data']['user']['planID'];
+        print(listOfPlan);
       });
     } catch (e) {
       // print('Error fetching profile: $e');
@@ -136,6 +138,7 @@ class _CalendarPageState extends State<CalendarPage> {
       id = response['data']['plan']['id'];
       name = response['data']['plan']['name'];
       type = response['data']['plan']['type'];
+      photo = response['data']['plan']['photo'];
     } catch (e) {
       // print('Error fetching plan: $e');
     }

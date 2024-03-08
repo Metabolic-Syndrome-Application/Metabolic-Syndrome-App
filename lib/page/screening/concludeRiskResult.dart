@@ -2,7 +2,7 @@ import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
-import 'package:flutter_application_1/page/home/home.dart';
+import 'package:flutter_application_1/page/nav.dart/nav.dart';
 import 'package:flutter_application_1/response/api.dart';
 import 'package:provider/provider.dart';
 
@@ -499,7 +499,7 @@ class _ConcludeRiskResultState extends State<ConcludeRiskResult> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => const HomePage()));
+                                      builder: (context) => const Navbar()));
                             },
                             child: Container(
                               height: 47,

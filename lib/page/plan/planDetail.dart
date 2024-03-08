@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/page/calendar.dart/calendar.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../../extension/Color.dart';
 
@@ -8,11 +9,12 @@ class PlanDetail extends StatefulWidget {
   final String name;
   final String type;
   final String description;
-
+  final String photo;
   const PlanDetail(
       {required this.planId,
       super.key,
       required this.name,
+      required this.photo,
       required this.type,
       required this.description});
 
@@ -205,10 +207,14 @@ class _PlanDetailState extends State<PlanDetail> {
                             size: 21,
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.only(top: 25, bottom: 25),
-                          height: 123,
-                          child: Image.asset('assets/images/login.png'),
+                        SvgPicture.network(
+                          height: 110,
+                          widget.photo,
+                          semanticsLabel: 'A shark?!',
+                          placeholderBuilder: (BuildContext context) =>
+                              Container(
+                                  padding: const EdgeInsets.all(30.0),
+                                  child: const CircularProgressIndicator()),
                         ),
                         const SizedBox(
                           width: 21,

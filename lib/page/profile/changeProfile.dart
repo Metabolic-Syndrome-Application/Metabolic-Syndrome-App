@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 
 class ChangeProfile extends StatefulWidget {
   final ImageProvider<Object>? profileImage;
+  final String? image;
   final String? alias;
   final String? firstname;
   final String? lastname;
@@ -19,6 +20,7 @@ class ChangeProfile extends StatefulWidget {
   final String? gender;
   const ChangeProfile(
       {this.profileImage,
+      this.image,
       this.alias,
       this.firstname,
       this.lastname,
@@ -35,6 +37,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
   String? selectedGender;
 
   ImageProvider? selectedProfile;
+  String? image;
   String? alias;
   String? firstname;
   String? lastname;
@@ -42,6 +45,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
   String? gender;
   String? hn;
 
+  String imageHint = 'assets/images/defaultProfile1.png';
   String? aliasHint;
   String? firstnameHint;
   String? lastnameHint;
@@ -63,6 +67,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
     try {
       Map<String, dynamic> response = await getProfile(token!);
       setState(() {
+        imageHint = response['data']['user']['photo'];
         aliasHint = response['data']['user']['alias'];
         firstnameHint = response['data']['user']['firstName'];
         lastnameHint = response['data']['user']['lastName'];
@@ -82,6 +87,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
   @override
   void initState() {
     fetchProfile();
+
     _controllerAlias = TextEditingController(text: widget.alias);
     _controllerFirstname = TextEditingController(text: widget.firstname);
     _controllerLastname = TextEditingController(text: widget.lastname);
@@ -167,13 +173,11 @@ class _ChangeProfileState extends State<ChangeProfile> {
                                 decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(60)),
                                 child: CircleAvatar(
-                                  maxRadius: 52.5,
-                                  minRadius: 52.5,
-                                  backgroundColor: Colors.grey[200],
-                                  backgroundImage: widget.profileImage ??
-                                      const AssetImage(
-                                          'assets/images/defaultProfile1.png'),
-                                )),
+                                    maxRadius: 52.5,
+                                    minRadius: 52.5,
+                                    backgroundColor: Colors.grey[200],
+                                    backgroundImage: widget.profileImage ??
+                                        AssetImage(imageHint))),
                             Container(
                                 height: 120,
                                 width: 105,
@@ -188,8 +192,9 @@ class _ChangeProfileState extends State<ChangeProfile> {
                                                   ChangeProfilePicturePage(
                                                       profileImage: widget
                                                               .profileImage ??
-                                                          const AssetImage(
-                                                              'assets/images/defaultProfile1.png'),
+                                                          AssetImage(imageHint),
+                                                      image: widget.image ??
+                                                          imageHint,
                                                       alias:
                                                           alias ?? widget.alias,
                                                       firstname: firstname ??
@@ -667,7 +672,7 @@ class _ChangeProfileState extends State<ChangeProfile> {
                                   widget.yearOfBirth ??
                                   yearOfBirthHint,
                               selectedGender ?? widget.gender ?? genderHint,
-                              'assets/images/defaultProfile1.png');
+                              widget.image ?? imageHint);
                           _controllerAlias.text = "";
                           _controllerFirstname.text = "";
                           _controllerLastname.text = "";

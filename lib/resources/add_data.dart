@@ -13,6 +13,7 @@ class StoreData {
     UploadTask uploadTask = ref.putData(file);
     TaskSnapshot snapshot = await uploadTask;
     String downloadUrl = await snapshot.ref.getDownloadURL();
+    print("store: $downloadUrl");
     return downloadUrl;
   }
 

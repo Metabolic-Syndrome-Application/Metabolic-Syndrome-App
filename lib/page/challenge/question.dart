@@ -47,8 +47,8 @@ class _QuestionPageState extends State<QuestionPage> {
   }
 
   Future<void> fetchRandomQuiz() async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
     try {
-      String? token = Provider.of<AuthProvider>(context, listen: false).token;
       Map<String, dynamic> response = await getRandomQuiz(token!);
       setState(() {
         quiz = response['data']['quiz'];
@@ -61,8 +61,9 @@ class _QuestionPageState extends State<QuestionPage> {
   }
 
   Future<void> fetchAnswer() async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
+
     try {
-      String? token = Provider.of<AuthProvider>(context, listen: false).token;
       Map<String, dynamic> response =
           await postAnswerQuiz(token!, _checkCorrect!);
       setState(() {
@@ -412,9 +413,7 @@ class _QuestionPageState extends State<QuestionPage> {
                                   padding:
                                       const EdgeInsets.symmetric(vertical: 5),
                                   child: Text(
-                                      checkDigit
-                                          ? '0$seconds'
-                                          : '$seconds',
+                                      checkDigit ? '0$seconds' : '$seconds',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           color: Color(hexColor('#FB6262')),
@@ -444,6 +443,7 @@ class _QuestionPageState extends State<QuestionPage> {
                 ),
               ),
               ListView.builder(
+                physics: const NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
                 itemCount: quiz['choices'].length,
                 itemBuilder: (context, index) {

@@ -37,23 +37,27 @@ class _StartScreeningState extends State<StartScreening> {
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 50),
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  InkWell(
-                    borderRadius: BorderRadius.circular(12),
-                    onTap: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => HomePage()));
-                    },
-                    child: Icon(
-                      Icons.arrow_back_ios_new_rounded,
-                      color: Color(hexColor('#484554')),
-                      size: 24,
+              firsttime
+                  ? const SizedBox()
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => HomePage()));
+                          },
+                          child: Icon(
+                            Icons.arrow_back_ios_new_rounded,
+                            color: Color(hexColor('#484554')),
+                            size: 24,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
-              ),
               Expanded(
                 child: Column(
                   children: [

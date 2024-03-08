@@ -121,7 +121,7 @@ Future<Map<String, dynamic>> updateProfile(
         "gender": gender,
         "photo": photo
       }));
-  print("$alias $firstname $lastname");
+  print("$alias $firstname $lastname $photo");
 
   if (response.statusCode == 200) {
     print("here ${response.body}");
@@ -486,7 +486,7 @@ Future<Map<String, dynamic>> getMyDaily(String accesstoken) async {
     headers: {'Authorization': 'Bearer $accesstoken'},
   );
   // if (response.statusCode == 200) {
-    return json.decode(response.body);
+  return json.decode(response.body);
   // } else {
   //   throw Exception('Failed to get plan');
   // }

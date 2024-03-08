@@ -1,4 +1,3 @@
-import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
@@ -7,8 +6,6 @@ import 'package:flutter_application_1/widget/challenge/challenge.dart';
 import 'package:flutter_application_1/widget/challenge/question.dart';
 import 'package:flutter_application_1/widget/challenge/yourChallenge.dart';
 import 'package:provider/provider.dart';
-
-@RoutePage()
 
 class AllChallenge extends StatelessWidget {
   const AllChallenge({super.key});
@@ -37,13 +34,15 @@ class _AllChallengePageState extends State<AllChallengePage> {
   dynamic myDailyList = [];
   String id = '';
   String name = '-';
+  String photo = '';
   int points = 0;
   int numDays = 0;
   int day = 0;
 
   Future<void> fetchMydaily() async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
+
     try {
-      String? token = Provider.of<AuthProvider>(context, listen: false).token;
       Map<String, dynamic> response = await getMyDaily(token!);
       setState(() {
         myChallenge = response['data']['daily'];
@@ -51,6 +50,7 @@ class _AllChallengePageState extends State<AllChallengePage> {
         name = myChallenge['name'];
         points = myChallenge['points'];
         numDays = myChallenge['numDays'];
+        photo = myChallenge['photo'];
         if (id != '') {
           fetchDailyList();
         }
@@ -62,12 +62,14 @@ class _AllChallengePageState extends State<AllChallengePage> {
   }
 
   Future<void> fetchDailyList() async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
+
     try {
-      String? token = Provider.of<AuthProvider>(context, listen: false).token;
       Map<String, dynamic> response = await getDailyList(token!);
       setState(() {
         myDailyList = response['data'];
         day = myDailyList['day'];
+
         print(myDailyList);
       });
     } catch (e) {
@@ -76,11 +78,12 @@ class _AllChallengePageState extends State<AllChallengePage> {
   }
 
   Future<void> fetchCheckQuiz() async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
     try {
-      String? token = Provider.of<AuthProvider>(context, listen: false).token;
       Map<String, dynamic> response = await getCheckQuiz(token!);
       setState(() {
         checkQuiz = response['check'];
+        print(checkQuiz);
       });
     } catch (e) {
       // print('Error fetching plan: $e');
@@ -88,11 +91,12 @@ class _AllChallengePageState extends State<AllChallengePage> {
   }
 
   Future<void> fetchAllChallenge() async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
     try {
-      String? token = Provider.of<AuthProvider>(context, listen: false).token;
       Map<String, dynamic> response = await getDailyChallengeAll(token!);
       setState(() {
         listOfChallenge = response['data']['daily'];
+        print(listOfChallenge);
       });
     } catch (e) {
       // print('Error fetching plan: $e');
@@ -100,8 +104,8 @@ class _AllChallengePageState extends State<AllChallengePage> {
   }
 
   Future<void> fetchRandomQuiz() async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
     try {
-      String? token = Provider.of<AuthProvider>(context, listen: false).token;
       Map<String, dynamic> response = await getRandomQuiz(token!);
       setState(() {
         quiz = response['data']['quiz'];
@@ -202,6 +206,7 @@ class _AllChallengePageState extends State<AllChallengePage> {
                                     ]))))
                     : YourChallengeCard(
                         id: id,
+                        photo:photo,
                         name: name,
                         points: points,
                         numDays: numDays,
@@ -302,6 +307,7 @@ class _AllChallengePageState extends State<AllChallengePage> {
                           final name = item['name'];
                           final points = item['points'];
                           final numDays = item['numDays'];
+                          final photo = item['photo'];
 
                           if (id == null ||
                               name == null ||
@@ -312,6 +318,7 @@ class _AllChallengePageState extends State<AllChallengePage> {
 
                           return ChallengeCard(
                             id: id,
+                            photo: photo,
                             name: name,
                             points: points,
                             numDays: numDays,

@@ -18,6 +18,7 @@ class _RankingState extends State<Ranking> {
   int myRank = 0;
   int collectPoints = 0;
   String name = '';
+  String photo = '';
   String firstname = '';
 
   Future<void> fetchProfile() async {
@@ -40,6 +41,7 @@ class _RankingState extends State<Ranking> {
         myRank = response['data']['rank'];
         collectPoints = response['data']['collectPoints'];
         name = response['data']['name'];
+        photo = response['data']['photo'];
       });
     } catch (e) {
       // print('Error fetching profile: $e');
@@ -96,9 +98,12 @@ class _RankingState extends State<Ranking> {
                   const SizedBox(
                     width: 10,
                   ),
-                  const CircleAvatar(
+                  CircleAvatar(
+                    backgroundColor: Colors.white,
                     radius: 20,
-                    backgroundImage: AssetImage('assets/images/person.png'),
+                    backgroundImage: AssetImage(listOfRank[x]['photo'] == ''
+                        ? "assets/images/photoNull.png"
+                        : listOfRank[x]['photo']),
                   ),
                   const SizedBox(
                     width: 7,
@@ -164,7 +169,7 @@ class _RankingState extends State<Ranking> {
                   ),
                   const CircleAvatar(
                     radius: 20,
-                    backgroundImage: AssetImage('assets/images/person.png'),
+                    backgroundImage: AssetImage(''),
                   ),
                   const SizedBox(
                     width: 7,
@@ -231,9 +236,9 @@ class _RankingState extends State<Ranking> {
               const SizedBox(
                 width: 10,
               ),
-              const CircleAvatar(
+              CircleAvatar(
                 radius: 20,
-                backgroundImage: AssetImage('assets/images/person.png'),
+                backgroundImage: AssetImage(photo),
               ),
               const SizedBox(
                 width: 7,

@@ -1,17 +1,18 @@
+import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/loginRegister/createProfile.dart';
 import 'package:flutter_application_1/response/api.dart';
-import 'package:flutter_application_1/utils.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:flutter_application_1/resources/add_data.dart';
 import 'package:provider/provider.dart';
 
 class SelectProfilePicturePage extends StatefulWidget {
   final ImageProvider<Object>? profileImage;
+  final String? image;
   final String? alias;
   final String? firstname;
   final String? lastname;
@@ -19,6 +20,7 @@ class SelectProfilePicturePage extends StatefulWidget {
   final String? gender;
   const SelectProfilePicturePage(
       {this.profileImage,
+      this.image,
       this.alias,
       this.firstname,
       this.lastname,
@@ -36,12 +38,37 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
   // AssetImage? _defaultImage;
 
   ImageProvider? _selectImage;
+  String? _imageString;
   String? _alias;
   String? _firstname;
   String? _lastname;
   int? _yearOfBirth;
   String? _gender;
   String? _id;
+  PlatformFile? pickedFile;
+  UploadTask? uploadTask;
+
+  Future selectFile() async {
+    final result = await FilePicker.platform.pickFiles();
+    if (result == null) {
+      return;
+    }
+    setState(() {
+      pickedFile = result.files.first;
+    });
+  }
+
+  Future uploadFile() async {
+    final path = 'files/${pickedFile!.name}';
+    final file = File(pickedFile!.path!);
+
+    final ref = FirebaseStorage.instance.ref().child(path);
+    uploadTask = ref.putFile(file);
+    final snapshot = await uploadTask!.whenComplete(() {});
+
+    final urlDownload = await snapshot.ref.getDownloadURL();
+    print('Download Link: $urlDownload');
+  }
 
   Future<void> fetchProfile() async {
     String? token = Provider.of<AuthProvider>(context, listen: false).token;
@@ -55,26 +82,26 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
     }
   }
 
-  void cameraImage() async {
-    Uint8List cameraImg = await pickImage(ImageSource.camera);
-    setState(() {
-      _image = cameraImg;
-      _selectImage = MemoryImage(_image!);
-    });
-  }
+  // void cameraImage() async {
+  //   Uint8List cameraImg = await pickImage(ImageSource.camera);
+  //   setState(() {
+  //     _image = cameraImg;
+  //     _selectImage = MemoryImage(_image!);
+  //   });
+  // }
 
-  void selectImage() async {
-    Uint8List img = await pickImage(ImageSource.gallery);
-    setState(() {
-      _image = img;
-      _selectImage = MemoryImage(_image!);
-    });
-  }
+  // void selectImage() async {
+  //   Uint8List img = await pickImage(ImageSource.gallery);
+  //   setState(() {
+  //     _image = img;
+  //     _selectImage = MemoryImage(_image!);
+  //   });
+  // }
 
-  void saveProfile() async {
-    String id = _id!;
-    String resp = await StoreData().saveData(id: id, file: _image!);
-  }
+  // void saveProfile() async {
+  //   String id = _id!;
+  //   String resp = await StoreData().saveData(id: id, file: _image!);
+  // }
 
   @override
   void initState() {
@@ -84,6 +111,7 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
 
   @override
   Widget build(BuildContext context) {
+    // _imageString = widget.image;
     _alias = widget.alias;
     _firstname = widget.firstname;
     _lastname = widget.lastname;
@@ -109,6 +137,7 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
                               MaterialPageRoute(
                                   builder: (context) => CreateProfilePage(
                                       profileImage: widget.profileImage,
+                                      image: widget.image,
                                       alias: _alias,
                                       firstname: _firstname,
                                       lastname: _lastname,
@@ -162,6 +191,11 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
                 SizedBox(
                   height: 38,
                 ),
+                // Image.file(
+                //   File(pickedFile!.path!),
+                //   width: double.infinity,
+                //   fit: BoxFit.cover,
+                // ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -171,6 +205,7 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
                           setState(() {
                             _selectImage =
                                 AssetImage('assets/images/defaultProfile2.png');
+                            _imageString = 'assets/images/defaultProfile2.png';
                           });
                         },
                         child:
@@ -184,6 +219,7 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
                           setState(() {
                             _selectImage =
                                 AssetImage('assets/images/defaultProfile3.png');
+                            _imageString = 'assets/images/defaultProfile3.png';
                           });
                         },
                         child:
@@ -202,6 +238,7 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
                           setState(() {
                             _selectImage =
                                 AssetImage('assets/images/defaultProfile4.png');
+                            _imageString = 'assets/images/defaultProfile4.png';
                           });
                         },
                         child:
@@ -215,6 +252,7 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
                           setState(() {
                             _selectImage =
                                 AssetImage('assets/images/defaultProfile5.png');
+                            _imageString = 'assets/images/defaultProfile5.png';
                           });
                         },
                         child:
@@ -233,6 +271,7 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
                           setState(() {
                             _selectImage =
                                 AssetImage('assets/images/defaultProfile6.png');
+                            _imageString = 'assets/images/defaultProfile6.png';
                           });
                         },
                         child:
@@ -277,7 +316,7 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
                                       ),
                                       InkWell(
                                         onTap: () {
-                                          selectImage();
+                                          selectFile();
                                         },
                                         child: Row(
                                             mainAxisAlignment:
@@ -306,7 +345,7 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
                                       ),
                                       InkWell(
                                         onTap: () {
-                                          cameraImage();
+                                          // FcameraImage();
                                         },
                                         child: Row(
                                             mainAxisAlignment:
@@ -362,12 +401,14 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
                   ),
                   onPressed: () {
                     // saveProfile();
+                    print("check $_imageString");
                     Navigator.push(
                         context,
                         MaterialPageRoute(
                             builder: (context) => CreateProfilePage(
                                 profileImage:
                                     _selectImage ?? widget.profileImage,
+                                image: _imageString ?? widget.image,
                                 alias: _alias,
                                 firstname: _firstname,
                                 lastname: _lastname,
@@ -387,6 +428,9 @@ class _SelectProfilePicturePageState extends State<SelectProfilePicturePage> {
                         textAlign: TextAlign.center),
                   ),
                 ),
+                SizedBox(
+                  height: 50,
+                )
               ],
             ),
           ),

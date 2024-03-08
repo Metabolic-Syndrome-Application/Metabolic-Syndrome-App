@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
-//import 'package:email_auth/email_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/extension/Color.dart';
@@ -13,7 +12,7 @@ import 'package:provider/provider.dart';
 
 class CreateProfilePage extends StatefulWidget {
   final ImageProvider<Object>? profileImage;
-
+  final String? image;
   final String? alias;
   final String? firstname;
   final String? lastname;
@@ -21,6 +20,7 @@ class CreateProfilePage extends StatefulWidget {
   final String? gender;
   const CreateProfilePage(
       {this.profileImage,
+      this.image,
       this.alias,
       this.firstname,
       this.lastname,
@@ -39,6 +39,7 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
   String? selectedGender;
 
   ImageProvider? selectedProfile;
+  String? image;
   String? alias;
   String? firstname;
   String? lastname;
@@ -273,6 +274,7 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    print("back first ${widget.image}");
     final List<int> items = [];
 
     for (int i = 2499; i <= 2550; i++) {
@@ -328,13 +330,17 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(60)),
                       child: CircleAvatar(
-                        maxRadius: 52.5,
-                        minRadius: 52.5,
-                        backgroundColor: Colors.grey[200],
-                        backgroundImage: widget.profileImage ??
-                            const AssetImage(
-                                'assets/images/defaultProfile1.png'),
-                      )),
+                          maxRadius: 52.5,
+                          minRadius: 52.5,
+                          backgroundColor: Colors.grey[200],
+                          backgroundImage: widget.image == null
+                              ? AssetImage('assets/images/defaultProfile1.png')
+                              : AssetImage(widget.image!)
+
+                          // widget.profileImage ??
+                          //     const AssetImage(
+                          //         'assets/images/defaultProfile1.png'),
+                          )),
                   Container(
                       height: 120,
                       width: 105,
@@ -345,18 +351,23 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => SelectProfilePicturePage(
-                                        profileImage: widget.profileImage ??
-                                            const AssetImage(
-                                                'assets/images/defaultProfile1.png'),
-                                        alias: alias ?? widget.alias,
-                                        firstname:
-                                            firstname ?? widget.firstname,
-                                        lastname: lastname ?? widget.lastname,
-                                        yearOfBirth:
-                                            selectedYear ?? widget.yearOfBirth,
-                                        gender:
-                                            selectedGender ?? widget.gender)));
+                                    builder: (context) =>
+                                        SelectProfilePicturePage(
+                                            profileImage: widget.profileImage ??
+                                                const AssetImage(
+                                                  'assets/images/defaultProfile1.png',
+                                                ),
+                                            image: widget.image ??
+                                                'assets/images/defaultProfile1.png',
+                                            alias: alias ?? widget.alias,
+                                            firstname:
+                                                firstname ?? widget.firstname,
+                                            lastname:
+                                                lastname ?? widget.lastname,
+                                            yearOfBirth: selectedYear ??
+                                                widget.yearOfBirth,
+                                            gender: selectedGender ??
+                                                widget.gender)));
                           },
                           child: Image.asset('assets/images/healthInfo.png'))),
                 ],
@@ -881,7 +892,6 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                   borderRadius: BorderRadius.circular(23.5),
                 ),
                 onPressed: () async {
-                  print('pop');
                   alias = alias ?? widget.alias;
                   firstname = firstname ?? widget.firstname;
                   lastname = lastname ?? widget.lastname;
@@ -934,15 +944,16 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                         selectedYear != null &&
                         selectedGender != null &&
                         isChecked == true) {
-                      print('here');
                       fetchUpdateProfile(
                           alias ?? widget.alias,
                           firstname ?? widget.firstname,
                           lastname ?? widget.lastname,
                           selectedYear ?? widget.yearOfBirth,
                           selectedGender ?? widget.gender,
-                          (widget.profileImage ??
-                              'assets/images/defaultProfile1.png') as String?);
+                          widget.image ?? 'assets/images/defaultProfile1.png'
+                          // (widget.profileImage ??
+                          //     'assets/images/defaultProfile1.png') as String?
+                          );
                       // refreshToken(token);
                       Navigator.push(
                           context,

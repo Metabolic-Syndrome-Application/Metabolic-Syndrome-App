@@ -247,7 +247,7 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           contentPadding:
                               const EdgeInsets.symmetric(horizontal: 15),
-                          hintText: '●●●●●●●●●●',
+                          hintText: '●●●●●●●●',
                           hintStyle: TextStyle(
                             fontSize: 16,
                             fontFamily: 'IBMPlexSansThai',

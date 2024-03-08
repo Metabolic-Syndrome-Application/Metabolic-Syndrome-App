@@ -35,6 +35,7 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   String imageProfile = 'assets/images/defaultProfile1.png';
   String? alias;
+  String? image;
   String? status;
   bool hospitalConnected = false;
 
@@ -44,6 +45,7 @@ class _ProfilePageState extends State<ProfilePage> {
       Map<String, dynamic> response = await getProfile(token!);
       setState(() {
         alias = response['data']['user']['alias'];
+        imageProfile = response['data']['user']['photo'];
         if (response['data']['user']['hn'] != null) {
           hospitalConnected = true;
         }

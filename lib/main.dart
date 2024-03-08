@@ -1,8 +1,9 @@
-import 'package:firebase_app_check/firebase_app_check.dart';
+// import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/page/loginRegister/login.dart';
+import 'package:flutter_application_1/page/loginRegister/testFileUpload.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -12,8 +13,8 @@ import 'extension/Color.dart';
 
 void main() async {
   await dotenv.load(fileName: '.env');
-  // WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   // await FirebaseAppCheck.instance.activate(
   //   // You can also use a `ReCaptchaEnterpriseProvider` provider instance as an
   //   // argument for `webProvider`
@@ -72,5 +73,6 @@ class _MyHomePageState extends State<MyHomePage> {
       backgroundColor: Color(hexColor('#FAFCFB')),
       body: const LoginPage(),
     );
+    // body: TestFileUpload());
   }
 }

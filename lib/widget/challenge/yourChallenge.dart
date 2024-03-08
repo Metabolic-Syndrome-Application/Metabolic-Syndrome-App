@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/challenge/challenge.dart';
+import 'package:flutter_svg/svg.dart';
 
 class YourChallengeCard extends StatelessWidget {
   final String id;
+  final String photo;
   final String name;
   final int points;
   final int numDays;
@@ -11,6 +13,7 @@ class YourChallengeCard extends StatelessWidget {
   const YourChallengeCard(
       {super.key,
       required this.name,
+      required this.photo,
       required this.points,
       required this.numDays,
       required this.day,
@@ -33,82 +36,90 @@ class YourChallengeCard extends StatelessWidget {
           padding: EdgeInsets.only(left: 7, right: 7),
           child: Row(
             children: [
-              Container(
-                  height: 110,
-                  child: Image.asset(
-                      'assets/images/your_challenge_image_default.png')),
+              SvgPicture.network(
+                height: 110,
+                photo,
+                semanticsLabel: 'A shark?!',
+                placeholderBuilder: (BuildContext context) => Container(
+                    padding: const EdgeInsets.all(30.0),
+                    child: const CircularProgressIndicator()),
+              ),
               SizedBox(
                 width: 7,
               ),
-              Container(
-                padding:
-                    EdgeInsets.only(top: 18, bottom: 18, left: 10, right: 10),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(name,
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontFamily: 'IBMPlexSansThai',
-                            color: Colors.black,
-                            fontWeight: FontWeight.normal,
-                          )),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Icon(
-                            Icons.monetization_on_outlined,
-                            size: 14,
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            "${points == 0 ? '-' : points} คะแนน",
+              Expanded(
+                child: Container(
+                  padding:
+                      EdgeInsets.only(top: 18, bottom: 18, left: 10, right: 10),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(name,
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 20,
                               fontFamily: 'IBMPlexSansThai',
                               color: Colors.black,
                               fontWeight: FontWeight.normal,
                             ),
-                            textAlign: TextAlign.left,
-                          )
-                        ],
-                      ),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.access_time_outlined,
-                            size: 14,
-                          ),
-                          SizedBox(width: 5),
-                          Text(
-                            "${numDays == 0 ? '-' : numDays} วัน",
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontFamily: 'IBMPlexSansThai',
-                              color: Colors.black,
-                              fontWeight: FontWeight.normal,
+                            overflow: TextOverflow.ellipsis),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Icon(
+                              Icons.monetization_on_outlined,
+                              size: 14,
                             ),
-                            textAlign: TextAlign.left,
-                          )
-                        ],
-                      ),
-                      SizedBox(
-                        height: 13,
-                      ),
-                      Container(
-                        width: 100,
-                        height: 6,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(10)),
-                          child: LinearProgressIndicator(
-                            value: day == 0 || numDays == 0 ? 0 : day / numDays,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                Color(hexColor('#FFC556'))),
-                            backgroundColor: Color(hexColor('#D9D9D9')),
-                          ),
+                            SizedBox(width: 5),
+                            Text(
+                              "${points == 0 ? '-' : points} คะแนน",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontFamily: 'IBMPlexSansThai',
+                                color: Colors.black,
+                                fontWeight: FontWeight.normal,
+                              ),
+                              textAlign: TextAlign.left,
+                            )
+                          ],
                         ),
-                      )
-                    ]),
+                        Row(
+                          children: [
+                            Icon(
+                              Icons.access_time_outlined,
+                              size: 14,
+                            ),
+                            SizedBox(width: 5),
+                            Text(
+                              "${numDays == 0 ? '-' : numDays} วัน",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontFamily: 'IBMPlexSansThai',
+                                color: Colors.black,
+                                fontWeight: FontWeight.normal,
+                              ),
+                              textAlign: TextAlign.left,
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 13,
+                        ),
+                        Container(
+                          width: 100,
+                          height: 6,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.all(Radius.circular(10)),
+                            child: LinearProgressIndicator(
+                              value:
+                                  day == 0 || numDays == 0 ? 0 : day / numDays,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  Color(hexColor('#FFC556'))),
+                              backgroundColor: Color(hexColor('#D9D9D9')),
+                            ),
+                          ),
+                        )
+                      ]),
+                ),
               )
             ],
           ),

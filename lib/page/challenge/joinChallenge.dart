@@ -4,11 +4,13 @@ import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/challenge/allChallenge.dart';
 import 'package:flutter_application_1/page/challenge/challenge.dart';
 import 'package:flutter_application_1/response/api.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 class JoinChallenge extends StatefulWidget {
   final String id;
-  const JoinChallenge({super.key, required this.id});
+  final bool enable;
+  const JoinChallenge({super.key, required this.id, required this.enable});
 
   @override
   State<JoinChallenge> createState() => _ChallengePageState();
@@ -21,14 +23,14 @@ class _ChallengePageState extends State<JoinChallenge> {
   int participants = 0;
   String description = '';
   int numDays = 0;
-
+  String photo = '';
   Future<void> fetchProfile() async {
     String? token = Provider.of<AuthProvider>(context, listen: false).token;
     try {
       Map<String, dynamic> response = await getProfile(token!);
       setState(() {
         planID = response['data']['user']['planID'];
-        print(planID);
+        print("here $planID");
       });
     } catch (e) {
       // print('Error fetching profile: $e');
@@ -45,6 +47,7 @@ class _ChallengePageState extends State<JoinChallenge> {
         participants = response['data']['daily']['participants'];
         description = response['data']['daily']['description'];
         numDays = response['data']['daily']['numDays'];
+        photo = response['data']['daily']['photo'];
         print(response);
       });
     } catch (e) {
@@ -55,15 +58,22 @@ class _ChallengePageState extends State<JoinChallenge> {
   Future<void> fetchUpdateProfile(
     String challengeId,
   ) async {
+    String? token = Provider.of<AuthProvider>(context, listen: false).token;
+
     try {
       print('pop');
-      String? token = Provider.of<AuthProvider>(context, listen: false).token;
       print(challengeId);
       Map<String, dynamic> response =
-          await postJoinChallenge(token, challengeId);
+          await postJoinChallenge(token!, challengeId);
       print(response);
       setState(() {
         print(response);
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ChallengePage(
+                      id: widget.id,
+                    )));
       });
     } catch (e) {
       // print('Error fetching profile: $e');
@@ -108,19 +118,22 @@ class _ChallengePageState extends State<JoinChallenge> {
                           size: 24,
                         ),
                       ),
-                      Container(
-                        padding: EdgeInsets.only(top: 6, bottom: 6),
-                        height: 123,
-                        child: Image.asset('assets/images/hula-hoop.png'),
+                      SvgPicture.network(
+                        height: 110,
+                        photo,
+                        semanticsLabel: 'A shark?!',
+                        placeholderBuilder: (BuildContext context) => Container(
+                            padding: const EdgeInsets.all(30.0),
+                            child: const CircularProgressIndicator()),
                       ),
                       SizedBox(
                         width: 24,
                       )
                     ],
                   ),
-                  SizedBox(
-                    height: 16,
-                  ),
+                  // SizedBox(
+                  //   height: 16,
+                  // ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -248,23 +261,23 @@ class _ChallengePageState extends State<JoinChallenge> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(23.5),
                       ),
-                      onPressed: planID == null
+                      onPressed: !widget.enable
                           ? null
                           : () {
                               setState(() {
                                 fetchUpdateProfile(widget.id);
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => ChallengePage(
-                                              id: widget.id,
-                                            )));
+                                // Navigator.push(
+                                //     context,
+                                //     MaterialPageRoute(
+                                //         builder: (context) => ChallengePage(
+                                //               id: widget.id,
+                                //             )));
                               });
                             },
                       child: Container(
                         height: 44,
                         alignment: Alignment.center,
-                        child: const  Text('เข้าร่วม',
+                        child: const Text('เข้าร่วม',
                             style: TextStyle(
                                 fontSize: 20,
                                 fontFamily: 'IBMPlexSansThai',

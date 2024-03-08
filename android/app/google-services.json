@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "816515833904",
-    "project_id": "fir-260dd",
-    "storage_bucket": "fir-260dd.appspot.com"
+    "project_number": "107265032287",
+    "project_id": "fir-d1106",
+    "storage_bucket": "fir-d1106.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:816515833904:android:3eff4f5ccee960c5d04df5",
+        "mobilesdk_app_id": "1:107265032287:android:15ee088ede97aef8dcdbea",
         "android_client_info": {
           "package_name": "com.example.flutter_application_1"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCJAw64yXjhUhVzoaiZC7tgnvCWjNnMy9c"
+          "current_key": "AIzaSyC1AR4AJ9VfgBcRWgcpgMGI08pZuOQ8w2Y"
         }
       ],
       "services": {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/plan/planDetail.dart';
 import 'package:flutter_application_1/response/api.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../authProvider.dart';
@@ -61,6 +62,7 @@ class _ProgramCardState extends State<ProgramCard> {
                           name: name,
                           description: description,
                           type: type,
+                          photo:photo
                         )));
           },
           child: Container(
@@ -71,10 +73,18 @@ class _ProgramCardState extends State<ProgramCard> {
               padding: const EdgeInsets.all(10.0),
               child: Row(
                 children: [
-                  SizedBox(
-                      height: 79,
-                      child: Image.asset(
-                          'assets/images/program_image_default.png')),
+                  SvgPicture.network(
+                    height: 79,
+                    photo,
+                    semanticsLabel: 'A shark?!',
+                    placeholderBuilder: (BuildContext context) => Container(
+                        padding: const EdgeInsets.all(30.0),
+                        child: const CircularProgressIndicator()),
+                  ),
+                  // SizedBox(
+                  //     height: 79,
+                  //     child: Image.asset(
+                  //         'assets/images/program_image_default.png')),
                   const SizedBox(
                     width: 7,
                   ),

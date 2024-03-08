@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 
 class ChangeProfilePicturePage extends StatefulWidget {
   final ImageProvider<Object>? profileImage;
+  final String? image;
   final String? alias;
   final String? firstname;
   final String? lastname;
@@ -15,6 +16,7 @@ class ChangeProfilePicturePage extends StatefulWidget {
   final String? gender;
   const ChangeProfilePicturePage(
       {this.profileImage,
+      this.image,
       this.alias,
       this.firstname,
       this.lastname,
@@ -32,6 +34,7 @@ class _ChangeProfilePicturePageState extends State<ChangeProfilePicturePage> {
   // AssetImage? _defaultImage;
 
   ImageProvider? _selectImage;
+  String? _imageString;
   String? _alias;
   String? _firstname;
   String? _lastname;
@@ -81,6 +84,7 @@ class _ChangeProfilePicturePageState extends State<ChangeProfilePicturePage> {
                               MaterialPageRoute(
                                   builder: (context) => ChangeProfile(
                                       profileImage: widget.profileImage,
+                                      image: widget.image,
                                       alias: _alias,
                                       firstname: _firstname,
                                       lastname: _lastname,
@@ -128,8 +132,7 @@ class _ChangeProfilePicturePageState extends State<ChangeProfilePicturePage> {
                                 maxRadius: 52.5,
                                 minRadius: 52.5,
                                 backgroundColor: Colors.grey[200],
-                                backgroundImage: AssetImage(
-                                    'assets/images/defaultProfile1.png'),
+                                backgroundImage: AssetImage(widget.image!),
                               )),
                 SizedBox(
                   height: 38,
@@ -143,6 +146,7 @@ class _ChangeProfilePicturePageState extends State<ChangeProfilePicturePage> {
                           setState(() {
                             _selectImage =
                                 AssetImage('assets/images/defaultProfile2.png');
+                            _imageString = 'assets/images/defaultProfile2.png';
                           });
                         },
                         child:
@@ -156,6 +160,7 @@ class _ChangeProfilePicturePageState extends State<ChangeProfilePicturePage> {
                           setState(() {
                             _selectImage =
                                 AssetImage('assets/images/defaultProfile3.png');
+                            _imageString = 'assets/images/defaultProfile3.png';
                           });
                         },
                         child:
@@ -174,6 +179,7 @@ class _ChangeProfilePicturePageState extends State<ChangeProfilePicturePage> {
                           setState(() {
                             _selectImage =
                                 AssetImage('assets/images/defaultProfile4.png');
+                            _imageString = 'assets/images/defaultProfile4.png';
                           });
                         },
                         child:
@@ -187,6 +193,7 @@ class _ChangeProfilePicturePageState extends State<ChangeProfilePicturePage> {
                           setState(() {
                             _selectImage =
                                 AssetImage('assets/images/defaultProfile5.png');
+                            _imageString = 'assets/images/defaultProfile5.png';
                           });
                         },
                         child:
@@ -205,6 +212,7 @@ class _ChangeProfilePicturePageState extends State<ChangeProfilePicturePage> {
                           setState(() {
                             _selectImage =
                                 AssetImage('assets/images/defaultProfile6.png');
+                            _imageString = 'assets/images/defaultProfile6.png';
                           });
                         },
                         child:
@@ -340,6 +348,7 @@ class _ChangeProfilePicturePageState extends State<ChangeProfilePicturePage> {
                             builder: (context) => ChangeProfile(
                                 profileImage:
                                     _selectImage ?? widget.profileImage,
+                                image: _imageString ?? widget.image,
                                 alias: _alias,
                                 firstname: _firstname,
                                 lastname: _lastname,

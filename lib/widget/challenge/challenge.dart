@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/extension/Color.dart';
 import 'package:flutter_application_1/page/challenge/joinChallenge.dart';
+import 'package:flutter_svg/svg.dart';
 
 class ChallengeCard extends StatefulWidget {
   final String id;
+  final String photo;
   final String name;
   final int points;
   final int numDays;
   final bool enable;
   const ChallengeCard({
     required this.id,
+    required this.photo,
     required this.name,
     required this.points,
     required this.numDays,
@@ -22,6 +25,7 @@ class ChallengeCard extends StatefulWidget {
 }
 
 class _ChallengeCardState extends State<ChallengeCard> {
+  // print(widget.photo);
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -45,10 +49,24 @@ class _ChallengeCardState extends State<ChallengeCard> {
       padding: EdgeInsets.only(left: 7, right: 7),
       child: Row(
         children: [
-          Container(
-              height: 110,
-              child:
-                  Image.asset('assets/images/hit_challenge_image_default.png')),
+          // CachedNetworkImage(
+          //         imageUrl:
+          //             widget.photo,
+          //         height: 110,
+          //         fit: BoxFit.fill,
+          //       ),
+          SvgPicture.network(
+            height: 110,
+            widget.photo,
+            semanticsLabel: 'A shark?!',
+            placeholderBuilder: (BuildContext context) => Container(
+                padding: const EdgeInsets.all(30.0),
+                child: const CircularProgressIndicator()),
+          ),
+          // Container(
+          //     height: 110,
+          //     // child: Image.asset('assets/images/challengeDefault.png')),
+          //     child: Image.network(widget.photo)),
           SizedBox(
             width: 7,
           ),
@@ -117,8 +135,7 @@ class _ChallengeCardState extends State<ChallengeCard> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => JoinChallenge(
-                                          id: widget.id,
-                                        )));
+                                        id: widget.id, enable: widget.enable)));
                           },
                           color: Color(hexColor('#2F4EF1')),
                           shape: RoundedRectangleBorder(

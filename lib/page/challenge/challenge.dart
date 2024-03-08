@@ -5,6 +5,7 @@ import 'package:flutter_application_1/authProvider.dart';
 import 'package:flutter_application_1/data/challengeList.dart';
 import 'package:flutter_application_1/page/challenge/allChallenge.dart';
 import 'package:flutter_application_1/response/api.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 
 import '../../extension/Color.dart';
@@ -28,6 +29,7 @@ class _ChallengePageState extends State<ChallengePage> {
   int points = 0;
   int numDays = 0;
   int day = 0;
+  String photo = '';
   List<ChallengeDetail> myList = [];
   Timer? _timer;
   Duration _duration = const Duration();
@@ -42,6 +44,7 @@ class _ChallengePageState extends State<ChallengePage> {
         name = myChallenge['name'];
         points = myChallenge['points'];
         numDays = myChallenge['numDays'];
+        photo = myChallenge['photo'];
         print(myChallenge);
         fetchDailyList();
       });
@@ -420,10 +423,13 @@ class _ChallengePageState extends State<ChallengePage> {
                           color: Color(hexColor('#484554')),
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.only(top: 6, bottom: 6),
-                        height: 123,
-                        child: Image.asset('assets/images/hula-hoop.png'),
+                      SvgPicture.network(
+                        height: 110,
+                        photo,
+                        semanticsLabel: 'A shark?!',
+                        placeholderBuilder: (BuildContext context) => Container(
+                            padding: const EdgeInsets.all(30.0),
+                            child: const CircularProgressIndicator()),
                       ),
                       const SizedBox(
                         width: 24,

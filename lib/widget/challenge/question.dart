@@ -97,10 +97,7 @@ class QuestionCard extends StatelessWidget {
                           minWidth: 73,
                           onPressed: () {
                             checkQuiz
-                                ? Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => Question()))
+                                ? null
                                 : Navigator.push(
                                     context,
                                     MaterialPageRoute(

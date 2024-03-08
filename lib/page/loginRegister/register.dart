@@ -343,7 +343,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             contentPadding:
                                 const EdgeInsets.symmetric(horizontal: 15),
-                            hintText: '●●●●●●●●●●',
+                            hintText: '●●●●●●●●',
                             hintStyle: TextStyle(
                               fontSize: 16,
                               fontFamily: 'IBMPlexSansThai',
@@ -428,7 +428,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             contentPadding:
                                 const EdgeInsets.symmetric(horizontal: 15),
-                            hintText: '●●●●●●●●●●',
+                            hintText: '●●●●●●●●',
                             hintStyle: TextStyle(
                               fontSize: 16,
                               fontFamily: 'IBMPlexSansThai',
